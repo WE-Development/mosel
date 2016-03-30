@@ -15,9 +15,50 @@
  */
 package server
 
-type MoselServer struct {
+import (
+	"github.com/gorilla/mux"
+	"net/http"
+	"log"
+)
 
+type moselServer struct {
+	config MoselServerConfig
 }
 
-func (server MoselServer) Run() {
+type handler struct {
+	path        string
+	handlerFunc func(http.ResponseWriter, *http.Request)
+}
+
+func NewMoselServer(config MoselServerConfig) *moselServer {
+	server := new(moselServer)
+	server.config = config
+
+	return server
+}
+
+func (server moselServer) Run() {
+
+	r := mux.NewRouter()
+	server.initHandler(r)
+	http.Handle("/", r)
+
+	addr := server.config.Http.BindAddress
+	log.Printf("Binding http server to %s", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+func (server moselServer) initHandler(r *mux.Router) {
+
+	var handlers = []handler{
+		{
+			path: "/{param:bla.*}",
+			handlerFunc: server.handlePing,
+		},
+	}
+
+	for _, h := range handlers {
+		log.Printf("Handling %s", h.path)
+		r.HandleFunc(h.path, h.handlerFunc)
+	}
 }

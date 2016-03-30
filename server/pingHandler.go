@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+package server
 
 import (
-	"github.com/bluedevel/mosel/server"
-	"gopkg.in/gcfg.v1"
-	"log"
-	"os"
+	"net/http"
+	"fmt"
+	"github.com/gorilla/mux"
 )
 
-func main() {
-
-	config, err := loadConfig()
-
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	server := server.NewMoselServer(*config)
-	server.Run()
-}
-
-func loadConfig() (*server.MoselServerConfig, error) {
-	config := new(server.MoselServerConfig)
-	err := gcfg.ReadFileInto(config, "/etc/mosel/moseld.conf")
-	return config, err
+func (server moselServer) handlePing(resp http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(resp,
+		"Hi there, I love %s!",
+		mux.Vars(req)["param"])
 }
