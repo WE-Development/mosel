@@ -27,11 +27,6 @@ type moselServer struct {
 	context MoselServerContext
 }
 
-type handler struct {
-	path        string
-	handlerFunc func(http.ResponseWriter, *http.Request)
-}
-
 func NewMoselServer(config MoselServerConfig) *moselServer {
 	server := new(moselServer)
 	server.config = config
@@ -109,15 +104,12 @@ func (server *moselServer) initAuth() error {
 
 func (server *moselServer) initHandler(r *mux.Router) {
 
-	var handlers = []handler{
-		{
-			path: "/secure/ping",
-			handlerFunc: server.secure(server.handlePing),
-		},
+	var handlers = []MoselHandler{pingHandler{},
 	}
 
 	for _, h := range handlers {
-		log.Printf("Handling %s", h.path)
-		r.HandleFunc(h.path, h.handlerFunc)
+		log.Printf("Handling %s", h.getPath())
+		h.setContext(&server.context)
+		r.Handle(h.getPath(), h)
 	}
 }

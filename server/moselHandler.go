@@ -15,23 +15,20 @@
  */
 package server
 
-import (
-	"net/http"
-	"encoding/json"
-	"github.com/bluedevel/mosel/api"
-	"time"
-)
+import "net/http"
 
-type pingHandler struct {
-	moselHandler
+type MoselHandler interface {
+	http.Handler
+
+	getPath() string
+	setContext(*MoselServerContext)
 }
 
-func (handler pingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp := api.PingResponse{}
-	resp.Time = time.Now()
-	json.NewEncoder(w).Encode(resp)
+type moselHandler struct {
+	MoselHandler
+	context *MoselServerContext
 }
 
-func (handler pingHandler) getPath() string {
-	return "/secure/ping"
+func (handler moselHandler) setContext(c *MoselServerContext) {
+	handler.context=c
 }
