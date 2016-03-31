@@ -15,16 +15,18 @@
  */
 package api
 
-import "time"
+import (
+	"time"
+)
 
 type moselInfo struct {
-	time time.Time
+	Time time.Time
 }
 
 type moselRequest struct {
 	moselInfo
 
-	SessionId string
+	//SessionId string
 }
 
 type moselResponse struct {
@@ -33,5 +35,4 @@ type moselResponse struct {
 
 type PingResponse struct {
 	moselResponse
-	Recived time.Time
 }

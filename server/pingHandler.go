@@ -17,12 +17,13 @@ package server
 
 import (
 	"net/http"
-	"fmt"
-	"github.com/gorilla/mux"
+	"encoding/json"
+	"github.com/bluedevel/mosel/api"
+	"time"
 )
 
 func (server moselServer) handlePing(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w,
-		"Hi there, I love %s!",
-		mux.Vars(r)["param"])
+	resp := api.PingResponse{}
+	resp.Time = time.Now()
+	json.NewEncoder(w).Encode(resp)
 }

@@ -111,11 +111,7 @@ func (server *moselServer) initHandler(r *mux.Router) {
 
 	var handlers = []handler{
 		{
-			path: "/{param:bla.*}",
-			handlerFunc: server.handlePing,
-		},
-		{
-			path: "/secure/{param:sec.*}",
+			path: "/secure/ping",
 			handlerFunc: server.secure(server.handlePing),
 		},
 	}
