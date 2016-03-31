@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package api
+package server
 
-import "time"
+import (
+	"net/http"
+	"github.com/bluedevel/mosel/api"
+	"encoding/json"
+)
 
-type loginResponse struct {
-	moselResponse
-
-	successful bool
-	validTo time.Time
+type loginHandler struct {
+	moselHandler
 }
 
-func NewLoginResponse() loginResponse {
-	return loginResponse{
-		moselResponse: newMoselResponse(),
-	}
+func (handler loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	resp := api.NewLoginResponse()
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (handler loginHandler) getPath() string {
+	return "/login"
 }

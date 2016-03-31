@@ -23,6 +23,12 @@ type moselInfo struct {
 	Time time.Time
 }
 
+func newMoselInfo() moselInfo {
+	mi := moselInfo{}
+	mi.Time=time.Now()
+	return mi
+}
+
 type moselRequest struct {
 	moselInfo
 
@@ -33,6 +39,18 @@ type moselResponse struct {
 	moselInfo
 }
 
-type PingResponse struct {
+func newMoselResponse() moselResponse {
+	return moselResponse{
+		moselInfo: newMoselInfo(),
+	}
+}
+
+type pingResponse struct {
 	moselResponse
+}
+
+func NewPingResponse() pingResponse {
+	return pingResponse{
+		moselResponse: newMoselResponse(),
+	}
 }

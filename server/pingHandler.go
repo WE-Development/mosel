@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/bluedevel/mosel/api"
-	"time"
 )
 
 type pingHandler struct {
@@ -27,9 +26,7 @@ type pingHandler struct {
 }
 
 func (handler pingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp := api.PingResponse{}
-	resp.Time = time.Now()
-	json.NewEncoder(w).Encode(resp)
+	json.NewEncoder(w).Encode(api.NewPingResponse())
 }
 
 func (handler pingHandler) getPath() string {
