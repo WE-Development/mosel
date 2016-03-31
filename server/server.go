@@ -39,11 +39,16 @@ func NewMoselServer(config MoselServerConfig) *moselServer {
 	return server
 }
 
-func (server moselServer) Run() error {
+func (server *moselServer) Run() error {
 
-	server.initContext()
+	err := server.initContext()
 
 	if ! server.context.isInitialized {
+
+		if err != nil {
+			return err
+		}
+
 		return fmt.Errorf("Mosel Server - Run: Context wasn't initialized correctly")
 	}
 
@@ -56,11 +61,51 @@ func (server moselServer) Run() error {
 	return http.ListenAndServe(addr, nil)
 }
 
-func (server moselServer) initContext() {
+func (server *moselServer) initContext() error {
 
+	initFns := []func() error{
+		server.initAuth,
+	}
+
+	for _, fn := range initFns {
+		err := fn()
+
+		if (err != nil) {
+			return err
+		}
+	}
+
+	server.context.isInitialized = true
+	return nil
 }
 
-func (server moselServer) initHandler(r *mux.Router) {
+func (server *moselServer) initAuth() error {
+	config := server.config
+
+	var enabledCount int = 0
+
+	if config.AuthSys.enabled {
+		enabledCount++
+	}
+
+	if config.AuthMySQL.enabled {
+		enabledCount++
+	}
+
+	if config.AuthTrue.enabled {
+		enabledCount++
+		log.Println("Using AuthTrue! This is for debugpurposes only, make sure you don't deploy this in production")
+		server.context.auth = authTrue{}
+	}
+
+	if enabledCount > 1 {
+		return fmt.Errorf("More then one auth services enabled")
+	}
+
+	return nil
+}
+
+func (server *moselServer) initHandler(r *mux.Router) {
 
 	var handlers = []handler{
 		{

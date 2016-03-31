@@ -15,8 +15,16 @@
  */
 package server
 
-type MoselServerContext struct {
-	isInitialized bool
+type authProvider interface {
+	Authenticate (user string, passwd string) bool
+}
 
-	auth authProvider
+//this provider will always authenticate successfully (for testing purposes)
+type authTrue struct {
+
+}
+
+//implement authProvider
+func (auth authTrue) Authenticate (user string, passwd string) bool {
+	return true
 }

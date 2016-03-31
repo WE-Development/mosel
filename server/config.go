@@ -15,8 +15,23 @@
  */
 package server
 
+type optional struct {
+	enabled bool
+}
+
 type MoselServerConfig struct {
-	Http struct {
-		BindAddress string
-	     }
+	Http      struct {
+			  BindAddress string
+		  }
+
+	//Auth stuff
+	AuthSys   struct {
+			  optional
+		  }
+	AuthMySQL struct {
+			  optional
+		  }
+	AuthTrue  struct {
+			  optional
+		  }
 }
