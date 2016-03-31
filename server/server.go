@@ -19,10 +19,12 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"log"
+	"fmt"
 )
 
 type moselServer struct {
-	config MoselServerConfig
+	config  MoselServerConfig
+	context MoselServerContext
 }
 
 type handler struct {
@@ -37,7 +39,11 @@ func NewMoselServer(config MoselServerConfig) *moselServer {
 	return server
 }
 
-func (server moselServer) Run() {
+func (server moselServer) Run() error {
+
+	if ! server.context.isInitialized {
+		return fmt.Errorf("Mosel Server - Run: Context wasn't initialized correctly")
+	}
 
 	r := mux.NewRouter()
 	server.initHandler(r)
@@ -45,7 +51,11 @@ func (server moselServer) Run() {
 
 	addr := server.config.Http.BindAddress
 	log.Printf("Binding http server to %s", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	return http.ListenAndServe(addr, nil)
+}
+
+func (server moselServer) initContext() {
+
 }
 
 func (server moselServer) initHandler(r *mux.Router) {

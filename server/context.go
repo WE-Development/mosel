@@ -13,30 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+package server
 
-import (
-	"github.com/bluedevel/mosel/server"
-	"gopkg.in/gcfg.v1"
-	"log"
-	"os"
-)
-
-func main() {
-
-	config, err := loadConfig()
-
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	server := server.NewMoselServer(*config)
-	log.Fatal(server.Run())
-}
-
-func loadConfig() (*server.MoselServerConfig, error) {
-	config := new(server.MoselServerConfig)
-	err := gcfg.ReadFileInto(config, "/etc/mosel/moseld.conf")
-	return config, err
+type MoselServerContext struct {
+	isInitialized bool
 }
