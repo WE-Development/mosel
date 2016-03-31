@@ -41,6 +41,8 @@ func NewMoselServer(config MoselServerConfig) *moselServer {
 
 func (server moselServer) Run() error {
 
+	server.initContext()
+
 	if ! server.context.isInitialized {
 		return fmt.Errorf("Mosel Server - Run: Context wasn't initialized correctly")
 	}
