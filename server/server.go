@@ -84,22 +84,24 @@ func (server *moselServer) initAuth() error {
 
 	var enabledCount int = 0
 
-	if config.AuthSys.enabled {
+	if config.AuthSys.Enabled {
 		enabledCount++
 	}
 
-	if config.AuthMySQL.enabled {
+	if config.AuthMySQL.Enabled {
 		enabledCount++
 	}
 
-	if config.AuthTrue.enabled {
+	if config.AuthTrue.Enabled {
 		enabledCount++
-		log.Println("Using AuthTrue! This is for debugpurposes only, make sure you don't deploy this in production")
+		log.Println("Using AuthTrue! This is for debug purposes only, make sure you don't deploy this in production")
 		server.context.auth = authTrue{}
 	}
 
 	if enabledCount > 1 {
 		return fmt.Errorf("More then one auth services enabled")
+	} else if enabledCount == 0 {
+		return fmt.Errorf("No auth service configured")
 	}
 
 	return nil

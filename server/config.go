@@ -16,7 +16,7 @@
 package server
 
 type optional struct {
-	enabled bool
+	Enabled bool
 }
 
 type MoselServerConfig struct {

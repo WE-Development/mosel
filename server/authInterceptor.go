@@ -23,6 +23,12 @@ func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//do basic auth here
+		user, passwd, enabled := r.BasicAuth()
+
+		if !enabled || !server.context.auth.Authenticate(user, passwd) {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
 
 		fn(w, r)
 	}
