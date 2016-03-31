@@ -17,12 +17,13 @@ package server
 
 import (
 	"net/http"
-	"fmt"
-	"github.com/gorilla/mux"
 )
 
-func (server moselServer) handlePing(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w,
-		"Hi there, I love %s!",
-		mux.Vars(r)["param"])
+func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		//do basic auth here
+
+		fn(w, r)
+	}
 }

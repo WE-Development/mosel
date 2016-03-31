@@ -55,6 +55,10 @@ func (server moselServer) initHandler(r *mux.Router) {
 			path: "/{param:bla.*}",
 			handlerFunc: server.handlePing,
 		},
+		{
+			path: "/secure/{param:sec.*}",
+			handlerFunc: server.secure(server.handlePing),
+		},
 	}
 
 	for _, h := range handlers {
