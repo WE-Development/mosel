@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"log"
 )
 
 type loginHandler struct {
@@ -27,17 +26,15 @@ type loginHandler struct {
 
 func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
-	log.Println("Call login handler")
-	log.Println(r.RequestURI)
 
-	//user, passwd, enabled := r.BasicAuth()
+	user, passwd, enabled := r.BasicAuth()
 
-	/*if false && !enabled || !handler.Context().auth.Authenticate(user, passwd) {
-		resp.Successful=false
+	if !enabled || !ctx.auth.Authenticate(user, passwd) {
+		resp.Successful = false
 		//resp.ValidTo
 	} else {
-
-	}*/
+		resp.Successful = true
+	}
 
 	json.NewEncoder(w).Encode(resp)
 }

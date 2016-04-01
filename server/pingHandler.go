@@ -19,14 +19,12 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/bluedevel/mosel/api"
-	"log"
 )
 
 type pingHandler struct {
 }
 
 func (handler pingHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
-	log.Println("Call ping handler")
 	json.NewEncoder(w).Encode(api.NewPingResponse())
 }
 
