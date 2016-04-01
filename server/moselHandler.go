@@ -15,20 +15,12 @@
  */
 package server
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type MoselHandler interface {
-	http.Handler
-
+	ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
 	getPath() string
-	setContext(*MoselServerContext)
-}
-
-type moselHandler struct {
-	MoselHandler
-	context *MoselServerContext
-}
-
-func (handler moselHandler) setContext(c *MoselServerContext) {
-	handler.context=c
+	Secure() bool
 }

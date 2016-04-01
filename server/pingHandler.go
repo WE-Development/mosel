@@ -19,16 +19,22 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/bluedevel/mosel/api"
+	"log"
 )
 
 type pingHandler struct {
-	moselHandler
+	MoselHandler
 }
 
-func (handler pingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler pingHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
+	log.Println("Call ping handler")
 	json.NewEncoder(w).Encode(api.NewPingResponse())
 }
 
 func (handler pingHandler) getPath() string {
 	return "/secure/ping"
+}
+
+func (handler pingHandler) Secure() bool {
+	return true
 }

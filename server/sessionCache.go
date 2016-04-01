@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package api
+package server
 
-import "time"
+type sessionCache struct {
 
-type loginResponse struct {
-	moselResponse
-
-	Successful bool
-	ValidTo time.Time
 }
 
-func NewLoginResponse() loginResponse {
-	return loginResponse{
-		moselResponse: newMoselResponse(),
-	}
+func (cache *sessionCache) ValidCredentials(ctx MoselServerContext, user string, passwd string) bool {
+	return ctx.auth.Authenticate(user, passwd);
 }

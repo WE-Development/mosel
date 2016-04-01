@@ -104,12 +104,20 @@ func (server *moselServer) initAuth() error {
 
 func (server *moselServer) initHandler(r *mux.Router) {
 
-	var handlers = []MoselHandler{pingHandler{},
+	var handlers = []MoselHandler{pingHandler{}, loginHandler{},
 	}
 
 	for _, h := range handlers {
 		log.Printf("Handling %s", h.getPath())
-		h.setContext(&server.context)
-		r.Handle(h.getPath(), h)
+
+		f := func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTPContext(server.context, w, r)
+		}
+
+		if h.Secure() {
+			f = server.secure(f)
+		}
+
+		r.HandleFunc(h.getPath(), f)
 	}
 }

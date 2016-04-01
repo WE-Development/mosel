@@ -19,17 +19,35 @@ import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
+	"log"
 )
 
 type loginHandler struct {
-	moselHandler
+	MoselHandler
 }
 
-func (handler loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
+	log.Println("Call login handler")
+
+	//user, passwd, enabled := r.BasicAuth()
+
+	log.Println(handler)
+
+	/*if false && !enabled || !handler.Context().auth.Authenticate(user, passwd) {
+		resp.Successful=false
+		//resp.ValidTo
+	} else {
+
+	}*/
+
 	json.NewEncoder(w).Encode(resp)
 }
 
 func (handler loginHandler) getPath() string {
 	return "/login"
+}
+
+func (handler loginHandler) Secure() bool {
+	return false
 }

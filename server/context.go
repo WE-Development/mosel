@@ -19,4 +19,5 @@ type MoselServerContext struct {
 	isInitialized bool
 
 	auth authProvider
+	sessions sessionCache
 }
