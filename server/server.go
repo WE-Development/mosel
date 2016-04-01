@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"log"
 	"fmt"
+	"strconv"
 )
 
 type moselServer struct {
@@ -108,16 +109,18 @@ func (server *moselServer) initHandler(r *mux.Router) {
 	}
 
 	for _, h := range handlers {
-		log.Printf("Handling %s", h.getPath())
 
 		f := func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTPContext(server.context, w, r)
 		}
 
-		if h.Secure() {
+		secure := h.Secure()
+
+		if secure {
 			f = server.secure(f)
 		}
 
+		log.Printf("Handling %s - secure=%s", h.getPath(), strconv.FormatBool(secure))
 		r.HandleFunc(h.getPath(), f)
 	}
 }

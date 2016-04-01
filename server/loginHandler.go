@@ -29,10 +29,9 @@ type loginHandler struct {
 func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
 	log.Println("Call login handler")
+	log.Println(r.RequestURI)
 
 	//user, passwd, enabled := r.BasicAuth()
-
-	log.Println(handler)
 
 	/*if false && !enabled || !handler.Context().auth.Authenticate(user, passwd) {
 		resp.Successful=false
