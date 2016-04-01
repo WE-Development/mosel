@@ -23,7 +23,6 @@ import (
 )
 
 type loginHandler struct {
-	MoselHandler
 }
 
 func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {

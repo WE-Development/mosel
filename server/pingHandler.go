@@ -23,7 +23,6 @@ import (
 )
 
 type pingHandler struct {
-	MoselHandler
 }
 
 func (handler pingHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
