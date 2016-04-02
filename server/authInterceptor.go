@@ -25,7 +25,7 @@ func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 		//do basic auth here
 		user, passwd, enabled := r.BasicAuth()
 
-		if !enabled || !server.context.sessions.ValidCredentials(server.context, user, passwd) {
+		if !enabled || !server.context.Sessions.ValidCredentials(server.context, user, passwd) {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}

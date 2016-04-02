@@ -17,10 +17,11 @@ package server
 
 import (
 	"net/http"
+	"github.com/bluedevel/mosel/server/core"
 )
 
 type MoselHandler interface {
-	ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
-	getPath() string
+	ServeHTTPContext(core.MoselServerContext, http.ResponseWriter, *http.Request)
+	GetPath() string
 	Secure() bool
 }

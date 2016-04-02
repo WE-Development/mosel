@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package core
 
-type sessionCache struct {
+type MoselServerContext struct {
+	IsInitialized bool
 
-}
-
-func (cache *sessionCache) ValidCredentials(ctx MoselServerContext, user string, passwd string) bool {
-	return ctx.auth.Authenticate(user, passwd);
+	Auth          authProvider
+	Sessions      sessionCache
 }

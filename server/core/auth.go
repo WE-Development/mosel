@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package core
 
 type authProvider interface {
 	Authenticate (user string, passwd string) bool
 }
 
 //this provider will always authenticate successfully (for testing purposes)
-type authTrue struct {
+type AuthTrue struct {
 
 }
 
 //implement authProvider
-func (auth authTrue) Authenticate (user string, passwd string) bool {
+func (auth AuthTrue) Authenticate (user string, passwd string) bool {
 	return true
 }

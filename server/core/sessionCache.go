@@ -13,25 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package core
 
-import (
-	"net/http"
-	"encoding/json"
-	"github.com/bluedevel/mosel/api"
-)
+type sessionCache struct {
 
-type pingHandler struct {
 }
 
-func (handler pingHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(api.NewPingResponse())
-}
-
-func (handler pingHandler) getPath() string {
-	return "/secure/ping"
-}
-
-func (handler pingHandler) Secure() bool {
-	return true
+func (cache *sessionCache) ValidCredentials(ctx MoselServerContext, user string, passwd string) bool {
+	return ctx.Auth.Authenticate(user, passwd);
 }

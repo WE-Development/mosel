@@ -21,11 +21,13 @@ import (
 	"log"
 	"fmt"
 	"strconv"
+	"github.com/bluedevel/mosel/server/handler"
+	"github.com/bluedevel/mosel/server/core"
 )
 
 type moselServer struct {
 	config  MoselServerConfig
-	context MoselServerContext
+	context core.MoselServerContext
 }
 
 func NewMoselServer(config MoselServerConfig) *moselServer {
@@ -39,7 +41,7 @@ func (server *moselServer) Run() error {
 
 	err := server.initContext()
 
-	if ! server.context.isInitialized {
+	if ! server.context.IsInitialized {
 
 		if err != nil {
 			return err
@@ -71,7 +73,7 @@ func (server *moselServer) initContext() error {
 		}
 	}
 
-	server.context.isInitialized = true
+	server.context.IsInitialized = true
 	return nil
 }
 
@@ -91,7 +93,7 @@ func (server *moselServer) initAuth() error {
 	if config.AuthTrue.Enabled {
 		enabledCount++
 		log.Println("Using AuthTrue! This is for debug purposes only, make sure you don't deploy this in production")
-		server.context.auth = authTrue{}
+		server.context.Auth = core.AuthTrue{}
 	}
 
 	if enabledCount > 1 {
@@ -105,20 +107,9 @@ func (server *moselServer) initAuth() error {
 
 func (server *moselServer) initHandler(r *mux.Router) {
 
-	/*ph := pingHandler{}
-	lh := loginHandler{}
-
-	r.HandleFunc(ph.getPath(), server.secure(func(w http.ResponseWriter, r *http.Request) {
-		ph.ServeHTTPContext(server.context, w, r)
-	}))
-
-	r.HandleFunc(lh.getPath(), func(w http.ResponseWriter, r *http.Request) {
-		lh.ServeHTTPContext(server.context, w, r)
-	})*/
-
 	var handlers = []MoselHandler{
-		loginHandler{},
-		pingHandler{},
+		handler.NewPingHandler(),
+		handler.NewLoginHandler(),
 	}
 
 	for n, _ := range handlers {
@@ -135,7 +126,7 @@ func (server *moselServer) initHandler(r *mux.Router) {
 			f = server.secure(f)
 		}
 
-		log.Printf("Handling %s - secure=%s", h.getPath(), strconv.FormatBool(secure))
-		r.HandleFunc(h.getPath(), f)
+		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))
+		r.HandleFunc(h.GetPath(), f)
 	}
 }

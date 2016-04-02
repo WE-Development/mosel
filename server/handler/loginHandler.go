@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package handler
 
 import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
+	"github.com/bluedevel/mosel/server/core"
 )
 
 type loginHandler struct {
 }
 
-func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.ResponseWriter, r *http.Request) {
+func NewLoginHandler() loginHandler {
+	return loginHandler{}
+}
+
+func (handler loginHandler) ServeHTTPContext(ctx core.MoselServerContext, w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
 
 	user, passwd, enabled := r.BasicAuth()
 
-	if !enabled || !ctx.auth.Authenticate(user, passwd) {
+	if !enabled || !ctx.Auth.Authenticate(user, passwd) {
 		resp.Successful = false
 		//resp.ValidTo
 	} else {
@@ -39,7 +44,7 @@ func (handler loginHandler) ServeHTTPContext(ctx MoselServerContext, w http.Resp
 	json.NewEncoder(w).Encode(resp)
 }
 
-func (handler loginHandler) getPath() string {
+func (handler loginHandler) GetPath() string {
 	return "/login"
 }
 
