@@ -15,10 +15,43 @@
  */
 package core
 
+import (
+	"time"
+	"math/rand"
+	"crypto/md5"
+	"encoding/hex"
+)
+
 type sessionCache struct {
 
 }
 
-func (cache *sessionCache) ValidCredentials(ctx MoselServerContext, user string, passwd string) bool {
-	return ctx.Auth.Authenticate(user, passwd);
+type session struct {
+	keyHash []byte
+	validTo time.Time
+}
+
+func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (string, time.Time) {
+	s := session{}
+	millis := time.Now().UnixNano() / int64(time.Millisecond)
+	b := make([]byte, 256)
+	rand.Read(b)
+
+	key := cache.hash(
+		[]byte(string(millis) + user + string(b)))
+
+	keyHash := cache.hash([]byte(key[:]))
+
+	s.keyHash = []byte(keyHash[:])
+	s.validTo = time.Now()
+	return hex.EncodeToString(key[:]), time.Now()
+}
+
+func (cache sessionCache) ValidateSession(key string) bool {
+	return true
+}
+
+func (cache sessionCache) hash(b []byte) []byte {
+	r := md5.Sum(b)
+	return r[:]
 }

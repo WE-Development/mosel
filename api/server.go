@@ -21,7 +21,8 @@ type loginResponse struct {
 	moselResponse
 
 	Successful bool
-	ValidTo time.Time
+	Key        string
+	ValidTo    time.Time
 }
 
 func NewLoginResponse() loginResponse {

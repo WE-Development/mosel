@@ -17,15 +17,17 @@ package server
 
 import (
 	"net/http"
+	"log"
 )
 
 func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		//do basic auth here
-		user, passwd, enabled := r.BasicAuth()
+		key := r.FormValue("key")
 
-		if !enabled || !server.context.Sessions.ValidCredentials(server.context, user, passwd) {
+		log.Println(key)
+
+		if key == "" || !server.context.Sessions.ValidateSession(key) {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}
