@@ -20,11 +20,10 @@ import (
 	"math/rand"
 	"crypto/md5"
 	"encoding/hex"
-	"log"
 )
 
 type sessionCache struct {
-	sessions    map[string]session
+	sessions map[string]session
 }
 
 type session struct {
@@ -56,20 +55,15 @@ func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (strin
 	keyHashString := cache.hashToString(s.keyHash[:])
 
 	cache.sessions[keyHashString] = s
-	log.Println(cache.sessions)
 
 	return cache.hashToString(key[:]), time.Now()
 }
 
 func (cache sessionCache) ValidateSession(ctx MoselServerContext, key string) bool {
-	log.Println(cache.sessions)
-
 	keyBin, _ := hex.DecodeString(key)
 	hash := cache.hash(keyBin)
 	hashString := cache.hashToString(hash)
-	//log.Printf("Check hash: %s", hashString)
 	_, ok := ctx.Sessions.sessions[hashString]
-	//log.Printf("Status: %s", ok)
 	return ok
 }
 
