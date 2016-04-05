@@ -63,6 +63,7 @@ func (server *moselServer) initContext() error {
 
 	initFns := []func() error{
 		server.initAuth,
+		server.initSessionCache,
 	}
 
 	for _, fn := range initFns {
@@ -105,6 +106,12 @@ func (server *moselServer) initAuth() error {
 	return nil
 }
 
+func (server *moselServer) initSessionCache() error {
+	c := core.NewSessionCache()
+	server.context.Sessions = *c
+	return nil
+}
+
 func (server *moselServer) initHandler(r *mux.Router) {
 
 	var handlers = []MoselHandler{
@@ -123,7 +130,7 @@ func (server *moselServer) initHandler(r *mux.Router) {
 		secure := h.Secure()
 
 		if secure {
-			f = server.secure(f)
+			f = server.secure(server.context, f)
 		}
 
 		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))

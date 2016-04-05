@@ -20,10 +20,11 @@ import (
 	"math/rand"
 	"crypto/md5"
 	"encoding/hex"
+	"log"
 )
 
 type sessionCache struct {
-
+	sessions    map[string]session
 }
 
 type session struct {
@@ -31,9 +32,16 @@ type session struct {
 	validTo time.Time
 }
 
+func NewSessionCache() *sessionCache {
+	m := make(map[string]session)
+	return &sessionCache{m}
+}
+
 func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (string, time.Time) {
-	s := session{}
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
+
+	s := session{}
+
 	b := make([]byte, 256)
 	rand.Read(b)
 
@@ -44,11 +52,29 @@ func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (strin
 
 	s.keyHash = []byte(keyHash[:])
 	s.validTo = time.Now()
-	return hex.EncodeToString(key[:]), time.Now()
+
+	keyHashString := cache.hashToString(s.keyHash[:])
+
+	cache.sessions[keyHashString] = s
+	log.Println(cache.sessions)
+
+	return cache.hashToString(key[:]), time.Now()
 }
 
-func (cache sessionCache) ValidateSession(key string) bool {
-	return true
+func (cache sessionCache) ValidateSession(ctx MoselServerContext, key string) bool {
+	log.Println(cache.sessions)
+
+	keyBin, _ := hex.DecodeString(key)
+	hash := cache.hash(keyBin)
+	hashString := cache.hashToString(hash)
+	//log.Printf("Check hash: %s", hashString)
+	_, ok := ctx.Sessions.sessions[hashString]
+	//log.Printf("Status: %s", ok)
+	return ok
+}
+
+func (cache sessionCache) hashToString(b []byte) string {
+	return hex.EncodeToString(b[:])
 }
 
 func (cache sessionCache) hash(b []byte) []byte {
