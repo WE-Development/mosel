@@ -17,10 +17,9 @@ package server
 
 import (
 	"net/http"
-	"github.com/bluedevel/mosel/server/core"
 )
 
-func (server moselServer) secure(ctx core.MoselServerContext, fn http.HandlerFunc) http.HandlerFunc {
+func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		key := r.FormValue("key")

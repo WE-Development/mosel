@@ -136,7 +136,7 @@ func (server *moselServer) initHandler(r *mux.Router) {
 		secure := h.Secure()
 
 		if secure {
-			f = server.secure(server.context, f)
+			f = server.secure(f)
 		}
 
 		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))
