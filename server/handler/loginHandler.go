@@ -37,7 +37,7 @@ func (handler loginHandler) ServeHTTPContext(ctx core.MoselServerContext, w http
 	if !enabled || !ctx.Auth.Authenticate(user, passwd) {
 		resp.Successful = false
 	} else {
-		key, validTo := ctx.Sessions.NewSession(ctx, user)
+		key, validTo := ctx.Sessions.NewSession()
 		resp.Key = key
 		resp.ValidTo = validTo
 		resp.Successful = true

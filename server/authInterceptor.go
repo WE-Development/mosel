@@ -25,7 +25,7 @@ func (server moselServer) secure(ctx core.MoselServerContext, fn http.HandlerFun
 
 		key := r.FormValue("key")
 
-		if key == "" || !server.context.Sessions.ValidateSession(ctx, key) {
+		if key == "" || !server.context.Sessions.ValidateSession(key) {
 			http.Error(w, http.StatusText(401), 401)
 			return
 		}

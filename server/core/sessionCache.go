@@ -36,7 +36,7 @@ func NewSessionCache() *sessionCache {
 	return &sessionCache{m}
 }
 
-func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (string, time.Time) {
+func (cache sessionCache) NewSession() (string, time.Time) {
 	s := session{}
 
 	b := make([]byte, 256)
@@ -54,11 +54,11 @@ func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (strin
 	return hashToString(key[:]), time.Now()
 }
 
-func (cache sessionCache) ValidateSession(ctx MoselServerContext, key string) bool {
+func (cache sessionCache) ValidateSession(key string) bool {
 	keyBin, _ := hex.DecodeString(key)
 	hash := cache.hash(keyBin)
 	hashString := hashToString(hash)
-	_, ok := ctx.Sessions.sessions[hashString]
+	_, ok := cache.sessions[hashString]
 	return ok
 }
 
