@@ -32,11 +32,12 @@ type session struct {
 }
 
 func NewSessionCache() *sessionCache {
-	m := make(map[string]session)
-	return &sessionCache{m}
+	cache := new(sessionCache)
+	cache.sessions = make(map[string]session)
+	return cache
 }
 
-func (cache sessionCache) NewSession() (string, time.Time) {
+func (cache *sessionCache) NewSession() (string, time.Time) {
 	s := session{}
 
 	b := make([]byte, 256)
@@ -54,12 +55,17 @@ func (cache sessionCache) NewSession() (string, time.Time) {
 	return hashToString(key[:]), time.Now()
 }
 
-func (cache sessionCache) ValidateSession(key string) bool {
+func (cache *sessionCache) ValidateSession(key string) bool {
 	keyBin, _ := hex.DecodeString(key)
 	hash := cache.hash(keyBin)
 	hashString := hashToString(hash)
 	_, ok := cache.sessions[hashString]
 	return ok
+}
+
+func (cache *sessionCache) hash(b []byte) []byte {
+	r := md5.Sum(b)
+	return r[:]
 }
 
 func hashToString(b []byte) string {
@@ -69,9 +75,4 @@ func hashToString(b []byte) string {
 func stringToHash(s string) []byte {
 	r, _ := hex.DecodeString(s)
 	return r
-}
-
-func (cache sessionCache) hash(b []byte) []byte {
-	r := md5.Sum(b)
-	return r[:]
 }
