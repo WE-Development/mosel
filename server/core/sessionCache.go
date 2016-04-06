@@ -37,38 +37,38 @@ func NewSessionCache() *sessionCache {
 }
 
 func (cache sessionCache) NewSession(ctx MoselServerContext, user string) (string, time.Time) {
-	millis := time.Now().UnixNano() / int64(time.Millisecond)
-
 	s := session{}
 
 	b := make([]byte, 256)
 	rand.Read(b)
 
-	key := cache.hash(
-		[]byte(string(millis) + user + string(b)))
-
+	key := cache.hash(b)
 	keyHash := cache.hash([]byte(key[:]))
 
 	s.keyHash = []byte(keyHash[:])
 	s.validTo = time.Now()
 
-	keyHashString := cache.hashToString(s.keyHash[:])
-
+	keyHashString := hashToString(s.keyHash[:])
 	cache.sessions[keyHashString] = s
 
-	return cache.hashToString(key[:]), time.Now()
+	return hashToString(key[:]), time.Now()
 }
 
 func (cache sessionCache) ValidateSession(ctx MoselServerContext, key string) bool {
 	keyBin, _ := hex.DecodeString(key)
 	hash := cache.hash(keyBin)
-	hashString := cache.hashToString(hash)
+	hashString := hashToString(hash)
 	_, ok := ctx.Sessions.sessions[hashString]
 	return ok
 }
 
-func (cache sessionCache) hashToString(b []byte) string {
+func hashToString(b []byte) string {
 	return hex.EncodeToString(b[:])
+}
+
+func stringToHash(s string) []byte {
+	r, _ := hex.DecodeString(s)
+	return r
 }
 
 func (cache sessionCache) hash(b []byte) []byte {
