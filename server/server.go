@@ -56,7 +56,13 @@ func (server *moselServer) Run() error {
 
 	addr := server.config.Http.BindAddress
 	log.Printf("Binding http server to %s", addr)
-	return http.ListenAndServe(addr, nil)
+
+	errors := make(chan error)
+	go func() {
+		errors <- http.ListenAndServe(addr, nil)
+	}()
+
+	return <-errors
 }
 
 func (server *moselServer) initContext() error {
