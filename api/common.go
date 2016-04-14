@@ -25,7 +25,7 @@ type moselInfo struct {
 
 func newMoselInfo() moselInfo {
 	mi := moselInfo{}
-	mi.Time=time.Now()
+	mi.Time = time.Now()
 	return mi
 }
 
@@ -52,5 +52,16 @@ type pingResponse struct {
 func NewPingResponse() pingResponse {
 	return pingResponse{
 		moselResponse: newMoselResponse(),
+	}
+}
+
+type nodeResponse struct {
+	Name string
+	URL  string
+}
+
+func NewNodeResponse(name string, url string) nodeResponse {
+	return nodeResponse{
+		Name:name, URL:url,
 	}
 }

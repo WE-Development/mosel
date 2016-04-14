@@ -15,10 +15,27 @@
  */
 package core
 
-type MoselServerContext struct {
-	IsInitialized bool
+import "net/url"
 
-	Auth          authProvider
-	Sessions      sessionCache
-	Nodes         nodeCache
+type Node struct {
+	Name string
+	URL  url.URL
+}
+
+type nodeCache struct {
+	nodes map[string]Node
+}
+
+func NewNodeCache() *nodeCache {
+	c := &nodeCache{}
+	c.nodes = make(map[string]Node)
+	return c
+}
+
+func (cache *nodeCache) Add(node Node) {
+	cache.nodes[node.Name] = node
+}
+
+func (cache * nodeCache) Get(name string) Node {
+	return cache.nodes[name]
 }

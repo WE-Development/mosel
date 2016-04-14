@@ -70,6 +70,7 @@ func (server *moselServer) initContext() error {
 	initFns := []func() error{
 		server.initAuth,
 		server.initSessionCache,
+		server.initNodeCache,
 	}
 
 	for _, fn := range initFns {
@@ -118,11 +119,18 @@ func (server *moselServer) initSessionCache() error {
 	return nil
 }
 
+func (server *moselServer) initNodeCache() error {
+	c := core.NewNodeCache()
+	server.context.Nodes = *c
+	return nil
+}
+
 func (server *moselServer) initHandler(r *mux.Router) {
 
 	var handlers = []MoselHandler{
 		handler.NewPingHandler(),
 		handler.NewLoginHandler(),
+		handler.NewDebugHandler(),
 	}
 
 	for n, _ := range handlers {

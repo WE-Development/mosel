@@ -13,35 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package handler
 
 import (
-	"reflect"
-	"log"
+	"github.com/bluedevel/mosel/server/core"
+	"net/http"
+	"time"
 	"fmt"
 )
 
-type dataSaver struct {
-
+type debugHandler struct {
 }
 
-func NewDataSaver(config MoselServerConfig) *dataSaver {
-	saver := new(dataSaver)
-	return saver
+func NewDebugHandler() debugHandler {
+	return debugHandler{}
 }
 
-func (dataSaver *dataSaver) SaveEntry(i interface{}) error {
-	name, _ := getFilename(i)
-	log.Printf("TODO save to %s", name)
-	return nil
-}
+func (handler debugHandler) ServeHTTPContext(ctx core.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+	var flusher http.Flusher
 
-func getFilename(i interface{}) (string, error) {
-	name := reflect.TypeOf(i).Name()
-
-	if name == "" {
-		return "", fmt.Errorf("Could not evaluate filename to save data to")
+	if f, ok := w.(http.Flusher); ok {
+		flusher = f
+	} else {
+		return
 	}
 
-	return name + ".msl", nil
+	for now := range time.Tick(1 * time.Second) {
+		fmt.Fprintln(w, now)
+		flusher.Flush()
+	}
+}
+
+func (handler debugHandler) GetPath() string {
+	return "/debug"
+}
+
+func (handler debugHandler) Secure() bool {
+	return false
 }
