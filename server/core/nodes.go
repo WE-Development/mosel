@@ -15,7 +15,12 @@
  */
 package core
 
-import "net/url"
+import (
+	"net/url"
+	"net/http"
+	"log"
+	"bufio"
+)
 
 type Node struct {
 	Name string
@@ -23,19 +28,43 @@ type Node struct {
 }
 
 type nodeCache struct {
-	nodes map[string]Node
+	nodes map[string]*Node
 }
 
 func NewNodeCache() *nodeCache {
 	c := &nodeCache{}
-	c.nodes = make(map[string]Node)
+	c.nodes = make(map[string]*Node)
 	return c
 }
 
-func (cache *nodeCache) Add(node Node) {
+func (cache *nodeCache) Add(node *Node) {
 	cache.nodes[node.Name] = node
+
+	go func() {
+		Connection: for {
+			resp, err := http.Get(node.URL.String())
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			reader := bufio.NewReader(resp.Body)
+
+			for {
+				line, err := reader.ReadBytes('\n')
+
+				if err != nil {
+					log.Fatal(resp.Body.Close())
+					continue Connection
+				}
+
+				log.Print(string(line))
+			}
+
+		}
+	}()
 }
 
-func (cache * nodeCache) Get(name string) Node {
+func (cache *nodeCache) Get(name string) *Node {
 	return cache.nodes[name]
 }
