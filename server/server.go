@@ -39,6 +39,7 @@ func NewMoselServer(config MoselServerConfig) *moselServer {
 
 func (server *moselServer) Run() error {
 
+	//initializing server context
 	err := server.initContext()
 
 	if ! server.context.IsInitialized {
@@ -50,6 +51,7 @@ func (server *moselServer) Run() error {
 		return fmt.Errorf("Mosel Server - Run: Context wasn't initialized correctly")
 	}
 
+	//init router and handlers
 	r := mux.NewRouter()
 	server.initHandler(r)
 	http.Handle("/", r)
@@ -57,13 +59,19 @@ func (server *moselServer) Run() error {
 	addr := server.config.Http.BindAddress
 	log.Printf("Binding http server to %s", addr)
 
+	//do async jobs after initialization here
 	errors := make(chan error)
+
 	go func() {
 		errors <- http.ListenAndServe(addr, nil)
 	}()
 
 	return <-errors
 }
+
+/*
+ * Initialize Context
+ */
 
 func (server *moselServer) initContext() error {
 
@@ -124,6 +132,10 @@ func (server *moselServer) initNodeCache() error {
 	server.context.Nodes = *c
 	return nil
 }
+
+/*
+ * Initialize Handler
+ */
 
 func (server *moselServer) initHandler(r *mux.Router) {
 
