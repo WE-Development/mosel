@@ -21,8 +21,8 @@ import (
 	"log"
 	"fmt"
 	"strconv"
-	"github.com/bluedevel/mosel/server/handler"
-	"github.com/bluedevel/mosel/server/core"
+	"github.com/bluedevel/mosel/moseld/server/handler"
+	"github.com/bluedevel/mosel/moseld/server/core"
 )
 
 type moselServer struct {

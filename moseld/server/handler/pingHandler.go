@@ -13,15 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package handler
 
 import (
 	"net/http"
-	"github.com/bluedevel/mosel/server/core"
+	"encoding/json"
+	"github.com/bluedevel/mosel/api"
+	"github.com/bluedevel/mosel/moseld/server/core"
 )
 
-type MoselHandler interface {
-	ServeHTTPContext(core.MoselServerContext, http.ResponseWriter, *http.Request)
-	GetPath() string
-	Secure() bool
+type pingHandler struct {
+}
+
+func NewPingHandler() pingHandler {
+	return pingHandler{}
+}
+
+func (handler pingHandler) ServeHTTPContext(ctx core.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(api.NewPingResponse())
+}
+
+func (handler pingHandler) GetPath() string {
+	return "/secure/ping"
+}
+
+func (handler pingHandler) Secure() bool {
+	return true
 }

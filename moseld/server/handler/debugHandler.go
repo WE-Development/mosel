@@ -16,10 +16,10 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/server/core"
 	"net/http"
 	"time"
 	"fmt"
+	"github.com/bluedevel/mosel/moseld/server/core"
 )
 
 type debugHandler struct {

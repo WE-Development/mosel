@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"github.com/bluedevel/mosel/server/core"
+	"github.com/bluedevel/mosel/moseld/server/core"
 )
 
 type loginHandler struct {

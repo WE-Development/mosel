@@ -14,3 +14,18 @@
  * limitations under the License.
  */
 package node
+
+type moselNodeServer struct {
+}
+
+func NewMoselNodeServer() *moselNodeServer {
+	server := new(moselNodeServer)
+	return server
+}
+
+func (server *moselNodeServer) Run() error {
+
+
+
+	return nil
+}
