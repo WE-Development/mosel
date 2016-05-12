@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+package moselserver
 
-import (
-	"github.com/bluedevel/mosel/moseld/server"
-	"gopkg.in/gcfg.v1"
-	"log"
-	"os"
-)
+import "time"
 
-func main() {
-
-	config, err := loadConfig()
-
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	server := moseldserver.NewMoseldServer(*config)
-	log.Fatal(server.Run())
+type basicData struct {
+	Time time.Time
 }
 
-func loadConfig() (*moseldserver.MoseldServerConfig, error) {
-	config := new(moseldserver.MoseldServerConfig)
-	err := gcfg.ReadFileInto(config, "/etc/mosel/moseld.conf")
-	return config, err
+type pingData struct {
+	basicData
+
+	Duration time.Duration
 }

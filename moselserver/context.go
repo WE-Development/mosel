@@ -13,22 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package moselserver
 
-import (
-	"net/http"
-)
+type MoselServerContext struct {
+	IsInitialized bool
 
-func (server moselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		key := r.FormValue("key")
-
-		if key == "" || !server.context.Sessions.ValidateSession(key) {
-			http.Error(w, http.StatusText(401), 401)
-			return
-		}
-
-		fn(w, r)
-	}
+	Auth          authProvider
+	Sessions      sessionCache
 }

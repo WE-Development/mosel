@@ -13,25 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package moseldserver
+
+import "github.com/bluedevel/mosel/moselserver"
 
 type optional struct {
 	Enabled bool
 }
 
-type MoselServerConfig struct {
-	Http      struct {
-			  BindAddress string
-		  }
+type MoseldServerConfig struct {
+	moselserver.MoselServerConfig
 
-	//Auth stuff
-	AuthSys   struct {
-			  optional
-		  }
-	AuthMySQL struct {
-			  optional
-		  }
-	AuthTrue  struct {
-			  optional
-		  }
 }

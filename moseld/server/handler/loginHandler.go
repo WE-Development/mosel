@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"github.com/bluedevel/mosel/moseld/server/core"
+	"github.com/bluedevel/mosel/moselserver"
 )
 
 type loginHandler struct {
@@ -29,7 +29,7 @@ func NewLoginHandler() loginHandler {
 	return loginHandler{}
 }
 
-func (handler loginHandler) ServeHTTPContext(ctx core.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+func (handler loginHandler) ServeHTTPContext(ctx moselserver.MoselServerContext, w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
 
 	user, passwd, enabled := r.BasicAuth()

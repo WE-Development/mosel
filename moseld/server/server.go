@@ -13,153 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package moseldserver
 
 import (
-	"github.com/gorilla/mux"
-	"net/http"
-	"log"
-	"fmt"
-	"strconv"
-	"github.com/bluedevel/mosel/moseld/server/handler"
-	"github.com/bluedevel/mosel/moseld/server/core"
+	"github.com/bluedevel/mosel/moselserver"
 )
 
-type moselServer struct {
-	config  MoselServerConfig
-	context core.MoselServerContext
+type moseldServer struct {
+	moselserver.MoselServer
+
+	config  MoseldServerConfig
 }
 
-func NewMoselServer(config MoselServerConfig) *moselServer {
-	server := new(moselServer)
-	server.config = config
-
-	return server
-}
-
-func (server *moselServer) Run() error {
-
-	//initializing server context
-	err := server.initContext()
-
-	if ! server.context.IsInitialized {
-
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("Mosel Server - Run: Context wasn't initialized correctly")
+func NewMoseldServer(config MoseldServerConfig) *moseldServer {
+	server := moseldServer{
+		config: config,
 	}
 
-	//init router and handlers
-	r := mux.NewRouter()
-	server.initHandler(r)
-	http.Handle("/", r)
+	server.MoselServer = moselserver.MoselServer{
+		Config: config.MoselServerConfig,
+	}
 
-	addr := server.config.Http.BindAddress
-	log.Printf("Binding http server to %s", addr)
-
-	//do async jobs after initialization here
-	errors := make(chan error)
-
-	go func() {
-		errors <- http.ListenAndServe(addr, nil)
-	}()
-
-	return <-errors
+	return &server
 }
 
 /*
  * Initialize Context
  */
 
-func (server *moselServer) initContext() error {
-
-	initFns := []func() error{
-		server.initAuth,
-		server.initSessionCache,
-		server.initNodeCache,
-	}
-
-	for _, fn := range initFns {
-		err := fn()
-
-		if (err != nil) {
-			return err
-		}
-	}
-
-	server.context.IsInitialized = true
+func (server *moseldServer) initNodeCache() error {
+	//c := NewNodeCache()
+	//todo extend context
+	//server.context.Nodes = *c
 	return nil
-}
-
-func (server *moselServer) initAuth() error {
-	config := server.config
-
-	var enabledCount int = 0
-
-	if config.AuthSys.Enabled {
-		enabledCount++
-	}
-
-	if config.AuthMySQL.Enabled {
-		enabledCount++
-	}
-
-	if config.AuthTrue.Enabled {
-		enabledCount++
-		log.Println("Using AuthTrue! This is for debug purposes only, make sure you don't deploy this in production")
-		server.context.Auth = core.AuthTrue{}
-	}
-
-	if enabledCount > 1 {
-		return fmt.Errorf("More then one auth services enabled")
-	} else if enabledCount == 0 {
-		return fmt.Errorf("No auth service configured")
-	}
-
-	return nil
-}
-
-func (server *moselServer) initSessionCache() error {
-	c := core.NewSessionCache()
-	server.context.Sessions = *c
-	return nil
-}
-
-func (server *moselServer) initNodeCache() error {
-	c := core.NewNodeCache()
-	server.context.Nodes = *c
-	return nil
-}
-
-/*
- * Initialize Handler
- */
-
-func (server *moselServer) initHandler(r *mux.Router) {
-
-	var handlers = []MoselHandler{
-		handler.NewPingHandler(),
-		handler.NewLoginHandler(),
-		handler.NewDebugHandler(),
-	}
-
-	for n, _ := range handlers {
-
-		h := handlers[n]
-
-		f := func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTPContext(server.context, w, r)
-		}
-
-		secure := h.Secure()
-
-		if secure {
-			f = server.secure(f)
-		}
-
-		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))
-		r.HandleFunc(h.GetPath(), f)
-	}
 }

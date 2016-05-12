@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package core
+package moselserver
 
-type MoselServerContext struct {
-	IsInitialized bool
+import (
+	"net/http"
+)
 
-	Auth          authProvider
-	Sessions      sessionCache
-	Nodes         nodeCache
+type MoselHandler interface {
+	ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
+	GetPath() string
+	Secure() bool
 }

@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package main
+package moselserver
 
 import (
-	"github.com/bluedevel/mosel/moseld/server"
-	"gopkg.in/gcfg.v1"
-	"log"
-	"os"
+	"net/http"
 )
 
-func main() {
+func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-	config, err := loadConfig()
+		key := r.FormValue("key")
 
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
+		if key == "" || !server.Context.Sessions.ValidateSession(key) {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		fn(w, r)
 	}
-
-	server := moseldserver.NewMoseldServer(*config)
-	log.Fatal(server.Run())
-}
-
-func loadConfig() (*moseldserver.MoseldServerConfig, error) {
-	config := new(moseldserver.MoseldServerConfig)
-	err := gcfg.ReadFileInto(config, "/etc/mosel/moseld.conf")
-	return config, err
 }

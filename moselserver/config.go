@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package server
+package moselserver
 
-import (
-	"net/http"
-	"github.com/bluedevel/mosel/moseld/server/core"
-)
+type optional struct {
+	Enabled bool
+}
 
-type MoselHandler interface {
-	ServeHTTPContext(core.MoselServerContext, http.ResponseWriter, *http.Request)
-	GetPath() string
-	Secure() bool
+type MoselServerConfig struct {
+	Http      struct {
+			  BindAddress string
+		  }
+
+	//Auth stuff
+	AuthSys   struct {
+			  optional
+		  }
+	AuthMySQL struct {
+			  optional
+		  }
+	AuthTrue  struct {
+			  optional
+		  }
 }
