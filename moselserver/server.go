@@ -24,13 +24,21 @@ import (
 )
 
 type MoselServer struct {
-	Config  MoselServerConfig
-	Context MoselServerContext
+	Config    MoselServerConfig
+	Context   MoselServerContext
+
+	Handlers  []MoselHandler
+	InitFuncs []func() error
 }
 
 func (server *MoselServer) Run() error {
 
 	//initializing server context
+	server.InitFuncs = append([]func() error{
+		server.initAuth,
+		server.initSessionCache,
+	}, server.InitFuncs...)
+
 	err := server.initContext()
 
 	if ! server.Context.IsInitialized {
@@ -44,7 +52,7 @@ func (server *MoselServer) Run() error {
 
 	//init router and handlers
 	r := mux.NewRouter()
-	//server.initHandler(r)
+	server.initHandler(r)
 	http.Handle("/", r)
 
 	addr := server.Config.Http.BindAddress
@@ -66,12 +74,7 @@ func (server *MoselServer) Run() error {
 
 func (server *MoselServer) initContext() error {
 
-	initFns := []func() error{
-		server.initAuth,
-		server.initSessionCache,
-	}
-
-	for _, fn := range initFns {
+	for _, fn := range server.InitFuncs {
 		err := fn()
 
 		if (err != nil) {
@@ -124,12 +127,9 @@ func (server *MoselServer) initSessionCache() error {
 
 func (server *MoselServer) initHandler(r *mux.Router) {
 
-	var handlers = []MoselHandler{
-	}
+	for n, _ := range server.Handlers {
 
-	for n, _ := range handlers {
-
-		h := handlers[n]
+		h := server.Handlers[n]
 
 		f := func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTPContext(server.Context, w, r)

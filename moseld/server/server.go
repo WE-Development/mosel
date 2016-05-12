@@ -17,12 +17,13 @@ package moseldserver
 
 import (
 	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moseld/server/handler"
 )
 
 type moseldServer struct {
 	moselserver.MoselServer
 
-	config  MoseldServerConfig
+	config MoseldServerConfig
 }
 
 func NewMoseldServer(config MoseldServerConfig) *moseldServer {
@@ -32,6 +33,15 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 
 	server.MoselServer = moselserver.MoselServer{
 		Config: config.MoselServerConfig,
+	}
+
+	server.InitFuncs = append(server.InitFuncs,
+		server.initNodeCache)
+
+	server.Handlers = []moselserver.MoselHandler{
+		handler.NewLoginHandler(),
+		handler.NewPingHandler(),
+		handler.NewDebugHandler(),
 	}
 
 	return &server
@@ -45,5 +55,6 @@ func (server *moseldServer) initNodeCache() error {
 	//c := NewNodeCache()
 	//todo extend context
 	//server.context.Nodes = *c
+
 	return nil
 }
