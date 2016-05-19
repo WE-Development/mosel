@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package moseldserver
+package context
 
 import (
 	"net/url"
@@ -31,10 +31,10 @@ type nodeCache struct {
 	nodes map[string]*Node
 }
 
-func NewNodeCache() *nodeCache {
+func NewNodeCache() (*nodeCache, error) {
 	c := &nodeCache{}
 	c.nodes = make(map[string]*Node)
-	return c
+	return c, nil
 }
 
 func (cache *nodeCache) Add(node *Node) {

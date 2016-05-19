@@ -20,13 +20,17 @@ import (
 	"time"
 	"fmt"
 	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moseld/server/context"
 )
 
 type debugHandler struct {
+	ctxd *context.MoseldServerContext
 }
 
-func NewDebugHandler() debugHandler {
-	return debugHandler{}
+func NewDebugHandler(ctxd *context.MoseldServerContext) debugHandler {
+	return debugHandler{
+		ctxd: ctxd,
+	}
 }
 
 func (handler debugHandler) ServeHTTPContext(ctx moselserver.MoselServerContext, w http.ResponseWriter, r *http.Request) {
