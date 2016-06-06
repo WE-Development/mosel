@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"log"
 	"bufio"
+	"time"
 )
 
 type Node struct {
@@ -45,7 +46,11 @@ func (cache *nodeCache) Add(node *Node) {
 			resp, err := http.Get(node.URL.String())
 
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
+
+				//todo make reconnection timeout configurable by moseld.conf
+				time.Sleep(10 * time.Second)
+				continue Connection
 			}
 
 			reader := bufio.NewReader(resp.Body)
