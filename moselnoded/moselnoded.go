@@ -15,8 +15,28 @@
  */
 package main
 
-import "fmt"
+import (
+	"github.com/bluedevel/mosel/moselnoded/server"
+	"log"
+	"os"
+	"gopkg.in/gcfg.v1"
+)
 
 func main() {
-	fmt.Println("Hallo Node")
+
+	config, err := loadConfig()
+
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	server := moselnodedserver.NewMoselNodedServer(*config)
+	log.Fatal(server.Run())
+}
+
+func loadConfig() (*moselnodedserver.MoselNodedServerConfig, error) {
+	config := new(moselnodedserver.MoselNodedServerConfig)
+	err := gcfg.ReadFileInto(config, "/etc/mosel/moselnoded.conf")
+	return config, err
 }

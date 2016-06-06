@@ -17,10 +17,6 @@ package moseldserver
 
 import "github.com/bluedevel/mosel/moselserver"
 
-type optional struct {
-	Enabled bool
-}
-
 type MoseldServerConfig struct {
 	moselserver.MoselServerConfig
 

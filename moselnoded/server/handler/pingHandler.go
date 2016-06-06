@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package moselserver
+package handler
 
-type Optional struct {
-	Enabled bool
+import (
+	"net/http"
+	"encoding/json"
+	"github.com/bluedevel/mosel/api"
+	"github.com/bluedevel/mosel/moselserver"
+)
+
+type pingHandler struct {
 }
 
-type MoselServerConfig struct {
-	Http      struct {
-			  BindAddress string
-		  }
+func NewPingHandler() pingHandler {
+	return pingHandler{}
+}
 
-	//Auth stuff
-	AuthSys   struct {
-			  Optional
-		  }
-	AuthMySQL struct {
-			  Optional
-		  }
-	AuthTrue  struct {
-			  Optional
-		  }
+func (handler pingHandler) ServeHTTPContext(ctx moselserver.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(api.NewPingResponse())
+}
+
+func (handler pingHandler) GetPath() string {
+	return "/ping"
+}
+
+func (handler pingHandler) Secure() bool {
+	return false
 }

@@ -13,19 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package node
+package moselnodedserver
 
-type moselNodeServer struct {
+import (
+	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moselnoded/server/handler"
+)
+
+type moselnodedServer struct {
+	moselserver.MoselServer
+
+	config MoselNodedServerConfig
 }
 
-func NewMoselNodeServer() *moselNodeServer {
-	server := new(moselNodeServer)
-	return server
-}
+func NewMoselNodedServer(config MoselNodedServerConfig) *moselnodedServer {
+	server := moselnodedServer{
+		config: config,
+	}
 
-func (server *moselNodeServer) Run() error {
+	server.MoselServer = moselserver.MoselServer{
+		Config: config.MoselServerConfig,
+	}
 
+	server.Handlers = []moselserver.MoselHandler{
+		handler.NewPingHandler(),
+	}
 
-
-	return nil
+	return &server
 }
