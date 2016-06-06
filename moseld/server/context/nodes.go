@@ -54,7 +54,12 @@ func (cache *nodeCache) Add(node *Node) {
 				line, err := reader.ReadBytes('\n')
 
 				if err != nil {
-					log.Fatal(resp.Body.Close())
+					//check weather we are dealing with a non-stream resource
+					if err.Error() != "EOF" {
+						log.Println(err)
+					}
+
+					resp.Body.Close()
 					continue Connection
 				}
 

@@ -19,12 +19,13 @@ import (
 	"github.com/bluedevel/mosel/moselserver"
 	"github.com/bluedevel/mosel/moseld/server/handler"
 	"github.com/bluedevel/mosel/moseld/server/context"
+	"net/url"
 )
 
 type moseldServer struct {
 	moselserver.MoselServer
 
-	config MoseldServerConfig
+	config  MoseldServerConfig
 	context context.MoseldServerContext
 }
 
@@ -56,6 +57,12 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 func (server *moseldServer) initNodeCache() error {
 	c, err := context.NewNodeCache()
 	server.context.Nodes = *c
+
+	url, _ := url.Parse("http://localhost:8181/ping")
+	c.Add(&context.Node{
+		Name: "self",
+		URL: *url,
+	})
 
 	return err
 }
