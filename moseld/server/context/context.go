@@ -21,4 +21,6 @@ type MoseldServerContext struct {
 	moselserver.MoselServerContext
 
 	Nodes nodeCache
+
+	Debug int
 }

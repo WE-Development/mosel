@@ -16,26 +16,28 @@
 package handler
 
 import (
+	"github.com/bluedevel/mosel/moselserver"
 	"net/http"
-	"encoding/json"
-	"github.com/bluedevel/mosel/api"
 )
 
-type pingHandler struct {
+type streamHandler struct {
+	ctx *moselserver.MoselServerContext
 }
 
-func NewPingHandler() pingHandler {
-	return pingHandler{}
+func NewStreamHandler(ctx *moselserver.MoselServerContext) streamHandler {
+	return streamHandler{
+		ctx: ctx,
+	}
 }
 
-func (handler pingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(api.NewPingResponse())
+func (handler streamHandler) ServeHTTPContext(w http.ResponseWriter, r *http.Request) {
+
 }
 
-func (handler pingHandler) GetPath() string {
-	return "/secure/ping"
+func (handler streamHandler) GetPath() string {
+	return "/stream"
 }
 
-func (handler pingHandler) Secure() bool {
-	return true
+func (handler streamHandler) Secure() bool {
+	return false
 }

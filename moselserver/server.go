@@ -132,7 +132,8 @@ func (server *MoselServer) initHandler(r *mux.Router) {
 		h := server.Handlers[n]
 
 		f := func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTPContext(server.Context, w, r)
+			//h.ServeHTTPContext(server.Context, w, r)
+			h.ServeHTTP(w, r)
 		}
 
 		secure := h.Secure()

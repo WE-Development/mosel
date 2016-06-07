@@ -19,8 +19,8 @@ import (
 	"net/http"
 	"time"
 	"fmt"
-	"github.com/bluedevel/mosel/moselserver"
 	"github.com/bluedevel/mosel/moseld/server/context"
+	"log"
 )
 
 type debugHandler struct {
@@ -33,7 +33,7 @@ func NewDebugHandler(ctxd *context.MoseldServerContext) debugHandler {
 	}
 }
 
-func (handler debugHandler) ServeHTTPContext(ctx moselserver.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+func (handler debugHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var flusher http.Flusher
 
 	if f, ok := w.(http.Flusher); ok {
@@ -43,6 +43,10 @@ func (handler debugHandler) ServeHTTPContext(ctx moselserver.MoselServerContext,
 	}
 
 	for now := range time.Tick(1 * time.Second) {
+
+		log.Println(handler.ctxd.Debug)
+		handler.ctxd.Debug++
+
 		fmt.Fprintln(w, now)
 		flusher.Flush()
 	}

@@ -20,7 +20,8 @@ import (
 )
 
 type MoselHandler interface {
-	ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
+	http.Handler
+	//ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
 	GetPath() string
 	Secure() bool
 }

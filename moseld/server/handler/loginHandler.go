@@ -23,21 +23,24 @@ import (
 )
 
 type loginHandler struct {
+	ctx *moselserver.MoselServerContext
 }
 
-func NewLoginHandler() loginHandler {
-	return loginHandler{}
+func NewLoginHandler(ctx *moselserver.MoselServerContext) loginHandler {
+	return loginHandler{
+		ctx: ctx,
+	}
 }
 
-func (handler loginHandler) ServeHTTPContext(ctx moselserver.MoselServerContext, w http.ResponseWriter, r *http.Request) {
+func (handler loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp := api.NewLoginResponse()
 
 	user, passwd, enabled := r.BasicAuth()
 
-	if !enabled || !ctx.Auth.Authenticate(user, passwd) {
+	if !enabled || !handler.ctx.Auth.Authenticate(user, passwd) {
 		resp.Successful = false
 	} else {
-		key, validTo := ctx.Sessions.NewSession()
+		key, validTo := handler.ctx.Sessions.NewSession()
 		resp.Key = key
 		resp.ValidTo = validTo
 		resp.Successful = true

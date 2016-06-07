@@ -42,7 +42,7 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 		server.initNodeCache)
 
 	server.Handlers = []moselserver.MoselHandler{
-		handler.NewLoginHandler(),
+		handler.NewLoginHandler(&server.Context),
 		handler.NewPingHandler(),
 		handler.NewDebugHandler(&server.context),
 	}
