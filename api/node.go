@@ -14,3 +14,14 @@
  * limitations under the License.
  */
 package api
+
+//A wrapper for sending data over the stream from the nodes to server
+type nodeResponse struct {
+	moselResponse
+}
+
+func NewNodeResponse() nodeResponse {
+	return nodeResponse{
+		moselResponse: newMoselResponse(),
+	}
+}

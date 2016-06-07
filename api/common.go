@@ -54,14 +54,3 @@ func NewPingResponse() pingResponse {
 		moselResponse: newMoselResponse(),
 	}
 }
-
-type nodeResponse struct {
-	Name string
-	URL  string
-}
-
-func NewNodeResponse(name string, url string) nodeResponse {
-	return nodeResponse{
-		Name:name, URL:url,
-	}
-}
