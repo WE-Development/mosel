@@ -51,6 +51,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			ticker.Stop()
+			break
 		}
 
 		_, err = w.Write(data)
@@ -58,6 +59,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			ticker.Stop()
+			break
 		}
 
 		fmt.Fprint(w, "\n")
@@ -67,6 +69,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Println(err)
 			ticker.Stop()
+			break
 		}
 
 	}
