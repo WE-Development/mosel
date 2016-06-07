@@ -18,6 +18,8 @@ package api
 //A wrapper for sending data over the stream from the nodes to server
 type nodeResponse struct {
 	moselResponse
+
+	Test int
 }
 
 func NewNodeResponse() nodeResponse {

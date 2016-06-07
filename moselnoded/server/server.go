@@ -37,6 +37,7 @@ func NewMoselNodedServer(config MoselNodedServerConfig) *moselnodedServer {
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewPingHandler(),
+		handler.NewStreamHandler(&server.Context),
 	}
 
 	return &server

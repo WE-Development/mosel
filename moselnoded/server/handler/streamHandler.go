@@ -18,6 +18,11 @@ package handler
 import (
 	"github.com/bluedevel/mosel/moselserver"
 	"net/http"
+	"time"
+	"log"
+	"github.com/bluedevel/mosel/api"
+	"encoding/json"
+	"fmt"
 )
 
 type streamHandler struct {
@@ -30,8 +35,48 @@ func NewStreamHandler(ctx *moselserver.MoselServerContext) streamHandler {
 	}
 }
 
-func (handler streamHandler) ServeHTTPContext(w http.ResponseWriter, r *http.Request) {
+func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var flusher http.Flusher
 
+	if f, ok := w.(http.Flusher); ok {
+		flusher = f
+	} else {
+		return
+	}
+
+	ticker := time.NewTicker(1 * time.Second)
+	for now := range ticker.C {
+		data, err := json.Marshal(handler.createResponse(r, now))
+
+		if err != nil {
+			log.Println(err)
+			ticker.Stop()
+		}
+
+		_, err = w.Write(data)
+
+		if err != nil {
+			log.Println(err)
+			ticker.Stop()
+		}
+
+		fmt.Fprint(w, "\n")
+
+		if err == nil {
+			flusher.Flush()
+		} else {
+			log.Println(err)
+			ticker.Stop()
+		}
+
+	}
+
+}
+
+func (handler streamHandler) createResponse(r *http.Request, now time.Time) interface{} {
+	resp := api.NewNodeResponse()
+
+	return resp
 }
 
 func (handler streamHandler) GetPath() string {
