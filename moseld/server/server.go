@@ -58,7 +58,7 @@ func (server *moseldServer) initNodeCache() error {
 	c, err := context.NewNodeCache()
 	server.context.Nodes = *c
 
-	url, _ := url.Parse("http://localhost:8181/ping")
+	url, _ := url.Parse("http://localhost:8181/stream")
 	c.Add(&context.Node{
 		Name: "self",
 		URL: *url,

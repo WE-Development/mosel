@@ -19,10 +19,9 @@ import (
 	"github.com/bluedevel/mosel/moselserver"
 	"net/http"
 	"time"
-	"log"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 type streamHandler struct {
@@ -46,7 +45,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ticker := time.NewTicker(1 * time.Second)
 	for now := range ticker.C {
-		data, err := json.Marshal(handler.createResponse(r, now))
+		err := json.NewEncoder(w).Encode(handler.createResponse(r, now))
 
 		if err != nil {
 			log.Println(err)
@@ -54,24 +53,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		_, err = w.Write(data)
-
-		if err != nil {
-			log.Println(err)
-			ticker.Stop()
-			break
-		}
-
-		fmt.Fprint(w, "\n")
-
-		if err == nil {
-			flusher.Flush()
-		} else {
-			log.Println(err)
-			ticker.Stop()
-			break
-		}
-
+		flusher.Flush()
 	}
 
 }
