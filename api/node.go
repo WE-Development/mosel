@@ -16,14 +16,14 @@
 package api
 
 //A wrapper for sending data over the stream from the nodes to server
-type nodeResponse struct {
+type NodeResponse struct {
 	moselResponse
 
 	Test int
 }
 
-func NewNodeResponse() nodeResponse {
-	return nodeResponse{
+func NewNodeResponse() NodeResponse {
+	return NodeResponse{
 		moselResponse: newMoselResponse(),
 	}
 }

@@ -21,6 +21,8 @@ import (
 	"log"
 	"bufio"
 	"time"
+	"encoding/json"
+	"github.com/bluedevel/mosel/api"
 )
 
 type Node struct {
@@ -56,7 +58,7 @@ func (cache *nodeCache) Add(node *Node) {
 			reader := bufio.NewReader(resp.Body)
 
 			for {
-				line, err := reader.ReadBytes('\n')
+				data, err := reader.ReadBytes('\n')
 
 				if err != nil {
 					//check weather we are dealing with a non-stream resource
@@ -68,7 +70,13 @@ func (cache *nodeCache) Add(node *Node) {
 					continue Connection
 				}
 
-				log.Print(string(line))
+				//line := string(data)
+				var resp api.NodeResponse
+				json.Unmarshal(data, &resp)
+
+
+
+				//log.Println(resp)
 			}
 
 		}
