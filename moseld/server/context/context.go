@@ -20,8 +20,9 @@ import "github.com/bluedevel/mosel/moselserver"
 type MoseldServerContext struct {
 	moselserver.MoselServerContext
 
-	Nodes nodeCache
-	Cache dataCache
+	Nodes *nodeCache
+	Cache *dataCache
+	NodeHandler *nodeRespHandler
 
 	Debug int
 }

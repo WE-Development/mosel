@@ -17,13 +17,13 @@ package context
 
 import (
 	"net/url"
-	"net/http"
-	"log"
-	"bufio"
-	"time"
-	"encoding/json"
-	"github.com/bluedevel/mosel/api"
 	"errors"
+	"log"
+	"net/http"
+	"time"
+	"bufio"
+	"github.com/bluedevel/mosel/api"
+	"encoding/json"
 )
 
 type Node struct {
@@ -34,16 +34,18 @@ type Node struct {
 }
 
 type nodeCache struct {
-	nodes map[string]*Node
+	handler *nodeRespHandler
+	nodes   map[string]*Node
 }
 
-func NewNodeCache() (*nodeCache, error) {
+func NewNodeCache(handler *nodeRespHandler) *nodeCache {
 	c := &nodeCache{}
+	c.handler = handler
 	c.nodes = make(map[string]*Node)
-	return c, nil
+	return c
 }
 
-func (cache *nodeCache) Add(node *Node) {
+func (cache nodeCache) Add(node *Node) {
 	cache.nodes[node.Name] = node
 	node.close = make(chan struct{})
 	go func() {
@@ -80,7 +82,7 @@ func (cache *nodeCache) Add(node *Node) {
 
 					var resp api.NodeResponse
 					json.Unmarshal(data, &resp)
-					handleNodeResp(resp)
+					cache.handler.handleNodeResp(resp)
 				}
 			}
 

@@ -28,12 +28,13 @@ type moseldServer struct {
 	moselserver.MoselServer
 
 	config  MoseldServerConfig
-	context context.MoseldServerContext
+	context *context.MoseldServerContext
 }
 
 func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 	server := moseldServer{
 		config: config,
+		context: &context.MoseldServerContext{},
 	}
 
 	server.MoselServer = moselserver.MoselServer{
@@ -41,13 +42,14 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 	}
 
 	server.InitFuncs = append(server.InitFuncs,
+		server.initDebs,
 		server.initNodeCache,
 		server.initDataCache)
 
 	server.Handlers = []moselserver.MoselHandler{
-		handler.NewLoginHandler(&server.Context),
+		handler.NewLoginHandler(server.context),
 		handler.NewPingHandler(),
-		handler.NewDebugHandler(&server.context),
+		handler.NewDebugHandler(server.context),
 	}
 
 	return &server
@@ -57,9 +59,18 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
  * Initialize Context
  */
 
+func (server *moseldServer) initDebs() error {
+	ctx := server.context
+
+	ctx.NodeHandler = context.NewNodeRespHandler()
+	ctx.Nodes = context.NewNodeCache(ctx.NodeHandler)
+	ctx.Cache = context.NewDataCache()
+
+	return nil
+}
+
 func (server *moseldServer) initNodeCache() error {
-	c, err := context.NewNodeCache()
-	server.context.Nodes = *c
+	c := server.context.Nodes
 
 	url, _ := url.Parse("http://localhost:8181/stream")
 	c.Add(&context.Node{
@@ -76,11 +87,10 @@ func (server *moseldServer) initNodeCache() error {
 		}
 	}()
 
-	return err
+	return nil
 }
 
 func (server *moseldServer) initDataCache() error {
-	c, err := context.NewDataCache()
-	server.context.Cache = *c
-	return err
+	//c := server.context.Cache
+	return nil
 }

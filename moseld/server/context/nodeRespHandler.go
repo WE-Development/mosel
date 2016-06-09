@@ -20,6 +20,14 @@ import (
 	"log"
 )
 
-func handleNodeResp(resp api.NodeResponse) {
+type nodeRespHandler struct {
+
+}
+
+func NewNodeRespHandler() *nodeRespHandler {
+	return &nodeRespHandler{}
+}
+
+func (handler nodeRespHandler) handleNodeResp(resp api.NodeResponse) {
 	log.Println(resp)
 }

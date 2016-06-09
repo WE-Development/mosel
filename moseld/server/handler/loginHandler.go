@@ -19,14 +19,14 @@ import (
 	"net/http"
 	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moseld/server/context"
 )
 
 type loginHandler struct {
-	ctx *moselserver.MoselServerContext
+	ctx *context.MoseldServerContext
 }
 
-func NewLoginHandler(ctx *moselserver.MoselServerContext) loginHandler {
+func NewLoginHandler(ctx *context.MoseldServerContext) loginHandler {
 	return loginHandler{
 		ctx: ctx,
 	}

@@ -18,17 +18,32 @@ package context
 import "time"
 
 type dataCache struct {
-	times []*time.Time
+	times  []*time.Time
 	points map[string][]dataPoint
 }
 
 type dataPoint struct {
 	time *time.Time
-	val float64
+	val  float64
 }
 
-func NewDataCache() (*dataCache, error) {
+func NewDataCache() *dataCache {
 	c := &dataCache{}
 	c.points = make(map[string][]dataPoint)
-	return c, nil
+	return c
+}
+
+func (cache dataCache) Add(name string, val float64) {
+	points, ok := cache.points[name]
+
+	if !ok {
+		points = make([]dataPoint, 0)
+	}
+
+	now := time.Now()
+	points = append(points, dataPoint{
+		time: &now,
+		val: val,
+	})
+
 }
