@@ -20,6 +20,7 @@ import (
 	"github.com/bluedevel/mosel/moseld/server/handler"
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"net/url"
+	"time"
 )
 
 type moseldServer struct {
@@ -60,10 +61,15 @@ func (server *moseldServer) initNodeCache() error {
 	server.context.Nodes = *c
 
 	url, _ := url.Parse("http://localhost:8181/stream")
-	c.Add(&context.Node{
+	close := c.Add(&context.Node{
 		Name: "self",
 		URL: *url,
 	})
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		close <- struct{}{}
+	}()
 
 	return err
 }

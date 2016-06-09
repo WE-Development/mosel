@@ -40,11 +40,13 @@ func NewNodeCache() (*nodeCache, error) {
 	return c, nil
 }
 
-func (cache *nodeCache) Add(node *Node) {
+func (cache *nodeCache) Add(node *Node) (chan struct{}) {
 	cache.nodes[node.Name] = node
 
+	close := make(chan struct{})
 	go func() {
 		Connection: for {
+			log.Printf("Connect to %s via %s", node.Name, node.URL.String())
 			resp, err := http.Get(node.URL.String())
 
 			if err != nil {
@@ -55,32 +57,35 @@ func (cache *nodeCache) Add(node *Node) {
 				continue Connection
 			}
 
-			reader := bufio.NewReader(resp.Body)
-
 			for {
-				data, err := reader.ReadBytes('\n')
+				select {
+				case <-close:
+					resp.Body.Close()
+					break Connection
+				default:
+					reader := bufio.NewReader(resp.Body)
+					data, err := reader.ReadBytes('\n')
 
-				if err != nil {
-					//check weather we are dealing with a non-stream resource
-					if err.Error() != "EOF" {
-						log.Println(err)
+					if err != nil {
+						//check weather we are dealing with a non-stream resource
+						if err.Error() != "EOF" {
+							log.Println(err)
+						}
+
+						resp.Body.Close()
+						continue Connection
 					}
 
-					resp.Body.Close()
-					continue Connection
+					var resp api.NodeResponse
+					json.Unmarshal(data, &resp)
+					handleNodeResp(resp)
 				}
-
-				//line := string(data)
-				var resp api.NodeResponse
-				json.Unmarshal(data, &resp)
-
-
-
-				//log.Println(resp)
 			}
 
 		}
 	}()
+
+	return close
 }
 
 func (cache *nodeCache) Get(name string) *Node {
