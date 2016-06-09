@@ -26,8 +26,10 @@ import (
 )
 
 type Node struct {
-	Name string
-	URL  url.URL
+	Name  string
+	URL   url.URL
+
+	close chan struct{}
 }
 
 type nodeCache struct {
@@ -40,10 +42,9 @@ func NewNodeCache() (*nodeCache, error) {
 	return c, nil
 }
 
-func (cache *nodeCache) Add(node *Node) (chan struct{}) {
+func (cache *nodeCache) Add(node *Node) {
 	cache.nodes[node.Name] = node
-
-	close := make(chan struct{})
+	node.close = make(chan struct{})
 	go func() {
 		Connection: for {
 			log.Printf("Connect to %s via %s", node.Name, node.URL.String())
@@ -59,7 +60,7 @@ func (cache *nodeCache) Add(node *Node) (chan struct{}) {
 
 			for {
 				select {
-				case <-close:
+				case <-node.close:
 					resp.Body.Close()
 					break Connection
 				default:
@@ -84,10 +85,13 @@ func (cache *nodeCache) Add(node *Node) (chan struct{}) {
 
 		}
 	}()
-
-	return close
 }
 
 func (cache *nodeCache) Get(name string) *Node {
 	return cache.nodes[name]
+}
+
+func (cache *nodeCache) CloseNode(name string) {
+	node := cache.Get(name)
+	node.close <- struct{}{}
 }

@@ -61,14 +61,14 @@ func (server *moseldServer) initNodeCache() error {
 	server.context.Nodes = *c
 
 	url, _ := url.Parse("http://localhost:8181/stream")
-	close := c.Add(&context.Node{
+	c.Add(&context.Node{
 		Name: "self",
 		URL: *url,
 	})
 
 	go func() {
 		time.Sleep(5 * time.Second)
-		close <- struct{}{}
+		c.CloseNode("self")
 	}()
 
 	return err
