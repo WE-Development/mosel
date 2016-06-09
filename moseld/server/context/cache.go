@@ -15,12 +15,20 @@
  */
 package context
 
-type dataCache struct {
+import "time"
 
+type dataCache struct {
+	times []*time.Time
+	points map[string][]dataPoint
+}
+
+type dataPoint struct {
+	time *time.Time
+	val float64
 }
 
 func NewDataCache() (*dataCache, error) {
 	c := &dataCache{}
-
+	c.points = make(map[string][]dataPoint)
 	return c, nil
 }
