@@ -15,15 +15,17 @@
  */
 package context
 
-import "time"
+import (
+	"time"
+	"log"
+)
 
 type dataCache struct {
-	times  []*time.Time
 	points map[string][]dataPoint
 }
 
 type dataPoint struct {
-	time *time.Time
+	time time.Time
 	val  float64
 }
 
@@ -33,17 +35,19 @@ func NewDataCache() *dataCache {
 	return c
 }
 
-func (cache dataCache) Add(name string, val float64) {
+func (cache dataCache) Add(name string, t time.Time, val float64) {
 	points, ok := cache.points[name]
 
 	if !ok {
+		log.Println("Alloc")
 		points = make([]dataPoint, 0)
 	}
 
-	now := time.Now()
 	points = append(points, dataPoint{
-		time: &now,
+		time: t.Round(time.Second),
 		val: val,
 	})
 
+	log.Println(points)
+	cache.points[name] = points
 }

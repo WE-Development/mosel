@@ -62,9 +62,9 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 func (server *moseldServer) initDebs() error {
 	ctx := server.context
 
-	ctx.NodeHandler = context.NewNodeRespHandler()
-	ctx.Nodes = context.NewNodeCache(ctx.NodeHandler)
 	ctx.Cache = context.NewDataCache()
+	ctx.NodeHandler = context.NewNodeRespHandler(ctx.Cache)
+	ctx.Nodes = context.NewNodeCache(ctx.NodeHandler)
 
 	return nil
 }

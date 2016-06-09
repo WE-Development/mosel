@@ -82,7 +82,7 @@ func (cache nodeCache) Add(node *Node) {
 
 					var resp api.NodeResponse
 					json.Unmarshal(data, &resp)
-					cache.handler.handleNodeResp(resp)
+					cache.handler.handleNodeResp(node.Name, resp)
 				}
 			}
 

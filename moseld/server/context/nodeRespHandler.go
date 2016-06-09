@@ -21,13 +21,17 @@ import (
 )
 
 type nodeRespHandler struct {
-
+	cache *dataCache
 }
 
-func NewNodeRespHandler() *nodeRespHandler {
-	return &nodeRespHandler{}
+func NewNodeRespHandler(cache *dataCache) *nodeRespHandler {
+	log.Println(cache)
+	return &nodeRespHandler{
+		cache: cache,
+	}
 }
 
-func (handler nodeRespHandler) handleNodeResp(resp api.NodeResponse) {
+func (handler nodeRespHandler) handleNodeResp(name string, resp api.NodeResponse) {
 	log.Println(resp)
+	handler.cache.Add(name, resp.Time, float64(resp.Test))
 }
