@@ -34,7 +34,7 @@ type moseldServer struct {
 func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 	server := moseldServer{
 		config: config,
-		context: &context.MoseldServerContext{},
+		context: new(context.MoseldServerContext),
 	}
 
 	server.MoselServer = moselserver.MoselServer{
