@@ -19,10 +19,13 @@ import (
 	"time"
 	"log"
 	"github.com/bluedevel/mosel/api"
+	"sync"
 )
 
 type dataCache struct {
 	points map[string][]dataPoint
+
+	m sync.Mutex
 }
 
 type dataPoint struct {
@@ -36,17 +39,25 @@ func NewDataCache() *dataCache {
 	return c
 }
 
-func (cache dataCache) Add(node string, t time.Time, info api.NodeInfo) {
+func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
+
+	var arr []dataPoint
+
+	cache.m.Lock()
 
 	if _, ok := cache.points[node]; !ok {
-		cache.points[node] = make([]dataPoint, 0)
+		arr = make([]dataPoint, 0)
+	} else {
+		arr = cache.points[node]
 	}
 
-	cache.points[node] =
-	append(cache.points[node], dataPoint{
+	arr = append(arr, dataPoint{
 		time: t.Round(time.Second),
 		info: info,
 	})
 
+	cache.points[node] = arr
 	log.Println(cache.points[node])
+
+	cache.m.Unlock()
 }
