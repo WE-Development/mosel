@@ -21,7 +21,7 @@ import (
 )
 
 type dataCache struct {
-	points map[string][]dataPoint
+	points map[string]map[string][]dataPoint
 }
 
 type dataPoint struct {
@@ -31,23 +31,27 @@ type dataPoint struct {
 
 func NewDataCache() *dataCache {
 	c := &dataCache{}
-	c.points = make(map[string][]dataPoint)
+	c.points = make(map[string]map[string][]dataPoint)
 	return c
 }
 
-func (cache dataCache) Add(name string, t time.Time, val float64) {
-	points, ok := cache.points[name]
+func (cache dataCache) Add(node string, name string, t time.Time, val float64) {
 
-	if !ok {
+	if _, ok := cache.points[node]; !ok {
 		log.Println("Alloc")
-		points = make([]dataPoint, 0)
+		cache.points[node] = make(map[string][]dataPoint)
 	}
 
-	points = append(points, dataPoint{
+	if _, ok := cache.points[node][name]; !ok {
+		log.Println("Alloc2")
+		cache.points[node][name] = make([]dataPoint, 0)
+	}
+
+	cache.points[node][name] =
+	append(cache.points[node][name], dataPoint{
 		time: t.Round(time.Second),
 		val: val,
 	})
 
-	log.Println(points)
-	cache.points[name] = points
+	log.Println(cache.points[node][name])
 }

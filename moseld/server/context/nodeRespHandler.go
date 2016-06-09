@@ -31,7 +31,7 @@ func NewNodeRespHandler(cache *dataCache) *nodeRespHandler {
 	}
 }
 
-func (handler nodeRespHandler) handleNodeResp(name string, resp api.NodeResponse) {
+func (handler nodeRespHandler) handleNodeResp(node string, resp api.NodeResponse) {
 	log.Println(resp)
-	handler.cache.Add(name, resp.Time, float64(resp.Test))
+	handler.cache.Add(node, "test", resp.Time, float64(resp.Test))
 }
