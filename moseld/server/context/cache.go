@@ -15,13 +15,12 @@
  */
 package context
 
-import "github.com/bluedevel/mosel/moselserver"
+type dataCache struct {
 
-type MoseldServerContext struct {
-	moselserver.MoselServerContext
+}
 
-	Nodes nodeCache
-	Cache dataCache
+func NewDataCache() (*dataCache, error) {
+	c := &dataCache{}
 
-	Debug int
+	return c, nil
 }

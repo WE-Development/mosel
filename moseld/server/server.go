@@ -39,7 +39,8 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 	}
 
 	server.InitFuncs = append(server.InitFuncs,
-		server.initNodeCache)
+		server.initNodeCache,
+		server.initDataCache)
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewLoginHandler(&server.Context),
@@ -64,5 +65,11 @@ func (server *moseldServer) initNodeCache() error {
 		URL: *url,
 	})
 
+	return err
+}
+
+func (server *moseldServer) initDataCache() error {
+	c, err := context.NewDataCache()
+	server.context.Cache = *c
 	return err
 }
