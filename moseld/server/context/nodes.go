@@ -23,6 +23,7 @@ import (
 	"time"
 	"encoding/json"
 	"github.com/bluedevel/mosel/api"
+	"errors"
 )
 
 type Node struct {
@@ -87,11 +88,21 @@ func (cache *nodeCache) Add(node *Node) {
 	}()
 }
 
-func (cache *nodeCache) Get(name string) *Node {
-	return cache.nodes[name]
+func (cache *nodeCache) Get(name string) (*Node, error) {
+	if val, ok := cache.nodes[name]; ok {
+		return val, nil
+	}
+
+	return nil, errors.New("No node with name " + name + " registered")
 }
 
-func (cache *nodeCache) CloseNode(name string) {
-	node := cache.Get(name)
+func (cache *nodeCache) CloseNode(name string) error {
+	node, err := cache.Get(name)
+
+	if err != nil {
+		return err
+	}
+
 	node.close <- struct{}{}
+	return nil
 }

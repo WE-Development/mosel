@@ -21,6 +21,7 @@ import (
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"net/url"
 	"time"
+	"log"
 )
 
 type moseldServer struct {
@@ -68,7 +69,11 @@ func (server *moseldServer) initNodeCache() error {
 
 	go func() {
 		time.Sleep(5 * time.Second)
-		c.CloseNode("self")
+
+		if err := c.CloseNode("self");
+		err != nil {
+			log.Println(err)
+		}
 	}()
 
 	return err
