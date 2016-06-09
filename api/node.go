@@ -15,15 +15,23 @@
  */
 package api
 
+type NodeInfo struct {
+	Test int
+}
+
 //A wrapper for sending data over the stream from the nodes to server
 type NodeResponse struct {
 	moselResponse
-
-	Test int
+	NodeInfo
 }
 
 func NewNodeResponse() NodeResponse {
 	return NodeResponse{
 		moselResponse: newMoselResponse(),
+		NodeInfo: NewNodeInfo(),
 	}
+}
+
+func NewNodeInfo() NodeInfo {
+	return NodeInfo{}
 }

@@ -18,40 +18,35 @@ package context
 import (
 	"time"
 	"log"
+	"github.com/bluedevel/mosel/api"
 )
 
 type dataCache struct {
-	points map[string]map[string][]dataPoint
+	points map[string][]dataPoint
 }
 
 type dataPoint struct {
 	time time.Time
-	val  float64
+	info api.NodeInfo
 }
 
 func NewDataCache() *dataCache {
 	c := &dataCache{}
-	c.points = make(map[string]map[string][]dataPoint)
+	c.points = make(map[string][]dataPoint)
 	return c
 }
 
-func (cache dataCache) Add(node string, name string, t time.Time, val float64) {
+func (cache dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 
 	if _, ok := cache.points[node]; !ok {
-		log.Println("Alloc")
-		cache.points[node] = make(map[string][]dataPoint)
+		cache.points[node] = make([]dataPoint, 0)
 	}
 
-	if _, ok := cache.points[node][name]; !ok {
-		log.Println("Alloc2")
-		cache.points[node][name] = make([]dataPoint, 0)
-	}
-
-	cache.points[node][name] =
-	append(cache.points[node][name], dataPoint{
+	cache.points[node] =
+	append(cache.points[node], dataPoint{
 		time: t.Round(time.Second),
-		val: val,
+		info: info,
 	})
 
-	log.Println(cache.points[node][name])
+	log.Println(cache.points[node])
 }
