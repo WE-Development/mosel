@@ -63,7 +63,7 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	cache.m.Unlock()
 }
 
-func (cache *dataCache) GetByTime(node string, t time.Time) (api.NodeInfo, error) {
+func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 
 	points, ok := cache.points[node]
 
