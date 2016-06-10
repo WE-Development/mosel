@@ -26,6 +26,8 @@ import (
 
 type streamHandler struct {
 	ctx *moselserver.MoselServerContext
+
+	test int
 }
 
 func NewStreamHandler(ctx *moselserver.MoselServerContext) streamHandler {
@@ -58,9 +60,13 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (handler streamHandler) createResponse(r *http.Request, now time.Time) interface{} {
+func (handler *streamHandler) createResponse(r *http.Request, now time.Time) interface{} {
 	resp := api.NewNodeResponse()
 
+
+
+	resp.Test = handler.test
+	handler.test += 1
 	return resp
 }
 
