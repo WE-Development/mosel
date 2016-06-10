@@ -50,6 +50,7 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 		handler.NewLoginHandler(server.context),
 		handler.NewPingHandler(),
 		handler.NewDebugHandler(server.context),
+		handler.NewNodeInfoHandler(server.context),
 	}
 
 	return &server

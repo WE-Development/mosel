@@ -17,7 +17,6 @@ package context
 
 import (
 	"time"
-	"log"
 	"github.com/bluedevel/mosel/api"
 	"sync"
 	"errors"
@@ -66,7 +65,7 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 	points, err := cache.GetAll(node)
 
 	if err != nil {
-		return nil, err
+		return api.NodeInfo{}, err
 	}
 
 	for _, p := range points {
@@ -75,7 +74,7 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 		}
 	}
 
-	return nil, errors.New("No datapoint found for time " + t.String())
+	return api.NodeInfo{}, errors.New("No datapoint found for time " + t.String())
 }
 
 func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) {
@@ -94,7 +93,7 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) 
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func (cache *dataCache) GetAll(node string) ([]dataPoint, error) {
@@ -107,5 +106,5 @@ func (cache *dataCache) GetAll(node string) ([]dataPoint, error) {
 	}
 
 	cache.m.Unlock()
-	return points
+	return points, nil
 }
