@@ -1,3 +1,7 @@
+### Mosel UI
+moselui/node_modules
+moselui/typings
+
 # Created by .ignore support plugin (hsz.mobi)
 ### OSX template
 .DS_Store
@@ -164,3 +168,5 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+moselui/node_modules/
+moselui/typings/
