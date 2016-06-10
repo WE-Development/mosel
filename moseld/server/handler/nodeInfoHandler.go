@@ -18,7 +18,11 @@ package handler
 import (
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"net/http"
-	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/bluedevel/mosel/api"
+	"encoding/json"
+	"log"
+	"strconv"
 )
 
 type nodeInfoHandler struct {
@@ -32,11 +36,23 @@ func NewNodeInfoHandler(ctxd *context.MoseldServerContext) *nodeInfoHandler {
 }
 
 func (handler nodeInfoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hallo Welt")
+	vars := mux.Vars(r)
+	node := vars["node"]
+
+	points, _ := handler.ctxd.Cache.GetAll(node)
+	resp := api.NewNodeInfoResponse()
+
+	for _, point := range points {
+		var stamp string = strconv.FormatInt(point.Time.Unix(), 10)
+		resp.Data[stamp] = point.Info
+	}
+
+	log.Println(resp)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (handler nodeInfoHandler) GetPath() string {
-	return "/nodeInfo"
+	return "/nodeInfo/{node}"
 }
 
 func (handler nodeInfoHandler) Secure() bool {

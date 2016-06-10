@@ -30,3 +30,16 @@ func NewLoginResponse() loginResponse {
 		moselResponse: newMoselResponse(),
 	}
 }
+
+type nodeInfoRepsonse struct {
+	moselResponse
+
+	Data map[string]NodeInfo
+}
+
+func NewNodeInfoResponse() nodeInfoRepsonse {
+	return nodeInfoRepsonse{
+		moselResponse: newMoselResponse(),
+		Data: make(map[string]NodeInfo),
+	}
+}
