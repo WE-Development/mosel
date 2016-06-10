@@ -20,12 +20,13 @@ import (
 	"log"
 	"github.com/bluedevel/mosel/api"
 	"sync"
+	"errors"
 )
 
 type dataCache struct {
 	points map[string][]dataPoint
 
-	m sync.Mutex
+	m      sync.Mutex
 }
 
 type dataPoint struct {
@@ -60,4 +61,21 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	log.Println(cache.points[node])
 
 	cache.m.Unlock()
+}
+
+func (cache *dataCache) GetByTime(node string, t time.Time) (api.NodeInfo, error) {
+
+	points, ok := cache.points[node]
+
+	if !ok {
+		return nil, errors.New("No node with name " + node)
+	}
+
+	for _, p := range points {
+		if p.time.Unix() == t.Unix() {
+			return p.info, nil
+		}
+	}
+
+	return nil, errors.New("No datapoint found for time " + t.String())
 }
