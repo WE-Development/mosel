@@ -58,8 +58,6 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	})
 
 	cache.points[node] = arr
-	log.Println(cache.points[node])
-
 	cache.m.Unlock()
 }
 
