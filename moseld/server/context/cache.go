@@ -100,11 +100,14 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) 
 }
 
 func (cache *dataCache) GetAll(node string) ([]dataPoint, error) {
+	cache.m.Lock()
+
 	points, ok := cache.points[node]
 
 	if !ok {
 		return nil, errors.New("No node with name " + node)
 	}
 
+	cache.m.Unlock()
 	return points
 }
