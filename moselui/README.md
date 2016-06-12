@@ -1,2 +1,0 @@
-# Mosel UI
-MonitoringServiceLinux Frontend
