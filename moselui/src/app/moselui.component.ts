@@ -1,18 +1,21 @@
 import {Component} from "@angular/core";
-import {MD_CARD_DIRECTIVES} from "@angular2-material/card/card";
-import {MD_BUTTON_DIRECTIVES} from "@angular2-material/button/button";
-import {MD_CHECKBOX_DIRECTIVES} from "@angular2-material/checkbox/checkbox";
+import {CHART_DIRECTIVES} from "angular2-highcharts/index";
 
 @Component({
   moduleId: module.id,
   selector: 'moselui-app',
   templateUrl: 'moselui.component.html',
   styleUrls: ['moselui.component.css'],
-  directives: [
-    MD_CARD_DIRECTIVES,
-    MD_BUTTON_DIRECTIVES,
-    MD_CHECKBOX_DIRECTIVES]
+  directives: [CHART_DIRECTIVES],
 })
 export class MoseluiAppComponent {
-  title = 'moselui works!';
+  constructor() {
+    this.options = {
+      title : { text : 'simple chart' },
+      series: [{
+        data: [29.9, 71.5, 106.4, 129.2],
+      }]
+    };
+  }
+  options: Object;
 }
