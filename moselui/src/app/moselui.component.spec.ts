@@ -14,9 +14,5 @@ describe('App: Moselui', () => {
       inject([MoseluiAppComponent], (app: MoseluiAppComponent) => {
     expect(app).toBeTruthy();
   }));
-
-  /*it('should have as title \'moselui works!\'',
-      inject([MoseluiAppComponent], (app: MoseluiAppComponent) => {
-    expect(app.title).toEqual('moselui works!');
-  }));*/
+  
 });
