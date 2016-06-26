@@ -31,6 +31,19 @@ func NewLoginResponse() loginResponse {
 	}
 }
 
+type infoResponse struct {
+	moselResponse
+
+	Nodes []string
+}
+
+func NewInfoResponse() infoResponse {
+	return infoResponse{
+		moselResponse: newMoselResponse(),
+		Nodes: make([]string, 0),
+	}
+}
+
 type nodeInfoRepsonse struct {
 	moselResponse
 

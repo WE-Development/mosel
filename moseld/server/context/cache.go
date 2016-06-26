@@ -109,3 +109,15 @@ func (cache *dataCache) GetAll(node string) ([]dataPoint, error) {
 	cache.m.Unlock()
 	return points, nil
 }
+
+func (cache *dataCache) GetNodes() []string {
+	nodes := make([]string, len(cache.points))
+
+	i := 0
+	for k := range cache.points {
+		nodes[i] = k
+		i++
+	}
+
+	return nodes
+}
