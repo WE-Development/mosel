@@ -1,6 +1,8 @@
 import {environment} from "./";
 import { Injectable } from '@angular/core';
-import {Http, Headers} from '@angular/http';
+import {Http, Response} from '@angular/http';
+import {Observable} from "rxjs/Observable";
+import "rxjs/add/operator/map"
 
 @Injectable()
 export class NodeService {
@@ -8,16 +10,16 @@ export class NodeService {
   nodes: string[];
 
   constructor(private http: Http) {
+  }
 
-    this.http.get(environment.baseUrl + '/info')
-      //.map(res => res.text())
-      .subscribe(
-        data => console.log(data),
-        err => console.error(err),
-        () => console.log('Complete')
-      );
+  getNodes(): Observable<any> {
+    return this.http.get(environment.baseUrl + '/info')
+      .map(this.extractData);
+  }
 
-
+  private extractData(res:Response) {
+    let body = res.json();
+    return body || { }
   }
 
 }

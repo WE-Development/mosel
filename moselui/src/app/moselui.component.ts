@@ -18,6 +18,11 @@ export class MoseluiAppComponent {
         data: [29.9, 71.5, 106.4, 129.2],
       }]
     };
+
+    this.nodeService.getNodes()
+      .subscribe(
+        res => console.log(res), 
+        err => console.log('Shit happens: ' + err))
   }
 
   options:Object;
