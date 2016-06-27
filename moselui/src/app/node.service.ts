@@ -1,25 +1,25 @@
 import {environment} from "./";
-import { Injectable } from '@angular/core';
-import {Http, Response} from '@angular/http';
+import {Injectable} from "@angular/core";
+import {Http, Response} from "@angular/http";
 import {Observable} from "rxjs/Observable";
-import "rxjs/add/operator/map"
+import "rxjs/add/operator/map";
 
 @Injectable()
 export class NodeService {
 
-  nodes: string[];
+  nodes:string[];
 
-  constructor(private http: Http) {
+  constructor(private http:Http) {
   }
 
-  getNodes(): Observable<any> {
+  getNodes():Observable<any> {
     return this.http.get(environment.baseUrl + '/info')
-      .map(this.extractData);
+      .map(NodeService.extractData);
   }
 
-  private extractData(res:Response) {
+  private static extractData(res:Response) {
     let body = res.json();
-    return body || { }
+    return body || {}
   }
 
 }
