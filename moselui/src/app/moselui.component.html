@@ -2,14 +2,16 @@
   <li *ngFor="let node of nodes">{{ node }}</li>
 </ul>
 
-<md-card>
-  <md-card-title>Basic grid list</md-card-title>
-  <md-card-content class="demo-basic-list">
-    <md-grid-list cols="4" [rowHeight]="100">
-      <md-grid-tile> One </md-grid-tile>
-      <md-grid-tile> Two </md-grid-tile>
-      <md-grid-tile> Three </md-grid-tile>
-      <md-grid-tile> Four </md-grid-tile>
-    </md-grid-list>
-  </md-card-content>
-</md-card>
+<div class="demo-card-container">
+  <md-card class="demo-card-blue md-card-flat">
+    <md-card-title>Basic grid list</md-card-title>
+    <md-card-content class="demo-basic-list">
+      <md-grid-list cols="4" [rowHeight]="100">
+        <md-grid-tile class="blue darken-2"> One</md-grid-tile>
+        <md-grid-tile class="blue darken-2"> Two</md-grid-tile>
+        <md-grid-tile class="blue darken-2"> Three</md-grid-tile>
+        <md-grid-tile class="blue darken-2"> Four</md-grid-tile>
+      </md-grid-list>
+    </md-card-content>
+  </md-card>
+</div>
