@@ -14,6 +14,7 @@ module.exports = function(defaults) {
       '@angular/**/*.+(js|js.map)',
       '@angular2-material/**/*',
       'angular2-highcharts/**/*.+(js|js.map)',
+      'materialize-css/dist/**/*',
       'highcharts/**/*.+(js|js.map)'
     ]
   });
