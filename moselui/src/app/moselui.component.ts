@@ -1,8 +1,6 @@
 import {NodeService} from "./node.service";
 import {Component} from "@angular/core";
 import {CHART_DIRECTIVES} from "angular2-highcharts/index";
-import {MD_CARD_DIRECTIVES} from "@angular2-material/card/card";
-import {MD_GRID_LIST_DIRECTIVES} from "@angular2-material/grid-list/grid-list";
 
 @Component({
   moduleId: module.id,
@@ -10,9 +8,7 @@ import {MD_GRID_LIST_DIRECTIVES} from "@angular2-material/grid-list/grid-list";
   templateUrl: 'moselui.component.html',
   styleUrls: ['moselui.component.css'],
   directives: [
-    CHART_DIRECTIVES,
-    MD_CARD_DIRECTIVES,
-    MD_GRID_LIST_DIRECTIVES
+    CHART_DIRECTIVES
   ],
   providers: [NodeService],
 })

@@ -3,7 +3,6 @@
  **********************************************************************************************/
 /** Map relative paths to URLs. */
 const map:any = {
-  '@angular2-material': 'vendor/@angular2-material',
   'angular2-highcharts': 'vendor/angular2-highcharts',
   'highcharts/highstock.src': 'vendor/highcharts/highstock.src.js'
 };
@@ -16,23 +15,6 @@ const packages:any = {
     defaultExtension: 'js'
   },
 };
-
-const materialPkgs:string[] = [
-  'core',
-  'button',
-  'card',
-  'checkbox',
-  'card',
-  'grid-list',
-];
-
-materialPkgs.forEach((pkg) => {
-  packages[`@angular2-material/${pkg}`] = {
-    main: `${pkg}.js`,
-    format: 'cjs',
-    defaultExtension: 'js'
-  };
-});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /***********************************************************************************************
