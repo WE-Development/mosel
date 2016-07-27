@@ -168,5 +168,5 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-moselui/node_modules/
-moselui/typings/
+moselui/node_modules
+moselui/distribution
