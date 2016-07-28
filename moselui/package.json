@@ -4,9 +4,8 @@
   "description": "A simple ui for the mosel system",
   "main": "index.js",
   "scripts": {
-    "build": "bin/build",
-    "serve": "bin/serve",
-
+    "build": "bin/build.sh",
+    "serve": "bin/serve.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Robin Engel",
@@ -15,6 +14,11 @@
     "babel-cli": "^6.11.4",
     "babel-preset-es2015": "^6.9.0",
     "copyfiles": "^1.0.0",
+    "del": "^2.2.1",
     "http-server": "^0.9.0"
+  },
+  "babel": {
+    "presets": ["es2015"],
+    "minified": true
   }
 }

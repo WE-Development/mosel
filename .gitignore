@@ -170,3 +170,4 @@ $RECYCLE.BIN/
 
 moselui/node_modules
 moselui/distribution
+!moselui/bin
