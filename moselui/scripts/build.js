@@ -1,3 +1,18 @@
+/*
+ * CONFIG
+ */
+
+var include = [
+    'src/**/*.html',
+    'src/**/*.css'
+];
+var dist = 'dist';
+var es6Main = 'src/MoselUI.es6';
+
+/*
+ * CONFIG END
+ */
+
 var fs = require("fs");
 var browserify = require("browserify");
 var bablify = require("babelify");
@@ -6,20 +21,17 @@ var rm = require("del");
 var mkdir = require("mkdirp");
 
 //cleanup
-rm.sync(['dist']);
-mkdir.sync('dist');
+rm.sync([dist]);
+mkdir.sync(dist);
 
-cp([
-        './src/**/*.html',
-
-        './dist'
-    ], true,
+include.push(dist);
+cp(include, 1,
     function (err, files) {
         if (typeof err != 'undefined') console.error(err);
-        console.log('Copied ' + files);
+        //console.log('Copied ' + files);
     });
 
-browserify('src/MoselUI.es6')
+browserify(es6Main)
     .transform(bablify, {presets: ["es2015"]})
     .bundle()
     .pipe(fs.createWriteStream('dist/moselui.min.js'));
