@@ -1,6 +1,6 @@
 import $ from "jquery";
 
-class MoselUI {
+window.app = new class {
 
     constructor() {
         console.log("Init mosel ui");
@@ -8,6 +8,7 @@ class MoselUI {
         //console.log(bootstrap);
     }
 
-}
-
-new MoselUI();
+    logIn() {
+        console.log("login");
+    }
+}();
