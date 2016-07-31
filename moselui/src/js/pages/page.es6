@@ -11,15 +11,17 @@ export class Controller {
     }
 
     load() {
-        console.debug(this.container, this.view);
+        this.container.ready(() => {
+            console.debug(this.container, this.view);
 
-        if (typeof this.container.controller != 'undefined') {
-            this.container.controller.destroy();
-        }
+            if (typeof this.container.controller != 'undefined') {
+                this.container.controller.destroy();
+            }
 
-        this.container.controller = this;
-        this.container.load(this.view);
-        $(this.container).ready(() => this.init());
+            this.container.controller = this;
+            this.container.load(this.view);
+            $(this.container).ready(() => this.init());
+        });
     }
 
     destroy() {
