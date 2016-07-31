@@ -5,7 +5,7 @@ import {Dashboard} from "./pages/dashboard.es6";
 class MoselUI extends Controller {
 
     constructor() {
-        super($('#moselui'), 'pages/moselui.html');
+        super($('#moselui'), 'pages/moselui.view');
     }
 
     init() {
@@ -14,7 +14,7 @@ class MoselUI extends Controller {
 
         this.pages = {
             dashboard: new Dashboard(content),
-            page2: new Controller(content, "pages/page2.html")
+            page2: new Controller(content, "pages/page2.view")
         };
 
         this.loadContent('dashboard');

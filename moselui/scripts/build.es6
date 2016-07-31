@@ -16,7 +16,7 @@ var resourceInclude = [
     {
         up: 1,
         paths: [
-            'src/**/*.html',
+            'src/**/*.view',
             'src/**/*.css'
         ]
     },

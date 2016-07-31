@@ -2,23 +2,23 @@ import $ from "jquery";
 
 export class Controller {
 
-    constructor(container, html) {
+    constructor(container, view) {
         this.container = container;
-        this.html = html;
+        this.view = view;
     }
 
     init() {
     }
 
     load() {
-        console.debug(this.container, this.html);
+        console.debug(this.container, this.view);
 
         if (typeof this.container.controller != 'undefined') {
             this.container.controller.destroy();
         }
 
         this.container.controller = this;
-        this.container.load(this.html);
+        this.container.load(this.view);
         $(this.container).ready(() => this.init());
     }
 

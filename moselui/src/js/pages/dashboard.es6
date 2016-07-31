@@ -3,7 +3,7 @@ import {Controller} from "./page.es6";
 export class Dashboard extends Controller {
 
     constructor(container) {
-        super(container, "pages/dashboard.html");
+        super(container, "pages/dashboard.view");
     }
 
     init() {
