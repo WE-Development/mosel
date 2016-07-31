@@ -1,4 +1,4 @@
-import {Controller} from "./page.es6";
+import {Controller} from "./controller.es6";
 
 export class Dashboard extends Controller {
 

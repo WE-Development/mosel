@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {Controller} from "./page.es6";
+import {Controller} from "./controller.es6";
 import {Dashboard} from "./dashboard.es6";
 
 export class MoselUI extends Controller {
