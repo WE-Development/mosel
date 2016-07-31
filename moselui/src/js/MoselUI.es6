@@ -1,38 +1,37 @@
 import $ from "jquery";
-import {Page} from "./pages/page.es6";
+import {Controller} from "./pages/page.es6";
 import {Dashboard} from "./pages/dashboard.es6";
 
-window.app = new class {
+class MoselUI extends Controller {
 
     constructor() {
+        super($('#moselui'), 'pages/moselui.html');
+    }
+
+    init() {
+        console.log('Init MoselUI');
+        var content = $('#content');
+
         this.pages = {
-            dashboard: new Dashboard(),
-            page2: new Page("pages/page2.html")
+            dashboard: new Dashboard(content),
+            page2: new Controller(content, "pages/page2.html")
         };
 
-        $(document).ready(() => {
-            this.loadContent('dashboard');
-        });
+        this.loadContent('dashboard');
     }
 
     loadContent(pageName) {
-
-        if (typeof this.currentPage != 'undefined') {
-            this.currentPage.destroy();
+        if (pageName in this.pages) {
+            this.pages[pageName].load();
         }
-
-        if (!(pageName in this.pages)) {
-            return;
-        }
-
-        this.currentPage = this.pages[pageName];
-        var content = $('#content');
-
-        content.load(this.currentPage.html);
-        content.ready(() => this.currentPage.init());
     }
 
     logIn() {
         console.log("login");
     }
-}();
+}
+
+$(document).ready(() => {
+    window.app = new MoselUI();
+    window.app.load();
+});

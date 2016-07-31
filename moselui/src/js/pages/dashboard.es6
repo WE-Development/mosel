@@ -1,9 +1,9 @@
-import {Page} from "./page.es6";
+import {Controller} from "./page.es6";
 
-export class Dashboard extends Page {
+export class Dashboard extends Controller {
 
-    constructor() {
-        super("pages/dashboard.html");
+    constructor(container) {
+        super(container, "pages/dashboard.html");
     }
 
     init() {
