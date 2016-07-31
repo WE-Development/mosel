@@ -1,33 +1,6 @@
 import $ from "jquery";
-
-class Page {
-
-    constructor(html) {
-        this.html = html;
-    }
-
-    init() {
-    }
-
-    destroy() {
-    }
-}
-
-class Dashboard extends Page {
-
-    constructor() {
-        super("pages/dashboard.html");
-    }
-
-    init() {
-        console.log("Dashboard init")
-    }
-
-    destroy() {
-        console.log("Dashboard destroy")
-    }
-
-}
+import {Page} from "./pages/page.es6";
+import {Dashboard} from "./pages/dashboard.es6";
 
 window.app = new class {
 
