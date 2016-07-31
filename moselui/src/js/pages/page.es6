@@ -5,7 +5,6 @@ export class Controller {
     constructor(container, view) {
         this.container = container;
         this.view = view;
-
     }
 
     init() {
