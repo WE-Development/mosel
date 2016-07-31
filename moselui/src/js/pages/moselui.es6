@@ -1,11 +1,11 @@
 import $ from "jquery";
-import {Controller} from "./pages/page.es6";
-import {Dashboard} from "./pages/dashboard.es6";
+import {Controller} from "./page.es6";
+import {Dashboard} from "./dashboard.es6";
 
-class MoselUI extends Controller {
+export class MoselUI extends Controller {
 
-    constructor() {
-        super($('#moselui'), 'pages/moselui.view');
+    constructor(container) {
+        super(container, 'pages/moselui.html');
     }
 
     init() {
@@ -14,7 +14,7 @@ class MoselUI extends Controller {
 
         this.pages = {
             dashboard: new Dashboard(content),
-            page2: new Controller(content, "pages/page2.view")
+            page2: new Controller(content, "pages/page2.html")
         };
 
         this.loadContent('dashboard');
@@ -30,8 +30,3 @@ class MoselUI extends Controller {
         console.log("login");
     }
 }
-
-$(document).ready(() => {
-    window.app = new MoselUI();
-    window.app.load();
-});

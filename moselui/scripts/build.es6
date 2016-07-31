@@ -7,16 +7,14 @@ var es2015Target = 'dist/js/moselui.min.js';
 
 var jsInclude = [
     'src/js/requireBootstrap.js',
-    'src/js/MoselUI.es6',
-    //'node_modules/jquery/dist/jquery.min.js',
-    //'node_modules/bootstrap/dist/js/bootstrap.min.js',
+    'src/js/index.es6'
 ];
 
 var resourceInclude = [
     {
         up: 1,
         paths: [
-            'src/**/*.view',
+            'src/**/*.html',
             'src/**/*.css'
         ]
     },
