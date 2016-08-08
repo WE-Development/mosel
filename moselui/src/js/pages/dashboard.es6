@@ -7,11 +7,11 @@ export class Dashboard extends Controller {
     }
 
     init() {
-        console.log("Dashboard init")
+        console.log("Dashboard init");
     }
 
     destroy() {
-        console.log("Dashboard destroy")
+        console.log("Dashboard destroy");
     }
 
 }
