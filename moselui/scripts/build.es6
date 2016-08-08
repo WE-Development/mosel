@@ -6,7 +6,7 @@ var dist = 'dist';
 var es2015Target = 'dist/js/moselui.min.js';
 
 var jsInclude = [
-    'src/js/requireBootstrap.js',
+    'src/js/setup.js',
     'src/js/index.es6'
 ];
 
