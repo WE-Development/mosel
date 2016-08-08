@@ -14,7 +14,7 @@ export class Controller {
         this.container.ready(() => {
             console.debug(this.container, this.view);
 
-            if (typeof this.container.controller != 'undefined') {
+            if (this.container.controller instanceof Controller) {
                 this.container.controller.destroy();
             }
 
