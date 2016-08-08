@@ -17,10 +17,12 @@ export class Controller {
 
             if (this.container.controller instanceof Controller) {
                 this.container.controller.destroy();
+                this.container.removeAttr('data-container');
             }
 
             this.container.controller = this;
             this.container.load(this.view);
+            this.container.attr('data-container', '');
             $(this.container).ready(() => this.init());
         });
     }
@@ -30,6 +32,12 @@ export class Controller {
     }
 
     getChild(selector) {
-        return this.container.find(selector);
+        return this.getChildren(selector).first();
+    }
+
+    getChildren(selector) {
+        var c = this.container;
+        return c.find(selector)
+            .not(c.find('*[data-container=""]').find(selector));
     }
 }
