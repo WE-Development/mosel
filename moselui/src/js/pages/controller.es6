@@ -8,6 +8,7 @@ export class Controller {
     }
 
     init() {
+        console.debug("Init", this)
     }
 
     load() {
@@ -25,6 +26,7 @@ export class Controller {
     }
 
     destroy() {
+        console.debug("Destroy", this)
     }
 
     getChild(selector) {
