@@ -26,4 +26,8 @@ export class Controller {
 
     destroy() {
     }
+
+    getChild(selector) {
+        return this.container.find(selector);
+    }
 }

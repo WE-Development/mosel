@@ -10,7 +10,7 @@ export class MoselUI extends Controller {
 
     init() {
         console.log('Init MoselUI');
-        var content = $('#content');
+        var content = super.getChild('#content');
 
         this.pages = {
             dashboard: new Dashboard(content),
