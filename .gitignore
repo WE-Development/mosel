@@ -167,6 +167,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-moselui/node_modules
-moselui/dist
