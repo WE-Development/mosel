@@ -21,9 +21,8 @@ export class Controller {
             }
 
             this.container.controller = this;
-            this.container.load(this.view);
+            this.container.load(this.view, () => this.init());
             this.container.attr('data-container', '');
-            $(this.container).ready(() => this.init());
         });
     }
 
