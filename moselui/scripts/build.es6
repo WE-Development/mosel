@@ -51,7 +51,7 @@ rm.sync([dist]);
 mkdir.sync(dist);
 
 //include resources
-resourceInclude.forEach(inc => {
+resourceInclude.forEach(function(inc) {
     var toCopy = inc.paths;
     toCopy.push(dist);
     cp(toCopy, inc.up,
@@ -66,7 +66,9 @@ var targetPath = filePath.create(es2015Target);
 mkdir.sync(targetPath.dir().toString());
 
 var bundler = new browserify({debug: true});
-jsInclude.forEach(inc => bundler.add(inc));
+jsInclude.forEach(function(inc) { 
+	bundler.add(inc);
+});
 bundler
     .transform(bablify, {presets: ["es2015"]})
     .transform(uglifyify, {global: true})
