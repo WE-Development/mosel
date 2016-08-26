@@ -16,10 +16,10 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/moseld/server/context"
+	"github.com/WE-Development/mosel/moseld/server/context"
 	"net/http"
 	"github.com/gorilla/mux"
-	"github.com/bluedevel/mosel/api"
+	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 	"log"
 	"strconv"

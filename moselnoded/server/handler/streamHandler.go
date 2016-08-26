@@ -16,10 +16,10 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/moselserver"
+	"github.com/WE-Development/mosel/moselserver"
 	"net/http"
 	"time"
-	"github.com/bluedevel/mosel/api"
+	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 	"log"
 )

@@ -15,7 +15,7 @@
  */
 package moselnodedserver
 
-import "github.com/bluedevel/mosel/moselserver"
+import "github.com/WE-Development/mosel/moselserver"
 
 type MoselNodedServerConfig struct {
 	moselserver.MoselServerConfig

@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 	"bufio"
-	"github.com/bluedevel/mosel/api"
+	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 )
 

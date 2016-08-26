@@ -16,9 +16,9 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/moseld/server/context"
+	"github.com/WE-Development/mosel/moseld/server/context"
 	"net/http"
-	"github.com/bluedevel/mosel/api"
+	"github.com/WE-Development/mosel/api"
 	"log"
 	"encoding/json"
 )

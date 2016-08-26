@@ -15,7 +15,7 @@
  */
 package context
 
-import "github.com/bluedevel/mosel/moselserver"
+import "github.com/WE-Development/mosel/moselserver"
 
 type MoseldServerContext struct {
 	moselserver.MoselServerContext

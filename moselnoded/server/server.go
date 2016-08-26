@@ -16,8 +16,8 @@
 package moselnodedserver
 
 import (
-	"github.com/bluedevel/mosel/moselserver"
-	"github.com/bluedevel/mosel/moselnoded/server/handler"
+	"github.com/WE-Development/mosel/moselserver"
+	"github.com/WE-Development/mosel/moselnoded/server/handler"
 )
 
 type moselnodedServer struct {

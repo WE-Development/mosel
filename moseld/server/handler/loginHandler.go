@@ -17,9 +17,9 @@ package handler
 
 import (
 	"net/http"
-	"github.com/bluedevel/mosel/api"
+	"github.com/WE-Development/mosel/api"
 	"encoding/json"
-	"github.com/bluedevel/mosel/moseld/server/context"
+	"github.com/WE-Development/mosel/moseld/server/context"
 )
 
 type loginHandler struct {

@@ -16,7 +16,7 @@
 package main
 
 import (
-	"github.com/bluedevel/mosel/moselnoded/server"
+	"github.com/WE-Development/mosel/moselnoded/server"
 	"log"
 	"os"
 	"gopkg.in/gcfg.v1"
