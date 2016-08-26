@@ -6,6 +6,8 @@ import (
 	"os/exec"
 	"bytes"
 	"strings"
+	"log"
+	"io/ioutil"
 )
 
 type collector struct {
@@ -20,16 +22,22 @@ func NewCollector() *collector {
 	}
 }
 
-func (collector *collector) AddScript(name string, src string) error {
-	mkdirIfNotExist(collector.scriptFolder, 0664)
-	file, err := os.Open(collector.scriptFolder)
+func (collector *collector) AddScript(name string, src []byte) error {
+	filePath := collector.scriptFolder + "/" + name
 
-	if err != nil {
+	if _, err := mkdirIfNotExist(collector.scriptFolder, 0764); err != nil {
 		return err
 	}
 
-	_, err = file.WriteString(src)
+	err := ioutil.WriteFile(filePath, src, 0664)
+
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
 	collector.scripts = append(collector.scripts, name)
+	log.Printf("Added script %s", name)
 	return nil
 }
 
@@ -55,16 +63,18 @@ func executeScript(script string, info *api.NodeInfo) {
 	(*info)[script] = res
 }
 
-func mkdirIfNotExist(path string, perm os.FileMode) bool {
+func mkdirIfNotExist(path string, perm os.FileMode) (bool, error) {
 	if ok, _ := exists(path); !ok {
-		os.Mkdir(path, perm)
+		err := os.Mkdir(path, perm)
+		return err != nil, err
 	}
-	return false
+	return false, nil
 }
 
 // exists returns whether the given file or directory exists or not
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)
+	log.Println(err)
 	if err == nil {
 		return true, nil
 	}
