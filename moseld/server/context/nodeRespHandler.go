@@ -17,14 +17,13 @@ package context
 
 import (
 	"github.com/WE-Development/mosel/api"
-	"log"
 )
 
 type nodeRespHandler struct {
 	cache *dataCache
 }
 
-func NewNodeRespHandler(cache *dataCache) (*nodeRespHandler,error) {
+func NewNodeRespHandler(cache *dataCache) (*nodeRespHandler, error) {
 	return &nodeRespHandler{
 		cache: cache,
 	}, nil
