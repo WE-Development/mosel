@@ -86,13 +86,11 @@ func (server *moseldServer) initDebs() error {
 }
 
 func (server *moseldServer) initNodeCache() error {
-	c := server.context.Nodes
+	cache := server.context.Nodes
 
 	url, _ := url.Parse("http://localhost:8181")
-	c.Add(&context.Node{
-		Name: "self",
-		URL: *url,
-	})
+	cache.Add(context.NewNode("self", *url,
+		server.context.NodeHandler, server.context.Scripts))
 
 	/*go func() {
 		time.Sleep(5 * time.Second)

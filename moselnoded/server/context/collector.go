@@ -43,11 +43,12 @@ func (collector *collector) AddScript(name string, src []byte) error {
 
 func (collector *collector) FillNodeInfo(info *api.NodeInfo) {
 	for _, script := range collector.scripts {
-		executeScript(collector.scriptFolder + "/" + script, info)
+		collector.executeScript(collector.scriptFolder + "/" + script, info)
 	}
 }
 
-func executeScript(script string, info *api.NodeInfo) {
+func (collector *collector) executeScript(name string, info *api.NodeInfo) {
+	script := collector.scriptFolder + "/" + name
 	cmd := exec.Command("/bin/bash", script)
 	out := &bytes.Buffer{}
 	cmd.Stdout = out
@@ -69,7 +70,7 @@ func executeScript(script string, info *api.NodeInfo) {
 		value := parts[1]
 		res[graph] = value
 	}
-	(*info)[script] = res
+	(*info)[name] = res
 }
 
 func mkdirIfNotExist(path string, perm os.FileMode) (bool, error) {

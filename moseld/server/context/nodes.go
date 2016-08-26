@@ -27,15 +27,32 @@ import (
 	"bytes"
 )
 
-type Node struct {
+type node struct {
 	Name  string
 	URL   url.URL
+
+	handler *nodeRespHandler
+	scripts *scriptCache
 
 	close chan struct{}
 }
 
-func (node *Node) ListenStream(handler *nodeRespHandler) {
+func NewNode(name string, url url.URL, handler *nodeRespHandler, scripts *scriptCache) *node {
+	node := &node{}
+	node.Name = name
+	node.URL = url
+	node.close = make(chan struct{})
+	node.handler = handler
+	node.scripts = scripts
+
+	return node
+}
+
+func (node *node) ListenStream() {
 	Connection: for {
+		//provision scripts before connecting to stream
+		node.ProvisionScripts(node.Name, node.scripts.Scripts)
+
 		url := node.URL.String() + "/stream"
 		log.Printf("Connect to %s via %s", node.Name, url)
 		resp, err := http.Get(url)
@@ -69,14 +86,32 @@ func (node *Node) ListenStream(handler *nodeRespHandler) {
 
 				var resp api.NodeResponse
 				json.Unmarshal(data, &resp)
-				handler.handleNodeResp(node.Name, resp)
+				node.handler.handleNodeResp(node.Name, resp)
 			}
 		}
 
 	}
 }
 
-func (node *Node) ProvisionScript(name string, b []byte) error {
+func (node *node) ProvisionScripts(name string, scripts []string) error {
+	for _, script := range scripts {
+		bytes, err := node.scripts.getScriptBytes(script)
+
+		if err != nil {
+			return err
+		}
+
+		err = node.ProvisionScript(script, bytes)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (node *node) ProvisionScript(name string, b []byte) error {
 	_, err := http.Post(node.URL.String() + "/script/" + name,
 		"application/x-sh",
 		bytes.NewBuffer(b))
@@ -87,28 +122,27 @@ type nodeCache struct {
 	handler *nodeRespHandler
 	scripts *scriptCache
 
-	nodes   map[string]*Node
+	nodes   map[string]*node
 }
 
 func NewNodeCache(handler *nodeRespHandler, scripts *scriptCache) (*nodeCache, error) {
 	c := &nodeCache{}
 	c.handler = handler
 	c.scripts = scripts
-	c.nodes = make(map[string]*Node)
+	c.nodes = make(map[string]*node)
 	return c, nil
 }
 
-func (cache *nodeCache) Add(node *Node) {
+func (cache *nodeCache) Add(node *node) {
 	cache.nodes[node.Name] = node
-	node.close = make(chan struct{})
 
-	cache.ProvisionScripts(node.Name, cache.scripts.Scripts)
+	//cache.ProvisionScripts(node.Name, cache.scripts.Scripts)
 	go func() {
-		node.ListenStream(cache.handler)
+		node.ListenStream()
 	}()
 }
 
-func (cache *nodeCache) Get(name string) (*Node, error) {
+func (cache *nodeCache) Get(name string) (*node, error) {
 	if val, ok := cache.nodes[name]; ok {
 		return val, nil
 	}
@@ -124,29 +158,5 @@ func (cache *nodeCache) CloseNode(name string) error {
 	}
 
 	node.close <- struct{}{}
-	return nil
-}
-
-func (cache *nodeCache) ProvisionScripts(name string, scripts []string) error {
-	node, err := cache.Get(name)
-
-	if err != nil {
-		return err
-	}
-
-	for _, script := range scripts {
-		bytes, err := cache.scripts.getScriptBytes(script)
-
-		if err != nil {
-			return err
-		}
-
-		err = node.ProvisionScript(script, bytes)
-
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
