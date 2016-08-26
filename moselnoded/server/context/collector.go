@@ -3,6 +3,9 @@ package context
 import (
 	"github.com/WE-Development/mosel/api"
 	"os"
+	"os/exec"
+	"bytes"
+	"strings"
 )
 
 type collector struct {
@@ -31,7 +34,25 @@ func (collector *collector) AddScript(name string, src string) error {
 }
 
 func (collector *collector) FillNodeInfo(info *api.NodeInfo) {
+	for _, script := range collector.scripts {
+		executeScript(collector.scriptFolder + "/" + script, info)
+	}
+}
 
+func executeScript(script string, info *api.NodeInfo) {
+	cmd := exec.Command("/bin/bash", script)
+	out := &bytes.Buffer{}
+	cmd.Stdout = out
+
+	res := make(map[string]string)
+	for _, line := range
+		strings.Split(out.String(), "\n") {
+		parts := strings.SplitN(line, ":", 2)
+		graph := parts[0]
+		value := parts[1]
+		res[graph] = value
+	}
+	(*info)[script] = res
 }
 
 func mkdirIfNotExist(path string, perm os.FileMode) bool {
