@@ -18,22 +18,28 @@ package moselnodedserver
 import (
 	"github.com/WE-Development/mosel/moselserver"
 	"github.com/WE-Development/mosel/moselnoded/server/handler"
+	"github.com/WE-Development/mosel/moselnoded/server/context"
 )
 
 type moselnodedServer struct {
 	moselserver.MoselServer
 
 	config MoselNodedServerConfig
+	context *context.MoselnodedServerContext
 }
 
 func NewMoselNodedServer(config MoselNodedServerConfig) *moselnodedServer {
 	server := moselnodedServer{
 		config: config,
+		context: new(context.MoselnodedServerContext),
 	}
 
 	server.MoselServer = moselserver.MoselServer{
 		Config: config.MoselServerConfig,
 	}
+
+	server.InitFuncs = append(server.InitFuncs,
+		server.initCollector,)
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewPingHandler(),
@@ -41,4 +47,10 @@ func NewMoselNodedServer(config MoselNodedServerConfig) *moselnodedServer {
 	}
 
 	return &server
+}
+
+func (server *moselnodedServer) initCollector() error {
+	ctx := server.context
+	ctx.Collector = context.NewCollector()
+	return nil
 }
