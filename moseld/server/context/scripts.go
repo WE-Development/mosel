@@ -15,9 +15,14 @@
  */
 package context
 
+import (
+	"io/ioutil"
+	"strings"
+)
+
 type scriptCache struct {
 	path    string
-	scripts []string
+	Scripts []string
 }
 
 func NewScriptCache(path string) (*scriptCache, error) {
@@ -28,5 +33,31 @@ func NewScriptCache(path string) (*scriptCache, error) {
 
 func (cache *scriptCache) initialize() error {
 
+	files, err := ioutil.ReadDir(cache.path)
+
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
+			continue
+		}
+
+		if strings.HasSuffix(
+			file.Name(), ".sh") {
+			cache.Scripts = append(cache.Scripts, file.Name())
+		}
+	}
+
 	return nil
+}
+
+func (cache *scriptCache) getScript(name string) (string,error) {
+	bytes, err := cache.getScriptBytes(name)
+	return string(bytes), err
+}
+
+func (cache *scriptCache) getScriptBytes(name string) ([]byte,error) {
+	return ioutil.ReadFile(cache.path + "/" + name)
 }

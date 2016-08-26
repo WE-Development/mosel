@@ -33,14 +33,63 @@ type Node struct {
 	close chan struct{}
 }
 
+func (node *Node) ListenStream(handler *nodeRespHandler) {
+	Connection: for {
+		url := node.URL.String() + "/stream"
+		log.Printf("Connect to %s via %s", node.Name, url)
+		resp, err := http.Get(url)
+
+		if err != nil {
+			log.Println(err)
+
+			//todo make reconnection timeout configurable by moseld.conf
+			time.Sleep(10 * time.Second)
+			continue Connection
+		}
+
+		for {
+			select {
+			case <-node.close:
+				resp.Body.Close()
+				break Connection
+			default:
+				reader := bufio.NewReader(resp.Body)
+				data, err := reader.ReadBytes('\n')
+
+				if err != nil {
+					//check weather we are dealing with a non-stream resource
+					if err.Error() != "EOF" {
+						log.Println(err)
+					}
+
+					resp.Body.Close()
+					continue Connection
+				}
+
+				var resp api.NodeResponse
+				json.Unmarshal(data, &resp)
+				handler.handleNodeResp(node.Name, resp)
+			}
+		}
+
+	}
+}
+
+func (node *Node) ProvisionScript(name string, src []byte) error {
+	return nil
+}
+
 type nodeCache struct {
 	handler *nodeRespHandler
+	scripts *scriptCache
+
 	nodes   map[string]*Node
 }
 
-func NewNodeCache(handler *nodeRespHandler) (*nodeCache, error) {
+func NewNodeCache(handler *nodeRespHandler, scripts *scriptCache) (*nodeCache, error) {
 	c := &nodeCache{}
 	c.handler = handler
+	c.scripts = scripts
 	c.nodes = make(map[string]*Node)
 	return c, nil
 }
@@ -49,45 +98,7 @@ func (cache nodeCache) Add(node *Node) {
 	cache.nodes[node.Name] = node
 	node.close = make(chan struct{})
 	go func() {
-		Connection: for {
-			url := node.URL.String() + "/stream"
-			log.Printf("Connect to %s via %s", node.Name, url)
-			resp, err := http.Get(url)
-
-			if err != nil {
-				log.Println(err)
-
-				//todo make reconnection timeout configurable by moseld.conf
-				time.Sleep(10 * time.Second)
-				continue Connection
-			}
-
-			for {
-				select {
-				case <-node.close:
-					resp.Body.Close()
-					break Connection
-				default:
-					reader := bufio.NewReader(resp.Body)
-					data, err := reader.ReadBytes('\n')
-
-					if err != nil {
-						//check weather we are dealing with a non-stream resource
-						if err.Error() != "EOF" {
-							log.Println(err)
-						}
-
-						resp.Body.Close()
-						continue Connection
-					}
-
-					var resp api.NodeResponse
-					json.Unmarshal(data, &resp)
-					cache.handler.handleNodeResp(node.Name, resp)
-				}
-			}
-
-		}
+		node.ListenStream(cache.handler)
 	}()
 }
 
@@ -110,6 +121,26 @@ func (cache *nodeCache) CloseNode(name string) error {
 	return nil
 }
 
-func (cache *nodeCache) ProvisionScripts(name string, scripts []string) {
+func (cache *nodeCache) ProvisionScripts(name string, scripts []string) error {
+	node, err := cache.Get(name)
 
+	if err != nil {
+		return err
+	}
+
+	for _, script := range scripts {
+		bytes, err := cache.scripts.getScriptBytes(script)
+
+		if err != nil {
+			return err
+		}
+
+		err = node.ProvisionScript(script, bytes)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

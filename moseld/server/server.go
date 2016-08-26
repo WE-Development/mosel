@@ -73,7 +73,7 @@ func (server *moseldServer) initDebs() error {
 	}
 
 	if ctx.Nodes, err =
-		context.NewNodeCache(ctx.NodeHandler); err != nil {
+		context.NewNodeCache(ctx.NodeHandler, ctx.Scripts); err != nil {
 		return err
 	}
 
