@@ -43,7 +43,7 @@ func (collector *collector) AddScript(name string, src []byte) error {
 
 func (collector *collector) FillNodeInfo(info *api.NodeInfo) {
 	for _, script := range collector.scripts {
-		collector.executeScript(collector.scriptFolder + "/" + script, info)
+		collector.executeScript(script, info)
 	}
 }
 
