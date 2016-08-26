@@ -21,7 +21,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/WE-Development/mosel/api"
 	"encoding/json"
-	"log"
 	"strconv"
 )
 
@@ -47,7 +46,6 @@ func (handler nodeInfoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		resp.Data[stamp] = point.Info
 	}
 
-	log.Println(resp)
 	json.NewEncoder(w).Encode(resp)
 }
 
