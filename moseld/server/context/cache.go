@@ -33,10 +33,10 @@ type dataPoint struct {
 	Info api.NodeInfo
 }
 
-func NewDataCache() *dataCache {
+func NewDataCache() (*dataCache,error) {
 	c := &dataCache{}
 	c.points = make(map[string][]dataPoint)
-	return c
+	return c, nil
 }
 
 func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {

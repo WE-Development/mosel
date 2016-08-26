@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package moseldserver
+package context
 
-import "github.com/WE-Development/mosel/moselserver"
+type scriptCache struct {
+	path    string
+	scripts []string
+}
 
-type MoseldServerConfig struct {
-	moselserver.MoselServerConfig
+func NewScriptCache(path string) (*scriptCache, error) {
+	c := &scriptCache{}
+	c.path = path
+	return c, c.initialize()
+}
 
-	Script struct {
-		       Path string
-	       }
+func (cache *scriptCache) initialize() error {
+
+	return nil
 }

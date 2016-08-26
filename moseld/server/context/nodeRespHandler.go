@@ -24,11 +24,11 @@ type nodeRespHandler struct {
 	cache *dataCache
 }
 
-func NewNodeRespHandler(cache *dataCache) *nodeRespHandler {
+func NewNodeRespHandler(cache *dataCache) (*nodeRespHandler,error) {
 	log.Println(cache)
 	return &nodeRespHandler{
 		cache: cache,
-	}
+	}, nil
 }
 
 func (handler nodeRespHandler) handleNodeResp(node string, resp api.NodeResponse) {

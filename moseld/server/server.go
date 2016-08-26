@@ -62,9 +62,25 @@ func NewMoseldServer(config MoseldServerConfig) *moseldServer {
 func (server *moseldServer) initDebs() error {
 	ctx := server.context
 
-	ctx.Cache = context.NewDataCache()
-	ctx.NodeHandler = context.NewNodeRespHandler(ctx.Cache)
-	ctx.Nodes = context.NewNodeCache(ctx.NodeHandler)
+	var err error
+	if ctx.Cache, err =
+		context.NewDataCache(); err != nil {
+		return err
+	}
+	if ctx.NodeHandler, err =
+		context.NewNodeRespHandler(ctx.Cache); err != nil {
+		return err
+	}
+
+	if ctx.Nodes, err =
+		context.NewNodeCache(ctx.NodeHandler); err != nil {
+		return err
+	}
+
+	if ctx.Scripts, err =
+		context.NewScriptCache(server.config.Script.Path); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -72,7 +88,7 @@ func (server *moseldServer) initDebs() error {
 func (server *moseldServer) initNodeCache() error {
 	c := server.context.Nodes
 
-	url, _ := url.Parse("http://localhost:8181/stream")
+	url, _ := url.Parse("http://localhost:8181")
 	c.Add(&context.Node{
 		Name: "self",
 		URL: *url,

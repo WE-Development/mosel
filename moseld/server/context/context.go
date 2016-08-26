@@ -23,6 +23,7 @@ type MoseldServerContext struct {
 	Nodes *nodeCache
 	Cache *dataCache
 	NodeHandler *nodeRespHandler
+	Scripts *scriptCache
 
 	Debug int
 }

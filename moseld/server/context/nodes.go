@@ -38,11 +38,11 @@ type nodeCache struct {
 	nodes   map[string]*Node
 }
 
-func NewNodeCache(handler *nodeRespHandler) *nodeCache {
+func NewNodeCache(handler *nodeRespHandler) (*nodeCache, error) {
 	c := &nodeCache{}
 	c.handler = handler
 	c.nodes = make(map[string]*Node)
-	return c
+	return c, nil
 }
 
 func (cache nodeCache) Add(node *Node) {
@@ -50,8 +50,9 @@ func (cache nodeCache) Add(node *Node) {
 	node.close = make(chan struct{})
 	go func() {
 		Connection: for {
-			log.Printf("Connect to %s via %s", node.Name, node.URL.String())
-			resp, err := http.Get(node.URL.String())
+			url := node.URL.String() + "/stream"
+			log.Printf("Connect to %s via %s", node.Name, url)
+			resp, err := http.Get(url)
 
 			if err != nil {
 				log.Println(err)
@@ -107,4 +108,8 @@ func (cache *nodeCache) CloseNode(name string) error {
 
 	node.close <- struct{}{}
 	return nil
+}
+
+func (cache *nodeCache) ProvisionScripts(name string, scripts []string) {
+
 }
