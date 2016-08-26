@@ -18,6 +18,7 @@ package context
 import (
 	"io/ioutil"
 	"strings"
+	"log"
 )
 
 type scriptCache struct {
@@ -47,6 +48,7 @@ func (cache *scriptCache) initialize() error {
 		if strings.HasSuffix(
 			file.Name(), ".sh") {
 			cache.Scripts = append(cache.Scripts, file.Name())
+			log.Printf("Registerd script %s", file.Name())
 		}
 	}
 

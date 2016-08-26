@@ -53,9 +53,18 @@ func executeScript(script string, info *api.NodeInfo) {
 	cmd.Stdout = out
 
 	res := make(map[string]string)
-	for _, line := range
-		strings.Split(out.String(), "\n") {
+	for _, line := range strings.Split(out.String(), "\n") {
+		if line == "" {
+			continue
+		}
+
 		parts := strings.SplitN(line, ":", 2)
+
+		if len(parts) != 2 {
+			log.Printf("Invalid grap data '%s'", line)
+			continue
+		}
+
 		graph := parts[0]
 		value := parts[1]
 		res[graph] = value
@@ -74,7 +83,6 @@ func mkdirIfNotExist(path string, perm os.FileMode) (bool, error) {
 // exists returns whether the given file or directory exists or not
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)
-	log.Println(err)
 	if err == nil {
 		return true, nil
 	}

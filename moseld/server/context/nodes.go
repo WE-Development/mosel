@@ -77,10 +77,10 @@ func (node *Node) ListenStream(handler *nodeRespHandler) {
 }
 
 func (node *Node) ProvisionScript(name string, b []byte) error {
-	http.Post(node.URL.String() + "/script/" + name,
+	_, err := http.Post(node.URL.String() + "/script/" + name,
 		"application/x-sh",
 		bytes.NewBuffer(b))
-	return nil
+	return err
 }
 
 type nodeCache struct {
