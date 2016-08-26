@@ -72,13 +72,13 @@ func (server *moseldServer) initDebs() error {
 		return err
 	}
 
-	if ctx.Nodes, err =
-		context.NewNodeCache(ctx.NodeHandler, ctx.Scripts); err != nil {
+	if ctx.Scripts, err =
+		context.NewScriptCache(server.config.Script.Path); err != nil {
 		return err
 	}
 
-	if ctx.Scripts, err =
-		context.NewScriptCache(server.config.Script.Path); err != nil {
+	if ctx.Nodes, err =
+		context.NewNodeCache(ctx.NodeHandler, ctx.Scripts); err != nil {
 		return err
 	}
 

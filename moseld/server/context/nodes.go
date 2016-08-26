@@ -24,6 +24,7 @@ import (
 	"bufio"
 	"github.com/WE-Development/mosel/api"
 	"encoding/json"
+	"bytes"
 )
 
 type Node struct {
@@ -75,7 +76,10 @@ func (node *Node) ListenStream(handler *nodeRespHandler) {
 	}
 }
 
-func (node *Node) ProvisionScript(name string, src []byte) error {
+func (node *Node) ProvisionScript(name string, b []byte) error {
+	http.Post(node.URL.String() + "/script/" + name,
+		"application/x-sh",
+		bytes.NewBuffer(b))
 	return nil
 }
 
@@ -94,9 +98,11 @@ func NewNodeCache(handler *nodeRespHandler, scripts *scriptCache) (*nodeCache, e
 	return c, nil
 }
 
-func (cache nodeCache) Add(node *Node) {
+func (cache *nodeCache) Add(node *Node) {
 	cache.nodes[node.Name] = node
 	node.close = make(chan struct{})
+
+	cache.ProvisionScripts(node.Name, cache.scripts.Scripts)
 	go func() {
 		node.ListenStream(cache.handler)
 	}()
