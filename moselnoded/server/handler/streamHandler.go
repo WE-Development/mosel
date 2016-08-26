@@ -71,5 +71,5 @@ func (handler streamHandler) GetPath() string {
 }
 
 func (handler streamHandler) Secure() bool {
-	return false
+	return true
 }

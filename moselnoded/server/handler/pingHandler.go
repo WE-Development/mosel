@@ -37,5 +37,5 @@ func (handler pingHandler) GetPath() string {
 }
 
 func (handler pingHandler) Secure() bool {
-	return false
+	return true
 }
