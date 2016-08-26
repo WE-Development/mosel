@@ -16,21 +16,21 @@
 package handler
 
 import (
-	"github.com/WE-Development/mosel/moselserver"
 	"net/http"
 	"time"
 	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 	"log"
+	"github.com/WE-Development/mosel/moselnoded/server/context"
 )
 
 type streamHandler struct {
-	ctx *moselserver.MoselServerContext
+	ctx *context.MoselnodedServerContext
 
 	test int
 }
 
-func NewStreamHandler(ctx *moselserver.MoselServerContext) streamHandler {
+func NewStreamHandler(ctx *context.MoselnodedServerContext) streamHandler {
 	return streamHandler{
 		ctx: ctx,
 	}
@@ -62,7 +62,7 @@ func (handler streamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (handler *streamHandler) createResponse(r *http.Request, now time.Time) interface{} {
 	resp := api.NewNodeResponse()
-
+	handler.ctx.Collector.FillNodeInfo(&resp.NodeInfo)
 	return resp
 }
 
