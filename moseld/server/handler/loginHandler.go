@@ -54,5 +54,5 @@ func (handler loginHandler) GetPath() string {
 }
 
 func (handler loginHandler) Secure() bool {
-	return false
+	return true
 }

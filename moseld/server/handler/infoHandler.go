@@ -47,5 +47,5 @@ func (handler infoHandler) GetPath() string {
 }
 
 func (handler infoHandler) Secure() bool {
-	return false
+	return true
 }

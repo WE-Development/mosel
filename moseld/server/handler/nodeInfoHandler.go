@@ -56,5 +56,5 @@ func (handler nodeInfoHandler) GetPath() string {
 }
 
 func (handler nodeInfoHandler) Secure() bool {
-	return false
+	return true
 }
