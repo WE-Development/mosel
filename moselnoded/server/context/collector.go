@@ -29,7 +29,7 @@ func (collector *collector) AddScript(name string, src []byte) error {
 		return err
 	}
 
-	err := ioutil.WriteFile(filePath, src, 0664)
+	err := ioutil.WriteFile(filePath, src, 0775)
 
 	if err != nil {
 		log.Println(err)
@@ -52,6 +52,11 @@ func (collector *collector) executeScript(name string, info *api.NodeInfo) {
 	cmd := exec.Command("/bin/bash", script)
 	out := &bytes.Buffer{}
 	cmd.Stdout = out
+
+	if err := cmd.Run(); err != nil {
+		log.Printf("Error executing script %s: %s", name, err.Error())
+		return
+	}
 
 	res := make(map[string]string)
 	for _, line := range strings.Split(out.String(), "\n") {
