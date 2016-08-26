@@ -13,4 +13,7 @@ pushd $(dirname $0)
 sudo mkdir /etc/mosel
 sudo cp moseld.conf /etc/mosel/
 
+sudo mkdir /opt/mosel
+sudo cp script/* /opt/mosel/
+
 popd
