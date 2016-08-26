@@ -25,6 +25,10 @@ type MoselServerConfig struct {
 		  }
 
 	//Auth stuff
+	Sessions  struct {
+			  Optional
+		  }
+
 	AuthSys   struct {
 			  Optional
 		  }

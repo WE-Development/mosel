@@ -22,13 +22,26 @@ import (
 func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		key := r.FormValue("key")
+		if server.Config.Sessions.Enabled {
+			key := r.FormValue("key")
+			if key == "" || !server.Context.Sessions.ValidateSession(key) {
+				httpUnauthorized(w)
+				return
+			}
+		} else {
+			user, passwd, enabled := r.BasicAuth()
 
-		if key == "" || !server.Context.Sessions.ValidateSession(key) {
-			http.Error(w, http.StatusText(401), 401)
-			return
+			if !server.Config.AuthTrue.Enabled &&
+				(!enabled || !server.Context.Auth.Authenticate(user, passwd)) {
+				httpUnauthorized(w)
+				return
+			}
 		}
 
 		fn(w, r)
 	}
+}
+
+func httpUnauthorized(w http.ResponseWriter) {
+	http.Error(w, http.StatusText(401), 401)
 }
