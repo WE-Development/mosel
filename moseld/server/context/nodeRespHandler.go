@@ -25,13 +25,12 @@ type nodeRespHandler struct {
 }
 
 func NewNodeRespHandler(cache *dataCache) (*nodeRespHandler,error) {
-	log.Println(cache)
 	return &nodeRespHandler{
 		cache: cache,
 	}, nil
 }
 
 func (handler nodeRespHandler) handleNodeResp(node string, resp api.NodeResponse) {
-	log.Println(resp)
+	//log.Println(resp)
 	handler.cache.Add(node, resp.Time, resp.NodeInfo)
 }
