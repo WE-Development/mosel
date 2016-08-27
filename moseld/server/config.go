@@ -21,6 +21,10 @@ type MoseldServerConfig struct {
 	moselserver.MoselServerConfig
 
 	Script struct {
-		       Path string
+		       Path string `gcfg:"path"`
 	       }
+
+	Node   map[string]*struct {
+		URL string `gcfg:"url"`
+	}
 }

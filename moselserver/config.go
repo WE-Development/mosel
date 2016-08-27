@@ -16,26 +16,26 @@
 package moselserver
 
 type Optional struct {
-	Enabled bool
+	Enabled bool `gcfg:"enabled"`
 }
 
 type MoselServerConfig struct {
 	Http      struct {
-			  BindAddress string
-		  }
+			  BindAddress string `gcfg:"bind"`
+		  } `gcfg:"http"`
 
 	//Auth stuff
 	Sessions  struct {
 			  Optional
-		  }
+		  } `gcfg:"sessions"`
 
 	AuthSys   struct {
 			  Optional
-		  }
+		  } `gcfg:"auth-sys"`
 	AuthMySQL struct {
 			  Optional
-		  }
+		  } `gcfg:"auth-mysql"`
 	AuthTrue  struct {
 			  Optional
-		  }
+		  } `gcfg:"auth-true"`
 }
