@@ -73,7 +73,7 @@ func (server *moseldServer) initDebs() error {
 	}
 
 	if ctx.Scripts, err =
-		context.NewScriptCache(server.config.Script.Path); err != nil {
+		context.NewScriptCache(server.config.Scripts); err != nil {
 		return err
 	}
 

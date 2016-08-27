@@ -40,11 +40,22 @@ type node struct {
 }
 
 func NewNode(name string, conf *moselconfig.NodeConfig, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
+
+	node := &node{}
+	node.Name = name
+	node.close = make(chan struct{})
+	node.handler = handler
+	node.scriptCache = scriptCache
+
+	return node, node.initialize(conf)
+}
+
+func (node *node) initialize(conf *moselconfig.NodeConfig) error {
 	//get base url
 	var url *url.URL
 	var err error
 	if url, err = url.Parse(conf.URL); err != nil {
-		return nil, err
+		return err
 	}
 
 	var scripts []string
@@ -53,27 +64,22 @@ func NewNode(name string, conf *moselconfig.NodeConfig, handler *nodeRespHandler
 	if len(conf.Scripts) > 0 {
 		scripts = conf.Scripts
 	} else {
-		scripts = scriptCache.Scripts
+		scripts = node.scriptCache.GetScripts()
 	}
 
 	//exclude certain scripts
 	for _, exclude := range conf.ScriptsExclude {
 		for i, script := range scripts {
 			if script == exclude {
-				scripts = append(scripts[:i], scripts[i+1:]...)
+				scripts = append(scripts[:i], scripts[i + 1:]...)
 			}
 		}
 	}
 
-	node := &node{}
-	node.Name = name
 	node.URL = *url
 	node.scripts = scripts
-	node.close = make(chan struct{})
-	node.handler = handler
-	node.scriptCache = scriptCache
 
-	return node, nil
+	return nil;
 }
 
 func (node *node) ListenStream() {

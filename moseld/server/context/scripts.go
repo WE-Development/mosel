@@ -17,49 +17,41 @@ package context
 
 import (
 	"io/ioutil"
-	"strings"
-	"log"
+	"github.com/WE-Development/mosel/config"
 )
 
 type scriptCache struct {
 	path    string
-	Scripts []string
+	Scripts map[string]moselconfig.ScriptConfig
 }
 
-func NewScriptCache(path string) (*scriptCache, error) {
-	c := &scriptCache{}
-	c.path = path
-	return c, c.initialize()
+func NewScriptCache(configs map[string]*moselconfig.ScriptConfig) (*scriptCache, error) {
+	cache := &scriptCache{}
+	return cache, cache.initialize(configs)
 }
 
-func (cache *scriptCache) initialize() error {
-
-	files, err := ioutil.ReadDir(cache.path)
-
-	if err != nil {
-		return err
+func (cache *scriptCache) initialize(configs map[string]*moselconfig.ScriptConfig) error {
+	scripts := make(map[string]moselconfig.ScriptConfig)
+	for script, conf := range configs {
+		scripts[script] = *conf
 	}
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		if strings.HasSuffix(
-			file.Name(), ".sh") {
-			cache.Scripts = append(cache.Scripts, file.Name())
-			log.Printf("Registerd script %s", file.Name())
-		}
-	}
-
+	cache.Scripts = scripts
 	return nil
 }
 
-func (cache *scriptCache) getScript(name string) (string,error) {
+func (cache *scriptCache) GetScripts() []string {
+	scripts := make([]string, 0, len(cache.Scripts))
+	for script := range cache.Scripts {
+		scripts = append(scripts, script)
+	}
+	return scripts
+}
+
+func (cache *scriptCache) getScript(name string) (string, error) {
 	bytes, err := cache.getScriptBytes(name)
 	return string(bytes), err
 }
 
-func (cache *scriptCache) getScriptBytes(name string) ([]byte,error) {
+func (cache *scriptCache) getScriptBytes(name string) ([]byte, error) {
 	return ioutil.ReadFile(cache.path + "/" + name)
 }

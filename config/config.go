@@ -43,17 +43,18 @@ type MoselServerConfig struct {
 type MoseldServerConfig struct {
 	MoselServerConfig
 
-	Script struct {
-		       Path string `gcfg:"path"`
-	       } `gcfg:"script"`
-
-	Node   map[string]*NodeConfig `gcfg:"node"`
+	Scripts map[string]*ScriptConfig `gcfg:"script"`
+	Node    map[string]*NodeConfig `gcfg:"node"`
 }
 
 type NodeConfig struct {
 	URL            string `gcfg:"url"`
 	Scripts        []string `gcfg:"script"`
 	ScriptsExclude []string `gcfg:"exclude-script"`
+}
+
+type ScriptConfig struct {
+	Path string `gcfg:"path"`
 }
 
 type MoselNodedServerConfig struct {
