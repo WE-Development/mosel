@@ -33,6 +33,10 @@ func NewScriptCache(configs map[string]*moselconfig.ScriptConfig) (*scriptCache,
 func (cache *scriptCache) initialize(configs map[string]*moselconfig.ScriptConfig) error {
 	scripts := make(map[string]moselconfig.ScriptConfig)
 	for script, conf := range configs {
+		if conf.Scope == nil {
+			conf.Scope = "node"
+		}
+
 		scripts[script] = *conf
 	}
 	cache.scripts = scripts
@@ -45,6 +49,24 @@ func (cache *scriptCache) GetScripts() []string {
 		scripts = append(scripts, script)
 	}
 	return scripts
+}
+
+func (cache *scriptCache) GetScriptsByScope(scope string) []string {
+	scripts := make([]string, 0)
+	for name, script := range cache.scripts {
+		if script.Scope == scope {
+			scripts = append(scripts, name)
+		}
+	}
+	return scripts
+}
+
+func (cache *scriptCache) getScriptConfig(name string) (moselconfig.ScriptConfig, error) {
+	if conf, ok := cache.scripts[name]; ok {
+		return conf, nil
+	}
+
+	return nil, errors.New("No script with name " + name + " loaded")
 }
 
 func (cache *scriptCache) getScript(name string) (string, error) {

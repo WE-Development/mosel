@@ -29,14 +29,15 @@ import (
 )
 
 type node struct {
-	Name        string
-	URL         url.URL
-	scripts     []string
+	Name         string
+	URL          url.URL
+	nodeScripts  []string
+	localScripts []string
 
-	handler     *nodeRespHandler
-	scriptCache *scriptCache
+	handler      *nodeRespHandler
+	scriptCache  *scriptCache
 
-	close       chan struct{}
+	close        chan struct{}
 }
 
 func NewNode(name string, conf *moselconfig.NodeConfig, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
@@ -62,8 +63,10 @@ func (node *node) initialize(conf *moselconfig.NodeConfig) error {
 
 	//get configured
 	if len(conf.Scripts) > 0 {
+		//manual config
 		scripts = conf.Scripts
 	} else {
+		//default
 		scripts = node.scriptCache.GetScripts()
 	}
 
@@ -76,14 +79,37 @@ func (node *node) initialize(conf *moselconfig.NodeConfig) error {
 		}
 	}
 
+	nodeScripts := make([]string, 0)
+	localScripts := make([]string, 0)
+
+	//sort scripts by scope
+	for script := range scripts {
+		if conf, err := node.scriptCache.getScriptConfig(script); err == nil {
+			switch conf.Scope {
+			case "node":
+				nodeScripts = append(nodeScripts, script)
+				break
+			case "local":
+				localScripts = append(localScripts, script)
+				break
+			default:
+				return errors.New("Unknown script scope " + conf.Scope + " for node " + node.Name)
+			}
+
+		} else {
+			return err
+		}
+	}
+
 	node.URL = *url
-	node.scripts = scripts
+	node.nodeScripts = nodeScripts
+	node.localScripts = localScripts
 
 	return nil;
 }
 
 func (node *node) ListenStream() {
-	Connection: for {
+	Run: for {
 		//provision scripts before connecting to stream
 		if err := node.ProvisionScripts(); err != nil {
 			log.Printf("Error while provisioning scripts: %s", err.Error())
@@ -98,14 +124,14 @@ func (node *node) ListenStream() {
 
 			//todo make reconnection timeout configurable by moseld.conf
 			time.Sleep(10 * time.Second)
-			continue Connection
+			continue Run
 		}
 
 		for {
 			select {
 			case <-node.close:
 				resp.Body.Close()
-				break Connection
+				break Run
 			default:
 				reader := bufio.NewReader(resp.Body)
 				data, err := reader.ReadBytes('\n')
@@ -117,7 +143,7 @@ func (node *node) ListenStream() {
 					}
 
 					resp.Body.Close()
-					continue Connection
+					continue Run
 				}
 
 				var resp api.NodeResponse
@@ -130,7 +156,7 @@ func (node *node) ListenStream() {
 }
 
 func (node *node) ProvisionScripts() error {
-	for _, script := range node.scripts {
+	for _, script := range node.nodeScripts {
 		bytes, err := node.scriptCache.getScriptBytes(script)
 
 		if err != nil {
