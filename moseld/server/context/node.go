@@ -27,14 +27,14 @@ import (
 )
 
 type node struct {
-	Name         string
-	URL          url.URL
-	scripts  []string
+	Name        string
+	URL         url.URL
+	scripts     []string
 
-	handler      *nodeRespHandler
-	scriptCache  *scriptCache
+	handler     *nodeRespHandler
+	scriptCache *scriptCache
 
-	close        chan struct{}
+	close       chan struct{}
 }
 
 func NewNode(name string, url url.URL, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
@@ -99,9 +99,10 @@ func (node *node) ListenStream() {
 
 func (node *node) ProvisionScripts() error {
 	for _, script := range node.scripts {
-		bytes, err := node.scriptCache.getScriptBytes(script)
+		var bytes []byte
+		var err error
 
-		if err != nil {
+		if bytes, err = node.scriptCache.getScriptBytes(script); err != nil {
 			return err
 		}
 
