@@ -22,6 +22,9 @@ import (
 	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 	"strconv"
+	"time"
+	"github.com/WE-Development/mosel/commons"
+	"log"
 )
 
 type nodeInfoHandler struct {
@@ -38,7 +41,21 @@ func (handler nodeInfoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 	vars := mux.Vars(r)
 	node := vars["node"]
 
-	points, _ := handler.ctxd.Cache.GetAll(node)
+	var points []context.DataPoint
+	var err error
+
+	since := r.URL.Query().Get("since")
+	if since == "" {
+		points, err = handler.ctxd.Cache.GetAll(node)
+	} else {
+		//test this with stamp=$(($(date +%s)-10)); curl http://localhost:8282/nodeInfo/self\?since\=${stamp}
+		var i int64
+		i, err = strconv.ParseInt(since, 10, 64)
+		commons.HttpCheckError(err, http.StatusBadRequest, w)
+		points, err = handler.ctxd.Cache.GetSince(node, time.Unix(i, 0))
+	}
+	commons.HttpCheckError(err, http.StatusInternalServerError, w)
+
 	resp := api.NewNodeInfoResponse()
 
 	for _, point := range points {

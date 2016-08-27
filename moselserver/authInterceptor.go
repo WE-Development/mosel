@@ -17,6 +17,7 @@ package moselserver
 
 import (
 	"net/http"
+	"github.com/WE-Development/mosel/commons"
 )
 
 func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
@@ -25,7 +26,7 @@ func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 		if server.Config.Sessions.Enabled {
 			key := r.FormValue("key")
 			if key == "" || !server.Context.Sessions.ValidateSession(key) {
-				httpUnauthorized(w)
+				commons.HttpUnauthorized(w)
 				return
 			}
 		} else {
@@ -33,15 +34,11 @@ func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 
 			if !server.Config.AuthTrue.Enabled &&
 				(!enabled || !server.Context.Auth.Authenticate(user, passwd)) {
-				httpUnauthorized(w)
+				commons.HttpUnauthorized(w)
 				return
 			}
 		}
 
 		fn(w, r)
 	}
-}
-
-func httpUnauthorized(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(401), 401)
 }

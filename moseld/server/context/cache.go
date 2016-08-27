@@ -23,35 +23,35 @@ import (
 )
 
 type dataCache struct {
-	points map[string][]dataPoint
+	points map[string][]DataPoint
 
 	m      sync.Mutex
 }
 
-type dataPoint struct {
+type DataPoint struct {
 	Time time.Time
 	Info api.NodeInfo
 }
 
 func NewDataCache() (*dataCache,error) {
 	c := &dataCache{}
-	c.points = make(map[string][]dataPoint)
+	c.points = make(map[string][]DataPoint)
 	return c, nil
 }
 
 func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 
-	var arr []dataPoint
+	var arr []DataPoint
 
 	cache.m.Lock()
 
 	if _, ok := cache.points[node]; !ok {
-		arr = make([]dataPoint, 0)
+		arr = make([]DataPoint, 0)
 	} else {
 		arr = cache.points[node]
 	}
 
-	arr = append(arr, dataPoint{
+	arr = append(arr, DataPoint{
 		Time: t.Round(time.Second),
 		Info: info,
 	})
@@ -77,7 +77,7 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 	return api.NodeInfo{}, errors.New("No datapoint found for time " + t.String())
 }
 
-func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) {
+func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) {
 
 	points, err := cache.GetAll(node)
 
@@ -85,7 +85,7 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) 
 		return nil, err
 	}
 
-	result := make([]dataPoint, 0)
+	result := make([]DataPoint, 0)
 
 	for _, p := range points {
 		if p.Time.Unix() > t.Unix() {
@@ -96,7 +96,7 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]dataPoint, error) 
 	return result, nil
 }
 
-func (cache *dataCache) GetAll(node string) ([]dataPoint, error) {
+func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
 	cache.m.Lock()
 
 	points, ok := cache.points[node]

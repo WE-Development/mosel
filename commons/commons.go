@@ -14,3 +14,23 @@
  * limitations under the License.
  */
 package commons
+
+import "net/http"
+
+func HttpUnauthorized(w http.ResponseWriter) {
+	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+}
+
+func HttpBadRequest(w http.ResponseWriter) {
+	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+}
+
+func HttpError(w http.ResponseWriter, code int) {
+	http.Error(w, http.StatusText(code), code)
+}
+
+func HttpCheckError(err error, status int, w http.ResponseWriter) {
+	if err != nil {
+		HttpError(w, status)
+	}
+}
