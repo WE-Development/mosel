@@ -24,7 +24,6 @@ import (
 	"strconv"
 	"time"
 	"github.com/WE-Development/mosel/commons"
-	"log"
 )
 
 type nodeInfoHandler struct {
