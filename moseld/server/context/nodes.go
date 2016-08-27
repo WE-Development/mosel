@@ -85,7 +85,9 @@ func (node *node) initialize(conf *moselconfig.NodeConfig) error {
 func (node *node) ListenStream() {
 	Connection: for {
 		//provision scripts before connecting to stream
-		node.ProvisionScripts()
+		if err := node.ProvisionScripts(); err != nil {
+			log.Printf("Error while provisioning scripts: %s", err.Error())
+		}
 
 		url := node.URL.String() + "/stream"
 		log.Printf("Connect to %s via %s", node.Name, url)

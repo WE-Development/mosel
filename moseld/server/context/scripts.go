@@ -18,11 +18,11 @@ package context
 import (
 	"io/ioutil"
 	"github.com/WE-Development/mosel/config"
+	"errors"
 )
 
 type scriptCache struct {
-	path    string
-	Scripts map[string]moselconfig.ScriptConfig
+	scripts map[string]moselconfig.ScriptConfig
 }
 
 func NewScriptCache(configs map[string]*moselconfig.ScriptConfig) (*scriptCache, error) {
@@ -35,13 +35,13 @@ func (cache *scriptCache) initialize(configs map[string]*moselconfig.ScriptConfi
 	for script, conf := range configs {
 		scripts[script] = *conf
 	}
-	cache.Scripts = scripts
+	cache.scripts = scripts
 	return nil
 }
 
 func (cache *scriptCache) GetScripts() []string {
-	scripts := make([]string, 0, len(cache.Scripts))
-	for script := range cache.Scripts {
+	scripts := make([]string, 0, len(cache.scripts))
+	for script := range cache.scripts {
 		scripts = append(scripts, script)
 	}
 	return scripts
@@ -53,5 +53,8 @@ func (cache *scriptCache) getScript(name string) (string, error) {
 }
 
 func (cache *scriptCache) getScriptBytes(name string) ([]byte, error) {
-	return ioutil.ReadFile(cache.path + "/" + name)
+	if _, ok := cache.scripts[name]; !ok {
+		return nil, errors.New("No script with name " + name)
+	}
+	return ioutil.ReadFile(cache.scripts[name].Path)
 }
