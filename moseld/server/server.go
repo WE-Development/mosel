@@ -98,15 +98,6 @@ func (server *moseldServer) initNodeCache() error {
 		cache.Add(node)
 	}
 
-	/*go func() {
-		time.Sleep(5 * time.Second)
-
-		if err := c.CloseNode("self");
-		err != nil {
-			log.Println(err)
-		}
-	}()*/
-
 	return nil
 }
 
