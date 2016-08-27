@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package moselserver
+package moselconfig
 
 type Optional struct {
 	Enabled bool `gcfg:"enabled"`
@@ -38,4 +38,24 @@ type MoselServerConfig struct {
 	AuthTrue  struct {
 			  Optional
 		  } `gcfg:"auth-true"`
+}
+
+type MoseldServerConfig struct {
+	MoselServerConfig
+
+	Script struct {
+		       Path string `gcfg:"path"`
+	       } `gcfg:"script"`
+
+	Node   map[string]*NodeConfig `gcfg:"node"`
+}
+
+type NodeConfig struct {
+	URL            string `gcfg:"url"`
+	Scripts        []string `gcfg:"script"`
+	ScriptsExclude []string `gcfg:"exclude-script"`
+}
+
+type MoselNodedServerConfig struct {
+	MoselServerConfig
 }

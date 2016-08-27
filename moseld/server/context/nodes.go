@@ -25,33 +25,41 @@ import (
 	"github.com/WE-Development/mosel/api"
 	"encoding/json"
 	"bytes"
+	"github.com/WE-Development/mosel/config"
 )
 
 type node struct {
-	Name  string
-	URL   url.URL
+	Name        string
+	URL         url.URL
+	scripts     []string
 
-	handler *nodeRespHandler
-	scripts *scriptCache
+	handler     *nodeRespHandler
+	scriptCache *scriptCache
 
-	close chan struct{}
+	close       chan struct{}
 }
 
-func NewNode(name string, url url.URL, handler *nodeRespHandler, scripts *scriptCache) *node {
+func NewNode(name string, conf *moselconfig.NodeConfig, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
+	var url *url.URL
+	var err error
+	if url, err = url.Parse(conf.URL); err != nil {
+		return nil, err
+	}
+
 	node := &node{}
 	node.Name = name
-	node.URL = url
+	node.URL = *url
 	node.close = make(chan struct{})
 	node.handler = handler
-	node.scripts = scripts
+	node.scriptCache = scriptCache
 
-	return node
+	return node, nil
 }
 
 func (node *node) ListenStream() {
 	Connection: for {
 		//provision scripts before connecting to stream
-		node.ProvisionScripts(node.Name, node.scripts.Scripts)
+		node.ProvisionScripts()
 
 		url := node.URL.String() + "/stream"
 		log.Printf("Connect to %s via %s", node.Name, url)
@@ -93,9 +101,9 @@ func (node *node) ListenStream() {
 	}
 }
 
-func (node *node) ProvisionScripts(name string, scripts []string) error {
-	for _, script := range scripts {
-		bytes, err := node.scripts.getScriptBytes(script)
+func (node *node) ProvisionScripts() error {
+	for _, script := range node.scripts {
+		bytes, err := node.scriptCache.getScriptBytes(script)
 
 		if err != nil {
 			return err

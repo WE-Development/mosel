@@ -19,17 +19,17 @@ import (
 	"github.com/WE-Development/mosel/moselserver"
 	"github.com/WE-Development/mosel/moseld/server/handler"
 	"github.com/WE-Development/mosel/moseld/server/context"
-	"net/url"
+	"github.com/WE-Development/mosel/config"
 )
 
 type moseldServer struct {
 	moselserver.MoselServer
 
-	config  MoseldServerConfig
+	config  moselconfig.MoseldServerConfig
 	context *context.MoseldServerContext
 }
 
-func NewMoseldServer(config MoseldServerConfig) *moseldServer {
+func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	server := moseldServer{
 		config: config,
 		context: new(context.MoseldServerContext),
@@ -88,9 +88,15 @@ func (server *moseldServer) initDebs() error {
 func (server *moseldServer) initNodeCache() error {
 	cache := server.context.Nodes
 
-	url, _ := url.Parse("http://localhost:8181")
-	cache.Add(context.NewNode("self", *url,
-		server.context.NodeHandler, server.context.Scripts))
+	for name, conf := range server.config.Node {
+		node, err := context.NewNode(name, conf, server.context.NodeHandler, server.context.Scripts)
+
+		if err != nil {
+			return err
+		}
+
+		cache.Add(node)
+	}
 
 	/*go func() {
 		time.Sleep(5 * time.Second)

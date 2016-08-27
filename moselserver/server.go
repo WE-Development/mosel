@@ -21,10 +21,11 @@ import (
 	"log"
 	"fmt"
 	"strconv"
+	"github.com/WE-Development/mosel/config"
 )
 
 type MoselServer struct {
-	Config    MoselServerConfig
+	Config    moselconfig.MoselServerConfig
 	Context   MoselServerContext
 
 	Handlers  []MoselHandler
