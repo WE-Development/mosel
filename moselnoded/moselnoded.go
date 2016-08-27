@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 	"gopkg.in/gcfg.v1"
+	"github.com/WE-Development/mosel/config"
 )
 
 func main() {
@@ -35,8 +36,8 @@ func main() {
 	log.Fatal(server.Run())
 }
 
-func loadConfig() (*moselnodedserver.MoselNodedServerConfig, error) {
-	config := new(moselnodedserver.MoselNodedServerConfig)
+func loadConfig() (*moselconfig.MoselNodedServerConfig, error) {
+	config := new(moselconfig.MoselNodedServerConfig)
 	err := gcfg.ReadFileInto(config, "/etc/mosel/moselnoded.conf")
 	return config, err
 }

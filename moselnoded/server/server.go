@@ -19,16 +19,17 @@ import (
 	"github.com/WE-Development/mosel/moselserver"
 	"github.com/WE-Development/mosel/moselnoded/server/handler"
 	"github.com/WE-Development/mosel/moselnoded/server/context"
+	"github.com/WE-Development/mosel/config"
 )
 
 type moselnodedServer struct {
 	moselserver.MoselServer
 
-	config MoselNodedServerConfig
+	config moselconfig.MoselNodedServerConfig
 	context *context.MoselnodedServerContext
 }
 
-func NewMoselNodedServer(config MoselNodedServerConfig) *moselnodedServer {
+func NewMoselNodedServer(config moselconfig.MoselNodedServerConfig) *moselnodedServer {
 	server := moselnodedServer{
 		config: config,
 		context: new(context.MoselnodedServerContext),
