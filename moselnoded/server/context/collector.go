@@ -18,11 +18,9 @@ package context
 import (
 	"github.com/WE-Development/mosel/api"
 	"os"
-	"os/exec"
-	"bytes"
-	"strings"
 	"log"
 	"io/ioutil"
+	"github.com/WE-Development/mosel/commons"
 )
 
 type collector struct {
@@ -58,39 +56,15 @@ func (collector *collector) AddScript(name string, src []byte) error {
 
 func (collector *collector) FillNodeInfo(info *api.NodeInfo) {
 	for _, script := range collector.scripts {
-		collector.executeScript(script, info)
-	}
-}
+		res, err := commons.ExecuteScript(collector.scriptFolder + "/" + script)
 
-func (collector *collector) executeScript(name string, info *api.NodeInfo) {
-	script := collector.scriptFolder + "/" + name
-	cmd := exec.Command("/bin/bash", script)
-	out := &bytes.Buffer{}
-	cmd.Stdout = out
-
-	if err := cmd.Run(); err != nil {
-		log.Printf("Error executing script %s: %s", name, err.Error())
-		return
-	}
-
-	res := make(map[string]string)
-	for _, line := range strings.Split(out.String(), "\n") {
-		if line == "" {
+		if err != nil {
+			log.Printf("Error executing script %s: %s", script, err.Error())
 			continue
 		}
 
-		parts := strings.SplitN(line, ":", 2)
-
-		if len(parts) != 2 {
-			log.Printf("Invalid grap data '%s'", line)
-			continue
-		}
-
-		graph := parts[0]
-		value := parts[1]
-		res[graph] = value
+		(*info)[script] = res
 	}
-	(*info)[name] = res
 }
 
 func mkdirIfNotExist(path string, perm os.FileMode) (bool, error) {
