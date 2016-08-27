@@ -16,23 +16,20 @@
 package context
 
 import (
-	"net/url"
-	"errors"
-	"log"
+	"encoding/json"
 	"net/http"
+	"bytes"
+	"net/url"
+	"log"
 	"time"
 	"bufio"
 	"github.com/WE-Development/mosel/api"
-	"encoding/json"
-	"bytes"
-	"github.com/WE-Development/mosel/config"
 )
 
 type node struct {
 	Name         string
 	URL          url.URL
-	nodeScripts  []string
-	localScripts []string
+	scripts  []string
 
 	handler      *nodeRespHandler
 	scriptCache  *scriptCache
@@ -40,72 +37,17 @@ type node struct {
 	close        chan struct{}
 }
 
-func NewNode(name string, conf *moselconfig.NodeConfig, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
+func NewNode(name string, url url.URL, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
 
 	node := &node{}
 	node.Name = name
+	node.URL = url
+	node.scripts = scripts
 	node.close = make(chan struct{})
 	node.handler = handler
 	node.scriptCache = scriptCache
 
-	return node, node.initialize(conf)
-}
-
-func (node *node) initialize(conf *moselconfig.NodeConfig) error {
-	//get base url
-	var url *url.URL
-	var err error
-	if url, err = url.Parse(conf.URL); err != nil {
-		return err
-	}
-
-	var scripts []string
-
-	//get configured
-	if len(conf.Scripts) > 0 {
-		//manual config
-		scripts = conf.Scripts
-	} else {
-		//default
-		scripts = node.scriptCache.GetScripts()
-	}
-
-	//exclude certain scripts
-	for _, exclude := range conf.ScriptsExclude {
-		for i, script := range scripts {
-			if script == exclude {
-				scripts = append(scripts[:i], scripts[i + 1:]...)
-			}
-		}
-	}
-
-	nodeScripts := make([]string, 0)
-	localScripts := make([]string, 0)
-
-	//sort scripts by scope
-	for script := range scripts {
-		if conf, err := node.scriptCache.getScriptConfig(script); err == nil {
-			switch conf.Scope {
-			case "node":
-				nodeScripts = append(nodeScripts, script)
-				break
-			case "local":
-				localScripts = append(localScripts, script)
-				break
-			default:
-				return errors.New("Unknown script scope " + conf.Scope + " for node " + node.Name)
-			}
-
-		} else {
-			return err
-		}
-	}
-
-	node.URL = *url
-	node.nodeScripts = nodeScripts
-	node.localScripts = localScripts
-
-	return nil;
+	return node, nil
 }
 
 func (node *node) ListenStream() {
@@ -156,7 +98,7 @@ func (node *node) ListenStream() {
 }
 
 func (node *node) ProvisionScripts() error {
-	for _, script := range node.nodeScripts {
+	for _, script := range node.scripts {
 		bytes, err := node.scriptCache.getScriptBytes(script)
 
 		if err != nil {
@@ -180,45 +122,3 @@ func (node *node) ProvisionScript(name string, b []byte) error {
 	return err
 }
 
-type nodeCache struct {
-	handler *nodeRespHandler
-	scripts *scriptCache
-
-	nodes   map[string]*node
-}
-
-func NewNodeCache(handler *nodeRespHandler, scripts *scriptCache) (*nodeCache, error) {
-	c := &nodeCache{}
-	c.handler = handler
-	c.scripts = scripts
-	c.nodes = make(map[string]*node)
-	return c, nil
-}
-
-func (cache *nodeCache) Add(node *node) {
-	cache.nodes[node.Name] = node
-
-	//cache.ProvisionScripts(node.Name, cache.scripts.Scripts)
-	go func() {
-		node.ListenStream()
-	}()
-}
-
-func (cache *nodeCache) Get(name string) (*node, error) {
-	if val, ok := cache.nodes[name]; ok {
-		return val, nil
-	}
-
-	return nil, errors.New("No node with name " + name + " registered")
-}
-
-func (cache *nodeCache) CloseNode(name string) error {
-	node, err := cache.Get(name)
-
-	if err != nil {
-		return err
-	}
-
-	node.close <- struct{}{}
-	return nil
-}

@@ -20,6 +20,8 @@ import (
 	"github.com/WE-Development/mosel/moseld/server/handler"
 	"github.com/WE-Development/mosel/moseld/server/context"
 	"github.com/WE-Development/mosel/config"
+	"errors"
+	"net/url"
 )
 
 type moseldServer struct {
@@ -86,16 +88,70 @@ func (server *moseldServer) initDebs() error {
 }
 
 func (server *moseldServer) initNodeCache() error {
-	cache := server.context.Nodes
+	for nodeName, nodeConf := range server.config.Node {
 
-	for name, conf := range server.config.Node {
-		node, err := context.NewNode(name, conf, server.context.NodeHandler, server.context.Scripts)
+		var scripts []string
+
+		//get configured
+		if len(nodeConf.Scripts) > 0 {
+			//manual config
+			scripts = nodeConf.Scripts
+		} else {
+			//default
+			scripts = server.context.Scripts.GetScripts()
+		}
+
+		//exclude certain scripts
+		for _, exclude := range nodeConf.ScriptsExclude {
+			for i, script := range scripts {
+				if script == exclude {
+					scripts = append(scripts[:i], scripts[i + 1:]...)
+				}
+			}
+		}
+
+		nodeScripts := make([]string, 0)
+		localScripts := make([]string, 0)
+
+		//sort scripts by scope
+		for _, script := range scripts {
+			if scriptConf, err := server.context.Scripts.GetScriptConfig(script); err == nil {
+				switch scriptConf.Scope {
+				case "node":
+					nodeScripts = append(nodeScripts, script)
+					break
+				case "local":
+					localScripts = append(localScripts, script)
+					break
+				default:
+					return errors.New("Unknown script scope " + scriptConf.Scope + " for node " + nodeName)
+				}
+
+			} else {
+				return err
+			}
+		}
+
+		//get base url
+		var url *url.URL
+		var err error
+		if url, err = url.Parse(nodeConf.URL); err != nil {
+			return err
+		}
+
+		//instantiate node
+		node, err := context.NewNode(
+			nodeName,
+			*url,
+			nodeScripts,
+			server.context.NodeHandler,
+			server.context.Scripts)
 
 		if err != nil {
 			return err
 		}
 
-		cache.Add(node)
+		server.context.Nodes.Add(node)
 	}
 
 	return nil
