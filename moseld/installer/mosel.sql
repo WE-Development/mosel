@@ -1,0 +1,43 @@
+CREATE DATABASE IF NOT EXISTS mosel;
+USE mosel;
+
+DROP TABLE IF EXISTS DataPoints;
+DROP TABLE IF EXISTS Graphs;
+DROP TABLE IF EXISTS Diagrams;
+DROP TABLE IF EXISTS Nodes;
+
+CREATE TABLE Nodes (
+  ID   INT          NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(255) NOT NULL,
+  Url  VARCHAR(2000),
+
+  PRIMARY KEY (ID)
+);
+
+CREATE TABLE Diagrams (
+  ID   INT          NOT NULL AUTO_INCREMENT,
+  Name VARCHAR(255) NOT NULL,
+  Node INT          NOT NULL,
+
+  PRIMARY KEY (ID),
+  FOREIGN KEY (Node) REFERENCES Nodes (ID)
+);
+
+CREATE TABLE Graphs (
+  ID      INT          NOT NULL AUTO_INCREMENT,
+  Name    VARCHAR(255) NOT NULL,
+  Diagram INT          NOT NULL,
+
+  PRIMARY KEY (ID),
+  FOREIGN KEY (Diagram) REFERENCES Diagrams (ID)
+);
+
+CREATE TABLE DataPoints (
+  ID        INT NOT NULL AUTO_INCREMENT,
+  Value     DOUBLE,
+  Timestamp TIMESTAMP    DEFAULT NOW(),
+  Graph     INT NOT NULL,
+
+  PRIMARY KEY (ID),
+  FOREIGN KEY (Graph) REFERENCES Graphs (ID)
+);
