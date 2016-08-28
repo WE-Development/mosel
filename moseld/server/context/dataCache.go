@@ -72,17 +72,15 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 }
 
 func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
-	points, err := cache.GetAll(node)
-	t = t.Round(time.Second)
+	points, err := cache.getAllByTime(node)
 
 	if err != nil {
 		return api.NodeInfo{}, err
 	}
 
-	for _, p := range points {
-		if p.Time.Unix() == t.Unix() {
-			return p.Info, nil
-		}
+	t = t.Round(time.Second)
+	if point, ok := points[t]; ok {
+		return point.Info, nil
 	}
 
 	return api.NodeInfo{}, errors.New("No datapoint found for time " + t.String())
@@ -97,7 +95,7 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) 
 	}
 
 	result := make([]DataPoint, 0)
-
+	t = t.Round(time.Second)
 	for pt, p := range points {
 		if pt.Unix() > t.Unix() {
 			result = append(result, p)
