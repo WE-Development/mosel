@@ -34,6 +34,7 @@ func (cache *scriptCache) initialize(configs map[string]*moselconfig.ScriptConfi
 	scripts := make(map[string]moselconfig.ScriptConfig)
 	for script, conf := range configs {
 		if conf.Scope == "" {
+			//set default scope
 			conf.Scope = "node"
 		}
 
