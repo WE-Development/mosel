@@ -90,7 +90,7 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 
 func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) {
 
-	points, err := cache.GetAll(node)
+	points, err := cache.getAllByTime(node)
 
 	if err != nil {
 		return nil, err
@@ -98,8 +98,8 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) 
 
 	result := make([]DataPoint, 0)
 
-	for _, p := range points {
-		if p.Time.Unix() > t.Unix() {
+	for pt, p := range points {
+		if pt.Unix() > t.Unix() {
 			result = append(result, p)
 		}
 	}
@@ -108,13 +108,14 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) 
 }
 
 func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
+	var points map[time.Time]DataPoint
+	var err error
+
 	cache.m.Lock()
 
-	points, ok := cache.points[node]
-
-	if !ok {
+	if points, err = cache.getAllByTime(node); err != nil {
 		cache.m.Unlock()
-		return nil, errors.New("No node with name " + node)
+		return nil, err
 	}
 
 	cache.m.Unlock()
@@ -136,4 +137,13 @@ func (cache *dataCache) GetNodes() []string {
 	}
 
 	return nodes
+}
+
+func (cache *dataCache) getAllByTime(node string) (map[time.Time]DataPoint, error) {
+	points, ok := cache.points[node]
+	if !ok {
+		cache.m.Unlock()
+		return nil, errors.New("No node with name " + node)
+	}
+	return points, nil
 }
