@@ -23,7 +23,7 @@ import (
 )
 
 type dataCache struct {
-	points map[string][]DataPoint
+	points map[string]map[time.Time]DataPoint
 
 	m      sync.Mutex
 }
@@ -33,36 +33,47 @@ type DataPoint struct {
 	Info api.NodeInfo
 }
 
-func NewDataCache() (*dataCache,error) {
+func NewDataCache() (*dataCache, error) {
 	c := &dataCache{}
-	c.points = make(map[string][]DataPoint)
+	c.points = make(map[string]map[time.Time]DataPoint)
 	return c, nil
 }
 
 func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
+	var points map[time.Time]DataPoint
 
-	var arr []DataPoint
-
+	t = t.Round(time.Second)
 	cache.m.Lock()
 
 	if _, ok := cache.points[node]; !ok {
-		arr = make([]DataPoint, 0)
+		points = make(map[time.Time]DataPoint)
+		cache.points[node] = points
 	} else {
-		arr = cache.points[node]
+		points = cache.points[node]
 	}
 
-	arr = append(arr, DataPoint{
-		Time: t.Round(time.Second),
-		Info: info,
-	})
+	if point, ok := points[t]; ok {
+		for diag, graphs := range info {
+			for graph, value := range graphs {
+				if _, ok := point.Info[diag]; !ok {
+					point.Info[diag] = make(map[string]string)
+				}
+				point.Info[diag][graph] = value
+			}
+		}
+	} else {
+		points[t] = DataPoint{
+			Time: t,
+			Info: info,
+		}
+	}
 
-	cache.points[node] = arr
 	cache.m.Unlock()
 }
 
 func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
-
 	points, err := cache.GetAll(node)
+	t = t.Round(time.Second)
 
 	if err != nil {
 		return api.NodeInfo{}, err
@@ -107,7 +118,12 @@ func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
 	}
 
 	cache.m.Unlock()
-	return points, nil
+
+	res := make([]DataPoint, len(points))
+	for _, point := range points {
+		res = append(res, point)
+	}
+	return res, nil
 }
 
 func (cache *dataCache) GetNodes() []string {
