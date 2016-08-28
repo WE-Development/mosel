@@ -20,10 +20,11 @@ import "github.com/WE-Development/mosel/moselserver"
 type MoseldServerContext struct {
 	moselserver.MoselServerContext
 
-	Nodes *nodeCache
-	Cache *dataCache
-	NodeHandler *nodeRespHandler
-	Scripts *scriptCache
+	Nodes         *nodeCache
+	DataCache     *dataCache
+	NodeHandler   *nodeRespHandler
+	Scripts       *scriptCache
+	ScriptsRunner * scriptsRunner
 
-	Debug int
+	Debug         int
 }

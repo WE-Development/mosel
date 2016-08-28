@@ -45,13 +45,13 @@ func (handler nodeInfoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	since := r.URL.Query().Get("since")
 	if since == "" {
-		points, err = handler.ctxd.Cache.GetAll(node)
+		points, err = handler.ctxd.DataCache.GetAll(node)
 	} else {
 		//test this with stamp=$(($(date +%s)-10)); curl http://localhost:8282/nodeInfo/self\?since\=${stamp}
 		var i int64
 		i, err = strconv.ParseInt(since, 10, 64)
 		commons.HttpCheckError(err, http.StatusBadRequest, w)
-		points, err = handler.ctxd.Cache.GetSince(node, time.Unix(i, 0))
+		points, err = handler.ctxd.DataCache.GetSince(node, time.Unix(i, 0))
 	}
 	commons.HttpCheckError(err, http.StatusInternalServerError, w)
 

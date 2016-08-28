@@ -65,17 +65,22 @@ func (server *moseldServer) initDebs() error {
 	ctx := server.context
 
 	var err error
-	if ctx.Cache, err =
+	if ctx.DataCache, err =
 		context.NewDataCache(); err != nil {
 		return err
 	}
 	if ctx.NodeHandler, err =
-		context.NewNodeRespHandler(ctx.Cache); err != nil {
+		context.NewNodeRespHandler(ctx.DataCache); err != nil {
 		return err
 	}
 
 	if ctx.Scripts, err =
 		context.NewScriptCache(server.config.Scripts); err != nil {
+		return err
+	}
+
+	if ctx.ScriptsRunner, err =
+		context.NewScriptsRunner(ctx.Scripts, ctx.DataCache); err != nil {
 		return err
 	}
 
@@ -152,6 +157,7 @@ func (server *moseldServer) initNodeCache() error {
 		}
 
 		server.context.Nodes.Add(node)
+		server.context.ScriptsRunner.Run(localScripts, node)
 	}
 
 	return nil

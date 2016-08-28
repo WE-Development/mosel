@@ -36,7 +36,7 @@ func NewInfoHandler(ctxd *context.MoseldServerContext) *infoHandler {
 func (handler infoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp := api.NewInfoResponse()
 
-	resp.Nodes = handler.ctxd.Cache.GetNodes()
+	resp.Nodes = handler.ctxd.DataCache.GetNodes()
 
 	log.Println(resp)
 	json.NewEncoder(w).Encode(resp)

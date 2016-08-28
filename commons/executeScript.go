@@ -22,8 +22,8 @@ import (
 	"strings"
 )
 
-func ExecuteScript(path string) (map[string]string, error) {
-	cmd := exec.Command("/bin/bash", path)
+func ExecuteScript(arg ...string) (map[string]string, error) {
+	cmd := exec.Command("/bin/bash", arg...)
 	out := &bytes.Buffer{}
 	cmd.Stdout = out
 
