@@ -19,6 +19,8 @@ import (
 	"log"
 	"os/exec"
 	"io"
+	"bytes"
+	"time"
 )
 
 type authProvider interface {
@@ -39,14 +41,17 @@ type AuthSys struct {
 	AllowedUsers []string
 }
 
+//todo find a clever solution for this
 func (auth AuthSys)  Authenticate(user string, passwd string) bool {
 	if (len(auth.AllowedUsers) == 0) {
 		log.Println("AuthSys is configured but no users are allowed")
 		return false
 	}
 
-	cmd := exec.Command("su", user);
+	cmd := exec.Command("/bin/sh", "-c", "$(su " + user + ")");
 	in, err := cmd.StdinPipe()
+	out := &bytes.Buffer{}
+	cmd.Stderr = out
 
 	if err != nil {
 		log.Printf("Failed to perform AuthSys! Stdin could't be opend: %s", err)
@@ -54,9 +59,12 @@ func (auth AuthSys)  Authenticate(user string, passwd string) bool {
 	}
 
 	cmd.Run()
+	time.Sleep(1 * time.Second)
 	io.WriteString(in, passwd)
 	io.WriteString(in, "\n")
 	cmd.Wait()
+
+	log.Println(out.String())
 
 	success := cmd.ProcessState.Success()
 	if success {
