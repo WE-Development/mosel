@@ -94,6 +94,9 @@ func (server *MoselServer) initAuth() error {
 
 	if config.AuthSys.Enabled {
 		enabledCount++
+		server.Context.Auth = &AuthSys{
+			AllowedUsers: config.AuthSys.AllowedUsers,
+		}
 	}
 
 	if config.AuthMySQL.Enabled {
@@ -103,7 +106,7 @@ func (server *MoselServer) initAuth() error {
 	if config.AuthTrue.Enabled {
 		enabledCount++
 		log.Println("Using AuthTrue! This is for debug purposes only, make sure you don't deploy this in production")
-		server.Context.Auth = AuthTrue{}
+		server.Context.Auth = &AuthTrue{}
 	}
 
 	if enabledCount > 1 {

@@ -18,27 +18,46 @@ package moselserver
 import (
 	"net/http"
 	"github.com/WE-Development/mosel/commons"
+	"log"
 )
 
-func (server MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
+func (server *MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		if server.Config.Sessions.Enabled {
-			key := r.FormValue("key")
-			if key == "" || !server.Context.Sessions.ValidateSession(key) {
-				commons.HttpUnauthorized(w)
-				return
-			}
+			authSession(server, fn, w, r)
+		} else if (server.Config.AuthTrue.Enabled) {
+			fn(w, r)
 		} else {
-			user, passwd, enabled := r.BasicAuth()
-
-			if !server.Config.AuthTrue.Enabled &&
-				(!enabled || !server.Context.Auth.Authenticate(user, passwd)) {
-				commons.HttpUnauthorized(w)
-				return
-			}
+			authDirect(server, fn, w, r)
 		}
+	}
+}
 
-		fn(w, r)
+func authSession(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
+	key := r.FormValue("key")
+	if key == "" || !server.Context.Sessions.ValidateSession(key) {
+		commons.HttpUnauthorized(w)
+		return
+	}
+	fn(w, r)
+}
+
+func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
+	user, passwd, enabled := r.BasicAuth()
+
+	if !enabled {
+		commons.HttpUnauthorized(w)
+		return
+	}
+
+	if server.Context.Auth == nil {
+		log.Println("No autheticator configured! Denying all requests")
+		commons.HttpUnauthorized(w)
+		return
+	}
+
+	if !server.Context.Auth.Authenticate(user, passwd) {
+		commons.HttpUnauthorized(w)
+		return
 	}
 }

@@ -31,6 +31,7 @@ type MoselServerConfig struct {
 
 	AuthSys   struct {
 			  Optional
+			  AllowedUsers []string `gcfg:"allow-user"`
 		  } `gcfg:"auth-sys"`
 	AuthMySQL struct {
 			  Optional
@@ -54,7 +55,7 @@ type NodeConfig struct {
 }
 
 type ScriptConfig struct {
-	Path string `gcfg:"path"`
+	Path  string `gcfg:"path"`
 	Scope string `gcfg:"scope"`
 }
 
