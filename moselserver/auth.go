@@ -18,7 +18,6 @@ package moselserver
 import (
 	"log"
 	"os/exec"
-	"io"
 	"bytes"
 	"time"
 )
@@ -42,35 +41,37 @@ type AuthSys struct {
 }
 
 //todo find a clever solution for this
-func (auth AuthSys)  Authenticate(user string, passwd string) bool {
+func (auth AuthSys)  Authenticate(userName string, passwd string) bool {
 	if (len(auth.AllowedUsers) == 0) {
 		log.Println("AuthSys is configured but no users are allowed")
 		return false
 	}
 
-	cmd := exec.Command("/bin/sh", "-c", "$(su " + user + ")");
-	in, err := cmd.StdinPipe()
+	//cmd := exec.Command("su", userName);
+	cmd := exec.Command("true", userName);
+	in := &bytes.Buffer{}
 	out := &bytes.Buffer{}
 	cmd.Stderr = out
+	cmd.Stdin = in
 
-	if err != nil {
+	/*if err != nil {
 		log.Printf("Failed to perform AuthSys! Stdin could't be opend: %s", err)
 		return false
-	}
+	}*/
 
 	cmd.Run()
 	time.Sleep(1 * time.Second)
-	io.WriteString(in, passwd)
-	io.WriteString(in, "\n")
+	in.WriteString(passwd + "\n")
+	//close(in)
 	cmd.Wait()
 
 	log.Println(out.String())
 
 	success := cmd.ProcessState.Success()
 	if success {
-		log.Printf("Authenticated user %s via AuthSys", user)
+		log.Printf("Authenticated user %s via AuthSys", userName)
 	} else {
-		log.Printf("Rejected user %s via AuthSys", user)
+		log.Printf("Rejected user %s via AuthSys", userName)
 	}
 
 	return success;

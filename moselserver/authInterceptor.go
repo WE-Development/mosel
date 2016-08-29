@@ -60,4 +60,6 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 		commons.HttpUnauthorized(w)
 		return
 	}
+
+	fn(w, r)
 }
