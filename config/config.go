@@ -20,25 +20,36 @@ type Optional struct {
 }
 
 type MoselServerConfig struct {
-	Http      struct {
-			  BindAddress string `gcfg:"bind"`
-		  } `gcfg:"http"`
+	Http       struct {
+			   BindAddress string `gcfg:"bind"`
+		   } `gcfg:"http"`
 
 	//Auth stuff
-	Sessions  struct {
-			  Optional
-		  } `gcfg:"sessions"`
+	Sessions   struct {
+			   Optional
+		   } `gcfg:"sessions"`
 
-	AuthSys   struct {
-			  Optional
-			  AllowedUsers []string `gcfg:"allow-user"`
-		  } `gcfg:"auth-sys"`
-	AuthMySQL struct {
-			  Optional
-		  } `gcfg:"auth-mysql"`
-	AuthTrue  struct {
-			  Optional
-		  } `gcfg:"auth-true"`
+	AuthSys    struct {
+			   Optional
+			   AllowedUsers []string `gcfg:"allow-user"`
+		   } `gcfg:"auth-sys"`
+	AuthMySQL  struct {
+			   Optional
+		   } `gcfg:"auth-mysql"`
+	AuthTrue   struct {
+			   Optional
+		   } `gcfg:"auth-true"`
+	AuthStatic struct {
+			   Optional
+		   } `gcfg:"auth-static"`
+
+	Users      map[string]*UserConfig `gcfg:"user"`
+}
+
+type UserConfig struct {
+	Password       string `gcfg:"password"`
+	AllowResources []string `gcfg:"allow-resource"`
+	DenyResources  []string`gcfg:"allow-resource"`
 }
 
 type MoseldServerConfig struct {
@@ -55,8 +66,8 @@ type NodeConfig struct {
 }
 
 type ScriptConfig struct {
-	Path  string `gcfg:"path"`
-	Scope string `gcfg:"scope"`
+	Path      string `gcfg:"path"`
+	Scope     string `gcfg:"scope"`
 	Arguments []string `gcfg:"arg"`
 }
 

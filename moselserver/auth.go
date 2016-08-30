@@ -20,6 +20,7 @@ import (
 	"os/exec"
 	"bytes"
 	"time"
+	"github.com/WE-Development/mosel/config"
 )
 
 type authProvider interface {
@@ -36,6 +37,24 @@ func (auth *AuthTrue) Authenticate(user string, passwd string) bool {
 	return true
 }
 
+//Auth Static
+type AuthStatic struct {
+	Users map[string]*moselconfig.UserConfig
+}
+
+//implement authProvider
+func (auth *AuthStatic) Authenticate(user string, passwd string) bool {
+	conf, ok := auth.Users[user]
+
+	if !ok {
+		//no user with that name is registered
+		return false
+	}
+
+	return passwd == conf.Password
+}
+
+//Auth Sys
 type AuthSys struct {
 	AllowedUsers []string
 }

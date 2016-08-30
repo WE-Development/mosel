@@ -92,6 +92,13 @@ func (server *MoselServer) initAuth() error {
 
 	var enabledCount int = 0
 
+	if config.AuthStatic.Enabled {
+		enabledCount++
+		server.Context.Auth = &AuthStatic{
+			Users: config.Users,
+		}
+	}
+
 	if config.AuthSys.Enabled {
 		enabledCount++
 		server.Context.Auth = &AuthSys{
