@@ -20,6 +20,7 @@ import (
 	"log"
 	"github.com/WE-Development/mosel/commons"
 	"github.com/WE-Development/mosel/api"
+	"strings"
 )
 
 type scriptsRunner struct {
@@ -62,19 +63,53 @@ func (runner *scriptsRunner) runScripts(scripts []string, node *node) {
 	for _, script := range scripts {
 		conf, err := runner.scriptCache.GetScriptConfig(script)
 		if err != nil {
-			runner.logError(script, node, err)
+			runner.logError(script, nil, node, err)
 			continue
 		}
 
-		res, err := commons.ExecuteScript(conf.Path, node.Name, node.URL.String())
+		args := make([]string, len(conf.Arguments) + 1)
+		args[0] = conf.Path
+
+		//interpret arguments
+		for i, argId := range conf.Arguments {
+			var arg string
+			switch argId {
+			case "node":
+				arg = node.Name
+				break
+			case "host":
+				arg = strings.Split(node.URL.Host, ":")[0]
+				break
+			case "port":
+				s := strings.Split(node.URL.Host, ":")
+				if len(s) == 2 {
+					arg = s[1]
+				}
+				break
+			case "scheme":
+				arg = node.URL.Scheme
+				break
+			case "path":
+				arg = node.URL.Path
+				break
+			case "query":
+				arg = node.URL.RawQuery
+			default:
+				arg = "nil"
+				break
+			}
+			args[i + 1] = arg
+		}
+
+		res, err := commons.ExecuteScript(args...)
 		if err != nil {
-			runner.logError(script, node, err)
+			runner.logError(script, args, node, err)
 		}
 		info[script] = res
 	}
 	runner.dataCache.Add(node.Name, time.Now(), info)
 }
 
-func (runner *scriptsRunner) logError(script string, node *node, err error) {
-	log.Printf("Error while executing local script %s on node %s: %s", script, node.Name, err)
+func (runner *scriptsRunner) logError(script string, args []string, node *node, err error) {
+	log.Printf("Error while executing local script %s on node %s: %s. Args: %s", script, node.Name, err, args)
 }

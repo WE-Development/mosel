@@ -57,6 +57,7 @@ type NodeConfig struct {
 type ScriptConfig struct {
 	Path  string `gcfg:"path"`
 	Scope string `gcfg:"scope"`
+	Arguments []string `gcfg:"arg"`
 }
 
 type MoselNodedServerConfig struct {
