@@ -25,8 +25,6 @@ func (server *MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if server.Config.Sessions.Enabled {
 			authSession(server, fn, w, r)
-		} else if (server.Config.AuthTrue.Enabled) {
-			fn(w, r)
 		} else {
 			authDirect(server, fn, w, r)
 		}
@@ -43,12 +41,7 @@ func authSession(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter
 }
 
 func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
-	user, passwd, enabled := r.BasicAuth()
-
-	if !enabled {
-		commons.HttpUnauthorized(w)
-		return
-	}
+	user, passwd, _ := r.BasicAuth()
 
 	if server.Context.Auth == nil {
 		log.Println("No autheticator configured! Denying all requests")
