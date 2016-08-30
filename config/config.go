@@ -49,7 +49,7 @@ type MoselServerConfig struct {
 type UserConfig struct {
 	Password       string `gcfg:"password"`
 	AllowResources []string `gcfg:"allow-resource"`
-	DenyResources  []string`gcfg:"allow-resource"`
+	DenyResources  []string`gcfg:"deny-resource"`
 }
 
 type MoseldServerConfig struct {
