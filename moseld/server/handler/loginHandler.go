@@ -22,6 +22,7 @@ import (
 	"github.com/WE-Development/mosel/moseld/server/context"
 )
 
+// Handler for providing a login and credential validation functionality.
 type loginHandler struct {
 	ctx *context.MoseldServerContext
 }

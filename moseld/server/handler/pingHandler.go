@@ -21,6 +21,7 @@ import (
 	"github.com/WE-Development/mosel/api"
 )
 
+// Handler for sending ping responses. See api for details about them
 type pingHandler struct {
 }
 

@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 )
 
+// Handler for providing general information about the server instance. See api for details.
 type infoHandler struct {
 	ctxd *context.MoseldServerContext
 }

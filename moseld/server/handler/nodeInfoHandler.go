@@ -26,6 +26,9 @@ import (
 	"github.com/WE-Development/mosel/commons"
 )
 
+// Handler for providing time coded information on a node.
+// It also supports queries for entries not older than a given unix-timestamp (Seconds since 01.01.1970).
+// Use: ?since=<timestamp>
 type nodeInfoHandler struct {
 	ctxd *context.MoseldServerContext
 }

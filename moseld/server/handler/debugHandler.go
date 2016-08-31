@@ -23,6 +23,7 @@ import (
 	"log"
 )
 
+// As the name suggests
 type debugHandler struct {
 	ctxd *context.MoseldServerContext
 }
