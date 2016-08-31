@@ -19,7 +19,6 @@ import (
 	"github.com/WE-Development/mosel/moseld/server/context"
 	"net/http"
 	"github.com/WE-Development/mosel/api"
-	"log"
 	"encoding/json"
 )
 
@@ -35,10 +34,7 @@ func NewInfoHandler(ctxd *context.MoseldServerContext) *infoHandler {
 
 func (handler infoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	resp := api.NewInfoResponse()
-
 	resp.Nodes = handler.ctxd.DataCache.GetNodes()
-
-	log.Println(resp)
 	json.NewEncoder(w).Encode(resp)
 }
 
