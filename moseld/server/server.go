@@ -25,6 +25,8 @@ import (
 	"log"
 )
 
+// The server started by moseld.
+// It collects data from the configured nodes and from locally running scripts and provides it over a rest service.
 type moseldServer struct {
 	moselserver.MoselServer
 
@@ -32,6 +34,7 @@ type moseldServer struct {
 	context *context.MoseldServerContext
 }
 
+// Construct a new Instance of a MoselServer for a given configuration.
 func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	server := moseldServer{
 		config: config,
@@ -62,6 +65,7 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
  * Initialize Context
  */
 
+// Initializes dependencies within the server context.
 func (server *moseldServer) initDebs() error {
 	ctx := server.context
 
@@ -93,6 +97,7 @@ func (server *moseldServer) initDebs() error {
 	return nil
 }
 
+// Initialize the node cache withe the configured nodes
 func (server *moseldServer) initNodeCache() error {
 	for nodeName, nodeConf := range server.config.Node {
 
@@ -168,6 +173,7 @@ func (server *moseldServer) initNodeCache() error {
 	return nil
 }
 
+// Initialize the data cache
 func (server *moseldServer) initDataCache() error {
 	//c := server.context.Cache
 	return nil
