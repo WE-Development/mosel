@@ -21,6 +21,8 @@ import (
 	"log"
 )
 
+// Wrap a http.HandleFunc such that it's authenticated before execution.
+// It's build on basic auth or use with sessions as provided by moselserver.sessionCache.
 func (server *MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if server.Config.Sessions.Enabled {
@@ -31,6 +33,7 @@ func (server *MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Authenticate via sessions
 func authSession(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	if key == "" || !server.Context.Sessions.ValidateSession(key) {
@@ -40,6 +43,7 @@ func authSession(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter
 	fn(w, r)
 }
 
+// Authenticate directly via basic auth
 func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
 	user, passwd, _ := r.BasicAuth()
 

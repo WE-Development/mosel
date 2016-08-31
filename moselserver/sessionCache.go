@@ -22,6 +22,8 @@ import (
 	"encoding/hex"
 )
 
+// !!! CURRENTLY UNSAVE !!!
+// It always produces the same session keys at the moment
 type sessionCache struct {
 	sessions map[string]session
 }

@@ -15,7 +15,9 @@
  */
 package moselserver
 
+// The abstract context which get associated with a server instance.
 type MoselServerContext struct {
+	// Get's set to true after the server booted successfully
 	IsInitialized bool
 
 	Auth          authProvider

@@ -24,6 +24,7 @@ import (
 	"github.com/WE-Development/mosel/config"
 )
 
+// The abstract http-server type underlying the mosel servers.
 type MoselServer struct {
 	Config    moselconfig.MoselServerConfig
 	Context   MoselServerContext
@@ -32,6 +33,10 @@ type MoselServer struct {
 	InitFuncs []func() error
 }
 
+// Boot up the server
+// 1: Run init functions
+// 2: Init request handlers and wrap them with gorilla/mux
+// 3: Handle the gorilla/mux router
 func (server *MoselServer) Run() error {
 
 	//initializing server context
@@ -73,6 +78,8 @@ func (server *MoselServer) Run() error {
  * Initialize Context
  */
 
+// Initialize the server context.
+// The configured init functions will be called and on success server.Context.IsInitialized will be set to true.
 func (server *MoselServer) initContext() error {
 
 	for _, fn := range server.InitFuncs {
@@ -87,6 +94,7 @@ func (server *MoselServer) initContext() error {
 	return nil
 }
 
+// Initialize the configured authentication method
 func (server *MoselServer) initAuth() error {
 	config := server.Config
 
@@ -125,6 +133,9 @@ func (server *MoselServer) initAuth() error {
 	return nil
 }
 
+// Initialize the session cache
+// This gets executed even if sessions are disabled by the config as the decision on weather to use session is
+// taken in the authInterceptor
 func (server *MoselServer) initSessionCache() error {
 	c := NewSessionCache()
 	server.Context.Sessions = *c
@@ -136,6 +147,7 @@ func (server *MoselServer) initSessionCache() error {
  * Initialize Handler
  */
 
+// Initialize the configured http handlers and wrap them into a gorilla/mux router
 func (server *MoselServer) initHandler(r *mux.Router) {
 
 	for n, _ := range server.Handlers {

@@ -23,26 +23,27 @@ import (
 	"github.com/WE-Development/mosel/config"
 )
 
+// Interface for validating a user-password combination
 type authProvider interface {
 	Authenticate(user string, passwd string) bool
 }
 
-//this provider will always authenticate successfully (for testing purposes)
+// Will always authenticate successfully. (for testing purposes!)
 type AuthTrue struct {
 
 }
 
-//implement authProvider
+// implement authProvider
 func (auth *AuthTrue) Authenticate(user string, passwd string) bool {
 	return true
 }
 
-//Auth Static
+// Will check a static set of user-password combinations
 type AuthStatic struct {
 	Users map[string]*moselconfig.UserConfig
 }
 
-//implement authProvider
+// implement authProvider
 func (auth *AuthStatic) Authenticate(user string, passwd string) bool {
 	conf, ok := auth.Users[user]
 
