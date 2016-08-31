@@ -22,6 +22,7 @@ import (
 	"github.com/WE-Development/mosel/config"
 	"errors"
 	"net/url"
+	"log"
 )
 
 type moseldServer struct {
@@ -136,6 +137,8 @@ func (server *moseldServer) initNodeCache() error {
 				return err
 			}
 		}
+
+		log.Printf("Scripts configured for node %s: node=%s local=%s", nodeName, nodeScripts, localScripts)
 
 		//get base url
 		var url *url.URL
