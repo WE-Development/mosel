@@ -62,7 +62,6 @@ func (node *node) ListenStream() {
 			log.Printf("Error while provisioning scripts: %s", err.Error())
 		}
 
-		var resp *http.Response
 		// TRY
 		resp, err := func() (*http.Response, error) {
 			url := node.URL.String() + "/stream"
@@ -72,15 +71,7 @@ func (node *node) ListenStream() {
 			if err != nil {
 				return nil, err
 			}
-
-			if node.user != "" {
-				req.SetBasicAuth(node.user, node.passwd)
-			}
-
-			client := http.Client{}
-			resp, err := client.Do(req)
-
-			return resp, err
+			return node.doRequest(req)
 		}()
 		// CATCH
 		if err != nil {
@@ -139,9 +130,30 @@ func (node *node) ProvisionScripts() error {
 }
 
 func (node *node) ProvisionScript(name string, b []byte) error {
-	_, err := http.Post(node.URL.String() + "/script/" + name,
-		"application/x-sh",
-		bytes.NewBuffer(b))
+	err := func() (error) {
+		url := node.URL.String() + "/script/" + name
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+		req.Header.Add("media-type", "application/x-sh")
+
+		if err != nil {
+			return err
+		}
+		_, err = node.doRequest(req)
+		return err
+	}()
 	return err
+}
+
+func (node *node) doRequest(req *http.Request) (*http.Response, error) {
+	return func() (*http.Response, error) {
+		if node.user != "" {
+			req.SetBasicAuth(node.user, node.passwd)
+		}
+
+		client := http.Client{}
+		resp, err := client.Do(req)
+
+		return resp, err
+	}()
 }
 
