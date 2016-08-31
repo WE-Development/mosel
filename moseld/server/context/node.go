@@ -31,18 +31,23 @@ type node struct {
 	URL         url.URL
 	scripts     []string
 
+	user        string
+	passwd      string
+
 	handler     *nodeRespHandler
 	scriptCache *scriptCache
 
 	close       chan struct{}
 }
 
-func NewNode(name string, url url.URL, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
+func NewNode(name string, url url.URL, user  string, passwd string, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
 
 	node := &node{}
 	node.Name = name
 	node.URL = url
 	node.scripts = scripts
+	node.user = user
+	node.passwd = passwd
 	node.close = make(chan struct{})
 	node.handler = handler
 	node.scriptCache = scriptCache
@@ -57,10 +62,27 @@ func (node *node) ListenStream() {
 			log.Printf("Error while provisioning scripts: %s", err.Error())
 		}
 
-		url := node.URL.String() + "/stream"
-		log.Printf("Connect to %s via %s", node.Name, url)
-		resp, err := http.Get(url)
+		var resp *http.Response
+		// TRY
+		resp, err := func() (*http.Response, error) {
+			url := node.URL.String() + "/stream"
+			log.Printf("Connect to %s via %s", node.Name, url)
+			req, err := http.NewRequest("GET", url, nil)
 
+			if err != nil {
+				return nil, err
+			}
+
+			if node.user != "" {
+				req.SetBasicAuth(node.user, node.passwd)
+			}
+
+			client := http.Client{}
+			resp, err := client.Do(req)
+
+			return resp, err
+		}()
+		// CATCH
 		if err != nil {
 			log.Println(err)
 

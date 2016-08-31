@@ -148,6 +148,8 @@ func (server *moseldServer) initNodeCache() error {
 		node, err := context.NewNode(
 			nodeName,
 			*url,
+			nodeConf.User,
+			nodeConf.Password,
 			nodeScripts,
 			server.context.NodeHandler,
 			server.context.Scripts)

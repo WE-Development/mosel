@@ -63,6 +63,8 @@ type NodeConfig struct {
 	URL            string `gcfg:"url"`
 	Scripts        []string `gcfg:"script"`
 	ScriptsExclude []string `gcfg:"exclude-script"`
+	User           string `gcfg:"user"`
+	Password       string`gcfg:"password"`
 }
 
 type ScriptConfig struct {
