@@ -17,6 +17,7 @@ package context
 
 import "github.com/WE-Development/mosel/moselserver"
 
+// The context associated with a server instance
 type MoseldServerContext struct {
 	moselserver.MoselServerContext
 

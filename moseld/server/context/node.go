@@ -26,6 +26,7 @@ import (
 	"github.com/WE-Development/mosel/api"
 )
 
+// Represents a node and handles all communication with it.
 type node struct {
 	Name        string
 	URL         url.URL
@@ -55,6 +56,8 @@ func NewNode(name string, url url.URL, user  string, passwd string, scripts []st
 	return node, nil
 }
 
+// Connect and Listen to the node pushing infos.
+// If the connection is lost, a reconnect is tried.
 func (node *node) ListenStream() {
 	Run: for {
 		//provision scripts before connecting to stream
@@ -110,6 +113,7 @@ func (node *node) ListenStream() {
 	}
 }
 
+// Provision scripts with node scope to the node
 func (node *node) ProvisionScripts() error {
 	for _, script := range node.scripts {
 		var bytes []byte
@@ -129,6 +133,7 @@ func (node *node) ProvisionScripts() error {
 	return nil
 }
 
+// Provision a singe script to the node
 func (node *node) ProvisionScript(name string, b []byte) error {
 	err := func() (error) {
 		url := node.URL.String() + "/script/" + name
@@ -144,6 +149,7 @@ func (node *node) ProvisionScript(name string, b []byte) error {
 	return err
 }
 
+// Do a request and setup basic auth if required for this node.
 func (node *node) doRequest(req *http.Request) (*http.Response, error) {
 	return func() (*http.Response, error) {
 		if node.user != "" {

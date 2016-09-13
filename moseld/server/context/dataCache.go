@@ -22,6 +22,7 @@ import (
 	"errors"
 )
 
+// Collects and caches NodeInfo objects by node name and time (unix).
 type dataCache struct {
 	points map[string]map[time.Time]DataPoint
 
@@ -39,6 +40,8 @@ func NewDataCache() (*dataCache, error) {
 	return c, nil
 }
 
+// Cache a new node info object.
+// If a node info is already cached for this node and time, the existing data gets extended or overwritten.
 func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	var points map[time.Time]DataPoint
 
@@ -71,6 +74,7 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	cache.m.Unlock()
 }
 
+// Get node info at a given time (rounded to seconds)
 func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 	points, err := cache.getAllByTime(node)
 
@@ -86,6 +90,7 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 	return api.NodeInfo{}, errors.New("No datapoint found for time " + t.String())
 }
 
+// Get all node infos for a node and not older than a given time (rounded to seconds)
 func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) {
 
 	points, err := cache.getAllByTime(node)
@@ -105,6 +110,7 @@ func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) 
 	return result, nil
 }
 
+// Get all cached node infos
 func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
 	var points map[time.Time]DataPoint
 	var err error
@@ -125,6 +131,7 @@ func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
 	return res, nil
 }
 
+// Get nodes for which data is cached
 func (cache *dataCache) GetNodes() []string {
 	nodes := make([]string, len(cache.points))
 
@@ -137,6 +144,7 @@ func (cache *dataCache) GetNodes() []string {
 	return nodes
 }
 
+// Get all node infos for a given time (rounded to seconds)
 func (cache *dataCache) getAllByTime(node string) (map[time.Time]DataPoint, error) {
 	points, ok := cache.points[node]
 	if !ok {
