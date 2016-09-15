@@ -43,13 +43,25 @@ type MoselServerConfig struct {
 			   Optional
 		   } `gcfg:"auth-static"`
 
+	Groups     map[string]*GroupConfig `gcfg:"group"`
 	Users      map[string]*UserConfig `gcfg:"user"`
 }
 
+type AccessRights struct {
+	Allow []string `gcfg:"allow-resource"`
+	Deny  []string`gcfg:"deny-resource"`
+	Prior string `gcfg:"prior"`
+}
+
+type GroupConfig struct {
+	AccessRights
+}
+
 type UserConfig struct {
-	Password       string `gcfg:"password"`
-	AllowResources []string `gcfg:"allow-resource"`
-	DenyResources  []string`gcfg:"deny-resource"`
+	AccessRights
+
+	Groups   []string `gcfg:"group"`
+	Password string `gcfg:"password"`
 }
 
 type MoseldServerConfig struct {

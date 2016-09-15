@@ -19,6 +19,8 @@ import (
 	"net/http"
 	"github.com/WE-Development/mosel/commons"
 	"log"
+	"github.com/WE-Development/mosel/config"
+	"regexp"
 )
 
 // Wrap a http.HandleFunc such that it's authenticated before execution.
@@ -53,10 +55,45 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 		return
 	}
 
-	if !server.Context.Auth.Authenticate(user, passwd) {
+	if !server.Context.Auth.Authenticate(user, passwd) ||
+		!validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups) {
 		commons.HttpUnauthorized(w)
 		return
 	}
 
 	fn(w, r)
+}
+
+func validateAccessRights(path string, userConfig moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) bool {
+	allow := false;
+
+	rights := make([]moselconfig.AccessRights, 0)
+
+	for groupName, groupConf := range groupConfigs {
+		for _, userGroup := range userConfig.Groups {
+			if userGroup != groupName {
+				continue
+			}
+			rights = append(rights, groupConf.AccessRights...)
+		}
+	}
+	rights = append(rights, userConfig.AccessRights)
+
+	for _, rightConf := range rights {
+		if rightConf.Prior == "allow" {
+			for _, denyRegex := range rightConf.Deny {
+				match, _ := regexp.MatchString(denyRegex, path)
+				allow =
+			}
+			for _, allowRegex := range rightConf.Allow {
+
+			}
+		} else if rightConf.Prior == "deny" {
+
+		} else {
+
+		}
+	}
+
+	return allow
 }
