@@ -48,8 +48,8 @@ type MoselServerConfig struct {
 }
 
 type AccessRights struct {
-	Allow []string `gcfg:"allow-resource"`
-	Deny  []string`gcfg:"deny-resource"`
+	Allow []string `gcfg:"allow"`
+	Deny  []string`gcfg:"deny"`
 	Prior string `gcfg:"prior"`
 }
 

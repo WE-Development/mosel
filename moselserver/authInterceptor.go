@@ -106,7 +106,7 @@ func validateAccessRights(path string, userConfig *moselconfig.UserConfig, group
 				return false, err
 			}
 
-			allow = allow || !match
+			allow = allow || match
 		}
 
 	}
