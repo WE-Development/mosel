@@ -55,8 +55,16 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 		return
 	}
 
-	if !server.Context.Auth.Authenticate(user, passwd) ||
-		!validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups) {
+	if !server.Context.Auth.Authenticate(user, passwd) {
+		commons.HttpUnauthorized(w)
+		return
+	}
+
+	if ok, err := validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups); !ok {
+		if err != nil {
+			log.Println(err)
+		}
+
 		commons.HttpUnauthorized(w)
 		return
 	}
@@ -64,7 +72,7 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 	fn(w, r)
 }
 
-func validateAccessRights(path string, userConfig moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) bool {
+func validateAccessRights(path string, userConfig moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) (bool, error) {
 	allow := false;
 
 	rights := make([]moselconfig.AccessRights, 0)
@@ -80,20 +88,28 @@ func validateAccessRights(path string, userConfig moselconfig.UserConfig, groupC
 	rights = append(rights, userConfig.AccessRights)
 
 	for _, rightConf := range rights {
-		if rightConf.Prior == "allow" {
-			for _, denyRegex := range rightConf.Deny {
-				match, _ := regexp.MatchString(denyRegex, path)
-				allow =
+		var err error
+		var match bool
+		for _, denyRegex := range rightConf.Deny {
+			match, err = regexp.MatchString(denyRegex, path)
+
+			if err != nil {
+				return false, err
 			}
-			for _, allowRegex := range rightConf.Allow {
 
-			}
-		} else if rightConf.Prior == "deny" {
-
-		} else {
-
+			allow = allow && !match
 		}
+		for _, allowRegex := range rightConf.Allow {
+			match, err = regexp.MatchString(allowRegex, path)
+
+			if err != nil {
+				return false, err
+			}
+
+			allow = allow || !match
+		}
+
 	}
 
-	return allow
+	return allow, nil
 }
