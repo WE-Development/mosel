@@ -92,5 +92,16 @@ func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) 
 	} else if empty {
 		pers.query("insertNode", node, "")
 	}
+	/*
+		if empty, err := pers.queryResultNotEmpty("diagramByName", node); err != nil {
+			log.Println(err)
+		} else if empty {
+			pers.query("insertDiagram", node, "")
+		}
 
+		if empty, err := pers.queryResultNotEmpty("nodeByName", node); err != nil {
+			log.Println(err)
+		} else if empty {
+			pers.query("insertNode", node, "")
+		}*/
 }

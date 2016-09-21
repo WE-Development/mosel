@@ -17,8 +17,13 @@ func getMysqlQueries() SqlQueries {
 
 	q["tableExists"] = "SHOW TABLES LIKE "
 	q["nodeByName"] = "SELECT * FROM Nodes WHERE Name=?"
+	q["diagramByName"] = "SELECT * FROM Diagrams WHERE Name=?"
+	q["graphByName"] = "SELECT * FROM Graphs WHERE Name=?"
 
 	q["insertNode"] = "INSERT INTO Nodes (Name, Url) VALUES(?,?)"
+	q["insertDiagram"] = "INSERT INTO Diagrams (Name, Node) VALUES (?,?)"
+	q["insertGraph"] = "INSERT INTO Graphs (Name, Diagram) VALUES (?,?)"
+	q["insertDataPoint"] = "INSERT INTO DataPoints (Value, Timestamp, Graph) VALUES (?,?,?)"
 
 	q["createNodes"] =
 		`CREATE TABLE Nodes (
