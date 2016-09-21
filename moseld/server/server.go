@@ -81,8 +81,6 @@ func (server *moseldServer) initDebs() error {
 
 	persistenceConfig := server.config.PersistenceConfig
 	if persistenceConfig.Enabled {
-		log.Println(ctx.DataSources)
-
 		dataSource, ok := ctx.DataSources[persistenceConfig.DataSource]
 
 		if !ok {
@@ -199,6 +197,8 @@ func (server *moseldServer) initNodeCache() error {
 
 // Initialize the data persistence
 func (server *moseldServer) initDataPersistence() error {
-
-	return nil
+	if server.context.DataPersistence == nil {
+		return nil
+	}
+	return server.context.DataPersistence.Init()
 }
