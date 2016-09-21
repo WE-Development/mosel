@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strconv"
 	"github.com/WE-Development/mosel/config"
+	"database/sql"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // The abstract http-server type underlying the mosel servers.
@@ -42,6 +44,7 @@ func (server *MoselServer) Run() error {
 	//initializing server context
 	server.InitFuncs = append([]func() error{
 		server.initAuth,
+		server.initDataSources,
 		server.initSessionCache,
 	}, server.InitFuncs...)
 
@@ -128,6 +131,39 @@ func (server *MoselServer) initAuth() error {
 		return fmt.Errorf("More then one auth services enabled")
 	} else if enabledCount == 0 {
 		return fmt.Errorf("No auth service configured")
+	}
+
+	return nil
+}
+
+// Initialize the configured data sources
+func (server *MoselServer) initDataSources() error {
+	server.Context.DataSources = make(map[string]*dataSource)
+
+	for name, config := range server.Config.DataSources {
+		var db *sql.DB
+		var err error
+
+		if config.Type == "mysql" {
+			// driver is configured by import
+		} else {
+			return fmt.Errorf("Data source type '%s' not supported", config.Type)
+		}
+
+		if db, err = sql.Open(config.Type, config.Connection); err != nil {
+			return err
+		}
+
+		if err = db.Ping(); err != nil {
+			return err
+		}
+
+		log.Printf("Register data source %s", name)
+		server.Context.DataSources[name] =
+			&dataSource{
+				Type: config.Type,
+				Db: db,
+			}
 	}
 
 	return nil
