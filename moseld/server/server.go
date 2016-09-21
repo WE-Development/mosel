@@ -107,7 +107,7 @@ func (server *moseldServer) initDebs() error {
 	}
 
 	if ctx.ScriptsRunner, err =
-		context.NewScriptsRunner(ctx.Scripts, ctx.DataCache); err != nil {
+		context.NewScriptsRunner(ctx.Scripts, ctx.DataCache, ctx.DataPersistence); err != nil {
 		return err
 	}
 

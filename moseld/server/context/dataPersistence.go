@@ -36,19 +36,34 @@ func (pers sqlDataPersistence) query(name string, args ...interface{}) (*sql.Row
 	return pers.db.Query(query, args...)
 }
 
-func (pers sqlDataPersistence) Init() error {
-	tables := make(map[string]string)
-	tables["Nodes"] = "createNodes"
-	tables["Diagrams"] = "createDiagrams"
-	tables["Graphs"] = "createGraphs"
-	tables["DataPoints"] = "createDataPoints"
+func (pers sqlDataPersistence) queryResultNotEmpty(name string, args ...interface{}) (bool, error) {
+	rows, err := pers.query(name, args...)
 
-	for table, createQuery := range tables {
-		if exists, err := pers.tableExists(table); err != nil {
+	if err != nil {
+		return false, err
+	}
+
+	return !rows.Next(), nil
+}
+
+type table struct {
+	name        string
+	createQuery string
+}
+
+func (pers sqlDataPersistence) Init() error {
+	tables := make([]table, 4)
+	tables[0] = table{name:"Nodes", createQuery:"createNodes", }
+	tables[1] = table{name:"Diagrams", createQuery:"createDiagrams", }
+	tables[2] = table{name:"Graphs", createQuery:"createGraphs", }
+	tables[3] = table{name:"DataPoints", createQuery:"createDataPoints", }
+
+	for _, table := range tables {
+		if exists, err := pers.tableExists(table.name); err != nil {
 			return err
 		} else if !exists {
 			log.Printf("Create table %s ", table)
-			_, err := pers.query(createQuery)
+			_, err := pers.query(table.createQuery)
 
 			if err != nil {
 				return err
@@ -62,6 +77,7 @@ func (pers sqlDataPersistence) Init() error {
 func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
 	//todo be clever bout this
 	rows, err := pers.db.Query(pers.q["tableExists"] + " '" + name + "'")
+	defer rows.Close()
 
 	if err != nil {
 		return false, err
@@ -71,5 +87,10 @@ func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
 }
 
 func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
+	if empty, err := pers.queryResultNotEmpty("nodeByName", node); err != nil {
+		log.Println(err)
+	} else if empty {
+		pers.query("insertNode", node, "")
+	}
 
 }

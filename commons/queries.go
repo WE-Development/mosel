@@ -14,7 +14,12 @@ func GetQueries(dialect string) (SqlQueries, error) {
 
 func getMysqlQueries() SqlQueries {
 	q := make(SqlQueries)
+
 	q["tableExists"] = "SHOW TABLES LIKE "
+	q["nodeByName"] = "SELECT * FROM Nodes WHERE Name=?"
+
+	q["insertNode"] = "INSERT INTO Nodes (Name, Url) VALUES(?,?)"
+
 	q["createNodes"] =
 		`CREATE TABLE Nodes (
   			ID   INT          NOT NULL AUTO_INCREMENT,

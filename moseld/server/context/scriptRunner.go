@@ -26,13 +26,15 @@ import (
 type scriptsRunner struct {
 	scriptCache *scriptCache
 	dataCache   *dataCache
+	dataPersistence dataPersistence
 	closer      map[string]chan struct{}
 }
 
-func NewScriptsRunner(scriptCache *scriptCache, dataCache *dataCache) (*scriptsRunner, error) {
+func NewScriptsRunner(scriptCache *scriptCache, dataCache *dataCache, dataPersistence dataPersistence) (*scriptsRunner, error) {
 	runner := &scriptsRunner{}
 	runner.scriptCache = scriptCache
 	runner.dataCache = dataCache
+	runner.dataPersistence = dataPersistence
 	runner.closer = make(map[string]chan struct{})
 	return runner, runner.initialize()
 }
@@ -108,6 +110,9 @@ func (runner *scriptsRunner) runScripts(scripts []string, node *node) {
 		info[script] = res
 	}
 	runner.dataCache.Add(node.Name, time.Now(), info)
+	if runner.dataPersistence != nil {
+		runner.dataPersistence.Add(node.Name, time.Now(), info)
+	}
 }
 
 func (runner *scriptsRunner) logError(script string, args []string, node *node, err error) {
