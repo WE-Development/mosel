@@ -23,6 +23,8 @@ import (
 	"errors"
 	"net/url"
 	"log"
+	"github.com/WE-Development/mosel/commons"
+	"fmt"
 )
 
 // The server started by moseld.
@@ -48,7 +50,7 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	server.InitFuncs = append(server.InitFuncs,
 		server.initDebs,
 		server.initNodeCache,
-		server.initDataCache)
+		server.initDataPersistence)
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewLoginHandler(server.context),
@@ -68,14 +70,36 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 // Initializes dependencies within the server context.
 func (server *moseldServer) initDebs() error {
 	ctx := server.context
+	ctx.MoselServerContext = server.Context
 
 	var err error
+
 	if ctx.DataCache, err =
 		context.NewDataCache(); err != nil {
 		return err
 	}
+
+	persistenceConfig := server.config.PersistenceConfig
+	if persistenceConfig.Enabled {
+		log.Println(ctx.DataSources)
+
+		dataSource, ok := ctx.DataSources[persistenceConfig.DataSource]
+
+		if !ok {
+			return fmt.Errorf("Datasource %s not configured", persistenceConfig.DataSource)
+		}
+
+		var queries commons.SqlQueries
+		var err error
+		if queries, err = commons.GetQueries(dataSource.Type); err != nil {
+			return fmt.Errorf("No queries configured for sql dialect %s", dataSource.Type)
+		}
+
+		ctx.DataPersistence = context.NewSqlDataPersistence(dataSource.Db, queries)
+	}
+
 	if ctx.NodeHandler, err =
-		context.NewNodeRespHandler(ctx.DataCache); err != nil {
+		context.NewNodeRespHandler(ctx.DataCache, ctx.DataPersistence); err != nil {
 		return err
 	}
 
@@ -173,8 +197,8 @@ func (server *moseldServer) initNodeCache() error {
 	return nil
 }
 
-// Initialize the data cache
-func (server *moseldServer) initDataCache() error {
-	//c := server.context.Cache
+// Initialize the data persistence
+func (server *moseldServer) initDataPersistence() error {
+
 	return nil
 }

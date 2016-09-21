@@ -29,7 +29,7 @@ import (
 // The abstract http-server type underlying the mosel servers.
 type MoselServer struct {
 	Config    moselconfig.MoselServerConfig
-	Context   MoselServerContext
+	Context   *MoselServerContext
 
 	Handlers  []MoselHandler
 	InitFuncs []func() error
@@ -84,6 +84,7 @@ func (server *MoselServer) Run() error {
 // Initialize the server context.
 // The configured init functions will be called and on success server.Context.IsInitialized will be set to true.
 func (server *MoselServer) initContext() error {
+	server.Context = &MoselServerContext{}
 
 	for _, fn := range server.InitFuncs {
 		err := fn()

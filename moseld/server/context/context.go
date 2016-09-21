@@ -19,13 +19,14 @@ import "github.com/WE-Development/mosel/moselserver"
 
 // The context associated with a server instance
 type MoseldServerContext struct {
-	moselserver.MoselServerContext
+	*moselserver.MoselServerContext
 
-	Nodes         *nodeCache
-	DataCache     *dataCache
-	NodeHandler   *nodeRespHandler
-	Scripts       *scriptCache
-	ScriptsRunner * scriptsRunner
+	Nodes           *nodeCache
+	DataCache       *dataCache
+	DataPersistence dataPersistence
+	NodeHandler     *nodeRespHandler
+	Scripts         *scriptCache
+	ScriptsRunner   *scriptsRunner
 
-	Debug         int
+	Debug           int
 }

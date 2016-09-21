@@ -20,16 +20,22 @@ import (
 )
 
 type nodeRespHandler struct {
-	cache *dataCache
+	cache           *dataCache
+	dataPersistence dataPersistence
 }
 
-func NewNodeRespHandler(cache *dataCache) (*nodeRespHandler, error) {
+func NewNodeRespHandler(cache *dataCache, dataPersistence dataPersistence) (*nodeRespHandler, error) {
 	return &nodeRespHandler{
 		cache: cache,
+		dataPersistence:dataPersistence,
 	}, nil
 }
 
 func (handler nodeRespHandler) handleNodeResp(node string, resp api.NodeResponse) {
 	//log.Println(resp)
 	handler.cache.Add(node, resp.Time, resp.NodeInfo)
+
+	if handler.dataPersistence != nil {
+		handler.dataPersistence.Add(node, resp.Time, resp.NodeInfo)
+	}
 }
