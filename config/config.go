@@ -20,31 +20,32 @@ type Optional struct {
 }
 
 type MoselServerConfig struct {
-	Http       struct {
-			   BindAddress string `gcfg:"bind"`
-		   } `gcfg:"http"`
+	Http        struct {
+			    BindAddress string `gcfg:"bind"`
+		    } `gcfg:"http"`
 
 	//Auth stuff
-	Sessions   struct {
-			   Optional
-		   } `gcfg:"sessions"`
+	Sessions    struct {
+			    Optional
+		    } `gcfg:"sessions"`
 
-	AuthSys    struct {
-			   Optional
-			   AllowedUsers []string `gcfg:"allow-user"`
-		   } `gcfg:"auth-sys"`
-	AuthMySQL  struct {
-			   Optional
-		   } `gcfg:"auth-mysql"`
-	AuthTrue   struct {
-			   Optional
-		   } `gcfg:"auth-true"`
-	AuthStatic struct {
-			   Optional
-		   } `gcfg:"auth-static"`
+	AuthSys     struct {
+			    Optional
+			    AllowedUsers []string `gcfg:"allow-user"`
+		    } `gcfg:"auth-sys"`
+	AuthMySQL   struct {
+			    Optional
+		    } `gcfg:"auth-mysql"`
+	AuthTrue    struct {
+			    Optional
+		    } `gcfg:"auth-true"`
+	AuthStatic  struct {
+			    Optional
+		    } `gcfg:"auth-static"`
 
-	Groups     map[string]*GroupConfig `gcfg:"group"`
-	Users      map[string]*UserConfig `gcfg:"user"`
+	Groups      map[string]*GroupConfig `gcfg:"group"`
+	Users       map[string]*UserConfig `gcfg:"user"`
+	DataSources map[string]*DataSource `gcfg:"data-source"`
 }
 
 type AccessRights struct {
@@ -64,11 +65,17 @@ type UserConfig struct {
 	Password string `gcfg:"password"`
 }
 
+type DataSource struct {
+	Type       string `gcfg:"type"`
+	Connection string `gcfg:"connection"`
+}
+
 type MoseldServerConfig struct {
 	MoselServerConfig
 
-	Scripts map[string]*ScriptConfig `gcfg:"script"`
-	Node    map[string]*NodeConfig `gcfg:"node"`
+	Scripts           map[string]*ScriptConfig `gcfg:"script"`
+	Node              map[string]*NodeConfig `gcfg:"node"`
+	PersistenceConfig PersistenceConfig `gcfg:"persistence"`
 }
 
 type NodeConfig struct {
@@ -83,6 +90,11 @@ type ScriptConfig struct {
 	Path      string `gcfg:"path"`
 	Scope     string `gcfg:"scope"`
 	Arguments []string `gcfg:"arg"`
+}
+
+type PersistenceConfig struct {
+	Optional
+	DataSource string `gcfg:"data-source"`
 }
 
 type MoselNodedServerConfig struct {
