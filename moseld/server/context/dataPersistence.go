@@ -103,9 +103,49 @@ func (pers sqlDataPersistence) Init() error {
 }
 
 func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
+	if pers.dbState == nil {
+		log.Println("No data base state initialized")
+		return
+	}
 
+	diagramsState, ok := pers.dbState[node]
 
+	if !ok {
+		if _, err := pers.query("insertNode", node, ""); err != nil {
+			log.Println(err)
+			return
+		}
+		diagramsState = make(map[string][]string)
+		pers.dbState[node] = diagramsState
+	}
 
+	for diagram, graphs := range info {
+		graphsState, ok := diagramsState[diagram]
+
+		if !ok {
+			if _, err := pers.query("insertDiagram", diagram, node); err != nil {
+				log.Println(err)
+				return
+			}
+			graphsState = make([]string, 0)
+			diagramsState[diagram] = graphsState
+		}
+
+		for graph, value := range graphs {
+			if !commons.ContainsStr(graphsState, graph) {
+				if _, err := pers.query("insertGraph", graph, diagram); err != nil {
+					log.Println(err)
+					return
+				}
+				diagramsState[diagram] = append(graphsState, graph)
+			}
+
+			if _, err := pers.query("insertDataPoint", value, t.Round(time.Second).Unix(), graph); err != nil {
+				log.Println(err)
+				return
+			}
+		}
+	}
 }
 
 func (pers sqlDataPersistence) GetAll() (result, error) {
@@ -132,10 +172,11 @@ func (pers sqlDataPersistence) GetAll() (result, error) {
 }
 
 func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
-	//log.Println(value, timestamp, graph, diagram, node, url)
 	if dbRes.node == "" {
 		return
 	}
+
+	log.Println("Update database state")
 
 	if pers.dbState == nil {
 		pers.dbState = make(dbState)
@@ -159,7 +200,7 @@ func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
 
 	if dbRes.graph == "" {
 		return
+	} else if !commons.ContainsStr(graphs, dbRes.graph) {
+		graphs = append(graphs, dbRes.graph)
 	}
-
-	graphs = append(graphs, dbRes.graph)
 }
