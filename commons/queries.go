@@ -32,7 +32,7 @@ func getMysqlQueries() SqlQueries {
   			Url  VARCHAR(2000),
 
   			PRIMARY KEY (ID)
-		);`
+		)`
 	q["createDiagrams"] =
 		`CREATE TABLE Diagrams (
 			  ID   INT          NOT NULL AUTO_INCREMENT,
@@ -41,7 +41,7 @@ func getMysqlQueries() SqlQueries {
 
 			  PRIMARY KEY (ID),
 			  FOREIGN KEY (Node) REFERENCES Nodes (ID)
-		);`
+		)`
 
 	q["createGraphs"] =
 		`CREATE TABLE Graphs (
@@ -51,7 +51,7 @@ func getMysqlQueries() SqlQueries {
 
 			  PRIMARY KEY (ID),
 			  FOREIGN KEY (Diagram) REFERENCES Diagrams (ID)
-		);`
+		)`
 
 	q["createDataPoints"] =
 		`CREATE TABLE DataPoints (
@@ -62,8 +62,23 @@ func getMysqlQueries() SqlQueries {
 
 			PRIMARY KEY (ID),
   			FOREIGN KEY (Graph) REFERENCES Graphs (ID)
-		);`
+		)`
 
-	q["all"] = "SELECT * FROM bla"
+	q["all"] =
+		`SELECT
+			p.Value "value",
+			p.Timestamp "timestamp",
+			g.Name "graph",
+			d.Name "diagram",
+			n.Name "node",
+			n.Url "url"
+		FROM DataPoints p
+			RIGHT JOIN Graphs g
+				ON p.Graph=g.Name
+			RIGHT JOIN Diagrams d
+				ON g.Diagram=d.Name
+			RIGHT JOIN Nodes n
+				ON d.Node=n.Name`
+
 	return q
 }

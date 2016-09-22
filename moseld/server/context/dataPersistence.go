@@ -17,6 +17,8 @@ type dataPersistence interface {
 type sqlDataPersistence struct {
 	db *sql.DB
 	q  commons.SqlQueries
+
+	dbState map[string]map[string][]string
 }
 
 func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) dataPersistence {
@@ -50,6 +52,8 @@ type table struct {
 	name        string
 	createQuery string
 }
+
+type result map[string]map[string]map[string]string
 
 func (pers sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
@@ -104,4 +108,10 @@ func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) 
 		} else if empty {
 			pers.query("insertNode", node, "")
 		}*/
+}
+
+func (pers sqlDataPersistence) GetAll() result {
+	res := make(result)
+
+	return res
 }
