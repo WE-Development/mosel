@@ -16,6 +16,17 @@ type table struct {
 
 type result map[string]map[string]map[string]string
 
+type dbState map[string]map[string][]string
+
+type dbResult struct {
+	value     string
+	timestamp []uint8
+	graph     string
+	diagram   string
+	node      string
+	url       string
+}
+
 type dataPersistence interface {
 	Init() error
 	Add(node string, t time.Time, info api.NodeInfo)
@@ -23,10 +34,10 @@ type dataPersistence interface {
 }
 
 type sqlDataPersistence struct {
-	db *sql.DB
-	q  commons.SqlQueries
+	db      *sql.DB
+	q       commons.SqlQueries
 
-	dbState map[string]map[string][]string
+	dbState dbState
 }
 
 func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) dataPersistence {
@@ -48,12 +59,24 @@ func (pers sqlDataPersistence) query(name string, args ...interface{}) (*sql.Row
 
 func (pers sqlDataPersistence) queryResultNotEmpty(name string, args ...interface{}) (bool, error) {
 	rows, err := pers.query(name, args...)
+	defer rows.Close()
 
 	if err != nil {
 		return false, err
 	}
 
 	return !rows.Next(), nil
+}
+
+func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
+	//todo be clever bout this
+	rows, err := pers.db.Query(pers.q["tableExists"] + " '" + name + "'")
+	defer rows.Close()
+	if err != nil {
+		return false, err
+	}
+
+	return rows.Next(), nil
 }
 
 func (pers sqlDataPersistence) Init() error {
@@ -79,36 +102,10 @@ func (pers sqlDataPersistence) Init() error {
 	return nil
 }
 
-func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
-	//todo be clever bout this
-	rows, err := pers.db.Query(pers.q["tableExists"] + " '" + name + "'")
-	defer rows.Close()
-
-	if err != nil {
-		return false, err
-	}
-
-	return rows.Next(), nil
-}
-
 func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
-	if empty, err := pers.queryResultNotEmpty("nodeByName", node); err != nil {
-		log.Println(err)
-	} else if empty {
-		pers.query("insertNode", node, "")
-	}
-	/*
-		if empty, err := pers.queryResultNotEmpty("diagramByName", node); err != nil {
-			log.Println(err)
-		} else if empty {
-			pers.query("insertDiagram", node, "")
-		}
 
-		if empty, err := pers.queryResultNotEmpty("nodeByName", node); err != nil {
-			log.Println(err)
-		} else if empty {
-			pers.query("insertNode", node, "")
-		}*/
+
+
 }
 
 func (pers sqlDataPersistence) GetAll() (result, error) {
@@ -121,20 +118,48 @@ func (pers sqlDataPersistence) GetAll() (result, error) {
 	}
 
 	for rows.Next() {
-		var value string
-		var timestamp []uint8
-		var graph string
-		var diagram string
-		var node string
-		var url string
-		err := rows.Scan(&value, &timestamp, &graph, &diagram, &node, &url)
+		var dbRes dbResult
+		err := rows.Scan(&dbRes.value, &dbRes.timestamp, &dbRes.graph, &dbRes.diagram, &dbRes.node, &dbRes.url)
 
 		if err != nil {
 			return nil, err
 		}
-
-		log.Println(value, timestamp, graph, diagram, node, url)
+		pers.updateDbState(dbRes)
 	}
+	log.Println(pers.dbState)
 
 	return res, nil
+}
+
+func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
+	//log.Println(value, timestamp, graph, diagram, node, url)
+	if dbRes.node == "" {
+		return
+	}
+
+	if pers.dbState == nil {
+		pers.dbState = make(dbState)
+	}
+
+	diagrams, ok := pers.dbState[dbRes.node]
+	if !ok {
+		diagrams = make(map[string][]string)
+		pers.dbState[dbRes.node] = diagrams
+	}
+
+	if dbRes.diagram == "" {
+		return
+	}
+
+	graphs, ok := pers.dbState[dbRes.node][dbRes.diagram]
+	if !ok {
+		graphs = make([]string, 0)
+		pers.dbState[dbRes.node][dbRes.diagram] = graphs
+	}
+
+	if dbRes.graph == "" {
+		return
+	}
+
+	graphs = append(graphs, dbRes.graph)
 }
