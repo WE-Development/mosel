@@ -16,13 +16,35 @@ type table struct {
 
 type result map[string]map[string]map[string]string
 
-type dbState map[string]map[string][]string
+type dbState struct {
+	nodes map[string]*dbNodeState
+}
+
+type dbNodeState struct {
+	id       int
+	name     string
+	diagrams map[string]*dbDiagramState
+}
+
+type dbDiagramState struct {
+	id     int
+	name   string
+	graphs map[string]*dbGraphState
+}
+
+type dbGraphState struct {
+	id   int
+	name string
+}
 
 type dbResult struct {
 	value     string
 	timestamp []uint8
+	graphId   int
 	graph     string
+	diagramId int
 	diagram   string
+	nodeId    int
 	node      string
 	url       string
 }
@@ -32,7 +54,7 @@ type sqlDataPersistence struct {
 	q             commons.SqlQueries
 	serverContext *MoseldServerContext
 
-	dbState       dbState
+	dbState       *dbState
 }
 
 func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) *sqlDataPersistence {
@@ -74,6 +96,22 @@ func (pers *sqlDataPersistence) tableExists(name string) (bool, error) {
 	return rows.Next(), nil
 }
 
+func (pers *sqlDataPersistence) lastInsertedId() (int, error) {
+	rows, err := pers.query("lastInsertedId")
+	defer rows.Close()
+	if err != nil {
+		return -1, err
+	}
+
+	if !rows.Next() {
+		return -1, fmt.Errorf("Last instered id couldn't be found")
+	}
+
+	var id int
+	rows.Scan(&id)
+	return id, nil
+}
+
 func (pers *sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
 	tables[0] = table{name:"Nodes", createQuery:"createNodes", }
@@ -98,44 +136,54 @@ func (pers *sqlDataPersistence) Init() error {
 }
 
 func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
+
 	if pers.dbState == nil {
 		log.Println("No database state initialized")
 		return
 	}
 
-	diagramsState, ok := pers.dbState[node]
+	nodeState, ok := pers.dbState.nodes[node]
 
 	if !ok {
 		if _, err := pers.query("insertNode", node, ""); err != nil {
 			log.Println(err)
 			return
 		}
-		diagramsState = make(map[string][]string)
-		pers.dbState[node] = diagramsState
+
+		// update the state. dirty but what the heck
+		pers.GetAll()
+		nodeState = pers.dbState.nodes[node]
 	}
 
 	for diagram, graphs := range info {
-		graphsState, ok := diagramsState[diagram]
+		diagramState, ok := nodeState.diagrams[diagram]
 
 		if !ok {
-			if _, err := pers.query("insertDiagram", diagram, node); err != nil {
+			if _, err := pers.query("insertDiagram", diagram, nodeState.id); err != nil {
 				log.Println(err)
 				return
 			}
-			graphsState = make([]string, 0)
-			diagramsState[diagram] = graphsState
+
+			// update the state. dirty but what the heck
+			pers.GetAll()
+			diagramState = pers.dbState.nodes[node].diagrams[diagram]
 		}
 
 		for graph, value := range graphs {
-			if !commons.ContainsStr(graphsState, graph) {
-				if _, err := pers.query("insertGraph", graph, diagram); err != nil {
+			graphState, ok := diagramState.graphs[graph]
+
+			if !ok {
+				if _, err := pers.query("insertGraph", graph, diagramState.id); err != nil {
 					log.Println(err)
 					return
 				}
-				diagramsState[diagram] = append(graphsState, graph)
+
+				// update the state. dirty but what the heck
+				pers.GetAll()
+				graphState = pers.dbState.nodes[node].diagrams[diagram].graphs[graph]
 			}
 
-			if _, err := pers.query("insertDataPoint", value, t.Round(time.Second).Unix(), graph); err != nil {
+			if _, err := pers.query("insertDataPoint", value, t.Round(time.Second).Unix(), graphState.id); err != nil {
 				log.Println(err)
 				return
 			}
@@ -152,50 +200,74 @@ func (pers *sqlDataPersistence) GetAll() (result, error) {
 		return nil, err
 	}
 
+	// dirty force reset
+	pers.dbState = &dbState{
+		nodes:make(map[string]*dbNodeState),
+	}
+
 	for rows.Next() {
 		var dbRes dbResult
-		err := rows.Scan(&dbRes.value, &dbRes.timestamp, &dbRes.graph, &dbRes.diagram, &dbRes.node, &dbRes.url)
+		err := rows.Scan(
+			&dbRes.value,
+			&dbRes.timestamp,
+			&dbRes.graphId,
+			&dbRes.graph,
+			&dbRes.diagramId,
+			&dbRes.diagram,
+			&dbRes.nodeId,
+			&dbRes.node,
+			&dbRes.url)
 
 		if err != nil {
 			return nil, err
 		}
 		pers.updateDbState(dbRes)
 	}
-	log.Println(pers.dbState)
 
 	return res, nil
 }
 
 func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
-	if dbRes.node == "" {
-		return
-	}
-
 	log.Println("Update database state")
 
-	if pers.dbState == nil {
-		pers.dbState = make(dbState)
-	}
-
-	diagrams, ok := pers.dbState[dbRes.node]
-	if !ok {
-		diagrams = make(map[string][]string)
-		pers.dbState[dbRes.node] = diagrams
-	}
-
-	if dbRes.diagram == "" {
+	if dbRes.nodeId == -1 {
 		return
 	}
 
-	graphs, ok := pers.dbState[dbRes.node][dbRes.diagram]
+	node, ok := pers.dbState.nodes[dbRes.node]
 	if !ok {
-		graphs = make([]string, 0)
-		pers.dbState[dbRes.node][dbRes.diagram] = graphs
+		node = &dbNodeState{
+			id:dbRes.nodeId,
+			name:dbRes.node,
+			diagrams:make(map[string]*dbDiagramState),
+		}
+		pers.dbState.nodes[dbRes.node] = node
 	}
 
-	if dbRes.graph == "" {
+	if dbRes.diagramId == -1 {
 		return
-	} else if !commons.ContainsStr(graphs, dbRes.graph) {
-		graphs = append(graphs, dbRes.graph)
+	}
+
+	diagram, ok := node.diagrams[dbRes.diagram]
+	if !ok {
+		diagram = &dbDiagramState{
+			id:dbRes.diagramId,
+			name:dbRes.diagram,
+			graphs:make(map[string]*dbGraphState),
+		}
+		node.diagrams[dbRes.diagram] = diagram
+	}
+
+	if dbRes.graphId == -1 {
+		return
+	}
+
+	graph, ok := diagram.graphs[dbRes.graph]
+	if !ok {
+		graph = &dbGraphState{
+			id:dbRes.graphId,
+			name:dbRes.graph,
+		}
+		diagram.graphs[dbRes.graph] = graph
 	}
 }

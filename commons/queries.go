@@ -15,6 +15,7 @@ func GetQueries(dialect string) (SqlQueries, error) {
 func getMysqlQueries() SqlQueries {
 	q := make(SqlQueries)
 
+	q["lastInsertedId"] = "SELECT LAST_INSERT_ID()"
 	q["tableExists"] = "SHOW TABLES LIKE "
 	q["nodeByName"] = "SELECT * FROM Nodes WHERE Name=?"
 	q["diagramByName"] = "SELECT * FROM Diagrams WHERE Name=?"
@@ -24,6 +25,25 @@ func getMysqlQueries() SqlQueries {
 	q["insertDiagram"] = "INSERT INTO Diagrams (Name, Node) VALUES (?,?)"
 	q["insertGraph"] = "INSERT INTO Graphs (Name, Diagram) VALUES (?,?)"
 	q["insertDataPoint"] = "INSERT INTO DataPoints (Value, Timestamp, Graph) VALUES (?,?,?)"
+
+	q["all"] =
+		`SELECT
+			IFNULL(p.Value,     "") "value",
+			IFNULL(p.Timestamp, NOW()) "timestamp",
+			IFNULL(g.ID,        -1) "graphId",
+			IFNULL(g.Name,      "") "graph",
+			IFNULL(d.ID,        -1) "diagramId",
+			IFNULL(d.Name,      "") "diagram",
+			IFNULL(n.ID,        -1) "nodeId",
+			IFNULL(n.Name,      "") "node",
+			IFNULL(n.Url,       "") "url"
+		FROM DataPoints p
+			RIGHT JOIN Graphs g
+				ON p.Graph=g.ID
+			RIGHT JOIN Diagrams d
+				ON g.Diagram=d.ID
+			RIGHT JOIN Nodes n
+				ON d.Node=n.ID`
 
 	q["createNodes"] =
 		`CREATE TABLE Nodes (
@@ -63,22 +83,6 @@ func getMysqlQueries() SqlQueries {
 			PRIMARY KEY (ID),
   			FOREIGN KEY (Graph) REFERENCES Graphs (ID)
 		)`
-
-	q["all"] =
-		`SELECT
-			IFNULL(p.Value,     "") "value",
-			IFNULL(p.Timestamp, NOW()) "timestamp",
-			IFNULL(g.Name,      "") "graph",
-			IFNULL(d.Name,      "") "diagram",
-			IFNULL(n.Name,      "") "node",
-			IFNULL(n.Url,       "") "url"
-		FROM DataPoints p
-			RIGHT JOIN Graphs g
-				ON p.Graph=g.Name
-			RIGHT JOIN Diagrams d
-				ON g.Diagram=d.Name
-			RIGHT JOIN Nodes n
-				ON d.Node=n.Name`
 
 	return q
 }
