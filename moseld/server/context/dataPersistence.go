@@ -9,9 +9,17 @@ import (
 	"log"
 )
 
+type table struct {
+	name        string
+	createQuery string
+}
+
+type result map[string]map[string]map[string]string
+
 type dataPersistence interface {
 	Init() error
 	Add(node string, t time.Time, info api.NodeInfo)
+	GetAll() (result, error)
 }
 
 type sqlDataPersistence struct {
@@ -47,13 +55,6 @@ func (pers sqlDataPersistence) queryResultNotEmpty(name string, args ...interfac
 
 	return !rows.Next(), nil
 }
-
-type table struct {
-	name        string
-	createQuery string
-}
-
-type result map[string]map[string]map[string]string
 
 func (pers sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
@@ -110,8 +111,30 @@ func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) 
 		}*/
 }
 
-func (pers sqlDataPersistence) GetAll() result {
+func (pers sqlDataPersistence) GetAll() (result, error) {
 	res := make(result)
+	rows, err := pers.query("all")
+	defer rows.Close()
 
-	return res
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var value string
+		var timestamp []uint8
+		var graph string
+		var diagram string
+		var node string
+		var url string
+		err := rows.Scan(&value, &timestamp, &graph, &diagram, &node, &url)
+
+		if err != nil {
+			return nil, err
+		}
+
+		log.Println(value, timestamp, graph, diagram, node, url)
+	}
+
+	return res, nil
 }

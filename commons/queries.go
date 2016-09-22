@@ -66,12 +66,12 @@ func getMysqlQueries() SqlQueries {
 
 	q["all"] =
 		`SELECT
-			p.Value "value",
-			p.Timestamp "timestamp",
-			g.Name "graph",
-			d.Name "diagram",
-			n.Name "node",
-			n.Url "url"
+			IFNULL(p.Value,     "") "value",
+			IFNULL(p.Timestamp, NOW()) "timestamp",
+			IFNULL(g.Name,      "") "graph",
+			IFNULL(d.Name,      "") "diagram",
+			IFNULL(n.Name,      "") "node",
+			IFNULL(n.Url,       "") "url"
 		FROM DataPoints p
 			RIGHT JOIN Graphs g
 				ON p.Graph=g.Name

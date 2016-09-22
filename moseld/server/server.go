@@ -50,7 +50,8 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	server.InitFuncs = append(server.InitFuncs,
 		server.initDebs,
 		server.initNodeCache,
-		server.initDataPersistence)
+		server.initDataPersistence,
+		server.initDataCache)
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewLoginHandler(server.context),
@@ -201,4 +202,10 @@ func (server *moseldServer) initDataPersistence() error {
 		return nil
 	}
 	return server.context.DataPersistence.Init()
+}
+
+// Initialize the data persistence
+func (server *moseldServer) initDataCache() error {
+	_, err := server.context.DataPersistence.GetAll()
+	return err
 }
