@@ -24,7 +24,7 @@ func getMysqlQueries() SqlQueries {
 	q["insertNode"] = "INSERT INTO Nodes (Name, Url) VALUES(?,?)"
 	q["insertDiagram"] = "INSERT INTO Diagrams (Name, Node) VALUES (?,?)"
 	q["insertGraph"] = "INSERT INTO Graphs (Name, Diagram) VALUES (?,?)"
-	q["insertDataPoint"] = "INSERT INTO DataPoints (Value, Timestamp, Graph) VALUES (?,?,?)"
+	q["insertDataPoint"] = "INSERT INTO DataPoints (Value, Timestamp, Graph) VALUES (?, FROM_UNIXTIME(?), ?)"
 
 	q["all"] =
 		`SELECT
@@ -76,7 +76,7 @@ func getMysqlQueries() SqlQueries {
 	q["createDataPoints"] =
 		`CREATE TABLE DataPoints (
   			ID        INT NOT NULL AUTO_INCREMENT,
-  			Value     DOUBLE,
+  			Value     VARCHAR(255),
   			Timestamp TIMESTAMP    DEFAULT NOW(),
   			Graph     INT NOT NULL,
 
