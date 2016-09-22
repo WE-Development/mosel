@@ -71,7 +71,22 @@ func (pers *sqlDataPersistence) query(name string, args ...interface{}) (*sql.Ro
 		return nil, fmt.Errorf("Quers %s is not registered", name)
 	}
 
-	return pers.db.Query(query, args...)
+	rows, err := pers.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	cols, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(cols) == 0 {
+		// nothing to scan here
+		rows.Close()
+	}
+
+	return rows, err
 }
 
 func (pers *sqlDataPersistence) queryResultNotEmpty(name string, args ...interface{}) (bool, error) {
