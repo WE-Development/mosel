@@ -24,13 +24,13 @@ import (
 )
 
 type scriptsRunner struct {
-	scriptCache *scriptCache
-	dataCache   *dataCache
-	dataPersistence dataPersistence
-	closer      map[string]chan struct{}
+	scriptCache     *scriptCache
+	dataCache       *dataCache
+	dataPersistence *sqlDataPersistence
+	closer          map[string]chan struct{}
 }
 
-func NewScriptsRunner(scriptCache *scriptCache, dataCache *dataCache, dataPersistence dataPersistence) (*scriptsRunner, error) {
+func NewScriptsRunner(scriptCache *scriptCache, dataCache *dataCache, dataPersistence *sqlDataPersistence) (*scriptsRunner, error) {
 	runner := &scriptsRunner{}
 	runner.scriptCache = scriptCache
 	runner.dataCache = dataCache

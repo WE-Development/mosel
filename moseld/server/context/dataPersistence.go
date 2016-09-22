@@ -27,27 +27,22 @@ type dbResult struct {
 	url       string
 }
 
-type dataPersistence interface {
-	Init() error
-	Add(node string, t time.Time, info api.NodeInfo)
-	GetAll() (result, error)
-}
-
 type sqlDataPersistence struct {
-	db      *sql.DB
-	q       commons.SqlQueries
+	db            *sql.DB
+	q             commons.SqlQueries
+	serverContext *MoseldServerContext
 
-	dbState dbState
+	dbState       dbState
 }
 
-func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) dataPersistence {
-	return sqlDataPersistence{
+func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) *sqlDataPersistence {
+	return &sqlDataPersistence{
 		db:db,
 		q:queries,
 	}
 }
 
-func (pers sqlDataPersistence) query(name string, args ...interface{}) (*sql.Rows, error) {
+func (pers *sqlDataPersistence) query(name string, args ...interface{}) (*sql.Rows, error) {
 	query, exists := pers.q[name]
 
 	if !exists {
@@ -57,7 +52,7 @@ func (pers sqlDataPersistence) query(name string, args ...interface{}) (*sql.Row
 	return pers.db.Query(query, args...)
 }
 
-func (pers sqlDataPersistence) queryResultNotEmpty(name string, args ...interface{}) (bool, error) {
+func (pers *sqlDataPersistence) queryResultNotEmpty(name string, args ...interface{}) (bool, error) {
 	rows, err := pers.query(name, args...)
 	defer rows.Close()
 
@@ -68,7 +63,7 @@ func (pers sqlDataPersistence) queryResultNotEmpty(name string, args ...interfac
 	return !rows.Next(), nil
 }
 
-func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
+func (pers *sqlDataPersistence) tableExists(name string) (bool, error) {
 	//todo be clever bout this
 	rows, err := pers.db.Query(pers.q["tableExists"] + " '" + name + "'")
 	defer rows.Close()
@@ -79,7 +74,7 @@ func (pers sqlDataPersistence) tableExists(name string) (bool, error) {
 	return rows.Next(), nil
 }
 
-func (pers sqlDataPersistence) Init() error {
+func (pers *sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
 	tables[0] = table{name:"Nodes", createQuery:"createNodes", }
 	tables[1] = table{name:"Diagrams", createQuery:"createDiagrams", }
@@ -102,9 +97,9 @@ func (pers sqlDataPersistence) Init() error {
 	return nil
 }
 
-func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
+func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
 	if pers.dbState == nil {
-		log.Println("No data base state initialized")
+		log.Println("No database state initialized")
 		return
 	}
 
@@ -148,7 +143,7 @@ func (pers sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) 
 	}
 }
 
-func (pers sqlDataPersistence) GetAll() (result, error) {
+func (pers *sqlDataPersistence) GetAll() (result, error) {
 	res := make(result)
 	rows, err := pers.query("all")
 	defer rows.Close()

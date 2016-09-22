@@ -23,7 +23,7 @@ type MoseldServerContext struct {
 
 	Nodes           *nodeCache
 	DataCache       *dataCache
-	DataPersistence dataPersistence
+	DataPersistence *sqlDataPersistence
 	NodeHandler     *nodeRespHandler
 	Scripts         *scriptCache
 	ScriptsRunner   *scriptsRunner
