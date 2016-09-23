@@ -22,9 +22,11 @@ import (
 	"errors"
 )
 
+type DataCacheStorage map[string]map[time.Time]DataPoint
+
 // Collects and caches NodeInfo objects by node name and time (unix).
 type dataCache struct {
-	points map[string]map[time.Time]DataPoint
+	points DataCacheStorage
 
 	m      sync.Mutex
 }
@@ -36,8 +38,12 @@ type DataPoint struct {
 
 func NewDataCache() (*dataCache, error) {
 	c := &dataCache{}
-	c.points = make(map[string]map[time.Time]DataPoint)
+	c.points = make(DataCacheStorage)
 	return c, nil
+}
+
+func (cache *dataCache) SetStorage(storage DataCacheStorage) {
+	cache.points = storage
 }
 
 // Cache a new node info object.

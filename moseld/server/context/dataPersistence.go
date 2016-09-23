@@ -14,8 +14,6 @@ type table struct {
 	createQuery string
 }
 
-type result map[string]map[string]map[string]string
-
 type dbState struct {
 	nodes map[string]*dbNodeState
 }
@@ -39,7 +37,7 @@ type dbGraphState struct {
 
 type dbResult struct {
 	value     string
-	timestamp []uint8
+	timestamp int64
 	graphId   int
 	graph     string
 	diagramId int
@@ -206,8 +204,8 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 	}
 }
 
-func (pers *sqlDataPersistence) GetAll() (result, error) {
-	res := make(result)
+func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
+	res := make(DataCacheStorage)
 	rows, err := pers.query("all")
 	defer rows.Close()
 
@@ -237,6 +235,31 @@ func (pers *sqlDataPersistence) GetAll() (result, error) {
 			return nil, err
 		}
 		pers.updateDbState(dbRes)
+
+		//parse db result
+		node, ok := res[dbRes.node]
+		if !ok {
+			node = make(map[time.Time]DataPoint)
+			res[dbRes.node] = node
+		}
+
+		t := time.Unix(dbRes.timestamp, 0)
+		point, ok := node[t]
+		if !ok {
+			point = DataPoint{
+				Time:t,
+				Info:make(api.NodeInfo),
+			}
+			node[t] = point
+		}
+
+		diagram, ok := point.Info[dbRes.diagram]
+		if !ok {
+			diagram = make(map[string]string)
+			point.Info[dbRes.diagram] = diagram
+		}
+
+		diagram[dbRes.graph] = dbRes.value
 	}
 
 	return res, nil

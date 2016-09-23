@@ -29,7 +29,9 @@ func getMysqlQueries() SqlQueries {
 	q["all"] =
 		`SELECT
 			IFNULL(p.Value,     "") "value",
-			IFNULL(p.Timestamp, NOW()) "timestamp",
+			IFNULL(UNIX_TIMESTAMP(	p.Timestamp),
+						NOW())
+						"timestamp",
 			IFNULL(g.ID,        -1) "graphId",
 			IFNULL(g.Name,      "") "graph",
 			IFNULL(d.ID,        -1) "diagramId",

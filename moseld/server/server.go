@@ -201,13 +201,17 @@ func (server *moseldServer) initDataPersistence() error {
 	if server.context.DataPersistence == nil {
 		return nil
 	}
+	log.Println("Init data persistence")
+	defer log.Println("Finished initializing data persistence")
 	return server.context.DataPersistence.Init()
 }
 
 // Initialize the data persistence
 func (server *moseldServer) initDataCache() error {
 	log.Println("Init data persistence")
-	_, err := server.context.DataPersistence.GetAll()
+	dataCacheStorage, err := server.context.DataPersistence.GetAll()
 	log.Println("Finished initializing data persistence")
+
+	server.context.DataCache.SetStorage(dataCacheStorage)
 	return err
 }
