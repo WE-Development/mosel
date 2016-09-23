@@ -207,11 +207,12 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
 	res := make(DataCacheStorage)
 	rows, err := pers.query("all")
-	defer rows.Close()
 
 	if err != nil {
-		return nil, err
+		return res, err
 	}
+
+	defer rows.Close()
 
 	// dirty force reset
 	pers.dbState = &dbState{
