@@ -206,6 +206,8 @@ func (server *moseldServer) initDataPersistence() error {
 
 // Initialize the data persistence
 func (server *moseldServer) initDataCache() error {
+	log.Println("Init data persistence")
 	_, err := server.context.DataPersistence.GetAll()
+	log.Println("Finished initializing data persistence")
 	return err
 }

@@ -243,8 +243,6 @@ func (pers *sqlDataPersistence) GetAll() (result, error) {
 }
 
 func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
-	log.Println("Update database state")
-
 	if dbRes.nodeId == -1 {
 		return
 	}
