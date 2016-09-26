@@ -214,29 +214,42 @@ func (server *moseldServer) initDataCache() error {
 
 	log.Println("Init data cache")
 
-	if server.config.PersistenceConfig.CacheSize == "" {
+	cacheSize := server.config.DataCache.CacheSize
+
+	if cacheSize == "" {
 		storage, err = server.context.DataPersistence.GetAll()
 		if err != nil {
 			return err
 		}
 	} else {
-		dur, err := time.ParseDuration(server.config.PersistenceConfig.CacheSize)
+		dur, err := time.ParseDuration(cacheSize)
 		if err != nil {
 			return err
 		}
 
+		server.context.DataCache.CacheSize = dur
 		storage, err = server.context.DataPersistence.GetAllSince(dur)
 		if err != nil {
 			return err
 		}
 	}
 
+	// count points
 	pointCount := 0
-	for _,points := range storage {
+	for _, points := range storage {
 		pointCount += len(points)
 	}
 
 	server.context.DataCache.SetStorage(storage)
+
+	// clean up the cache
+	go func() {
+		for {
+			server.context.DataCache.Clean()
+			time.Sleep(10 * time.Second)
+		}
+	}()
+
 	log.Printf("Finished initializing data cache with %d data points", pointCount)
 	return nil
 }

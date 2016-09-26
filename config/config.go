@@ -75,6 +75,7 @@ type MoseldServerConfig struct {
 
 	Scripts           map[string]*ScriptConfig `gcfg:"script"`
 	Node              map[string]*NodeConfig `gcfg:"node"`
+	DataCache         DataCacheConfig `gcfg:"data-cache"`
 	PersistenceConfig PersistenceConfig `gcfg:"persistence"`
 }
 
@@ -92,10 +93,13 @@ type ScriptConfig struct {
 	Arguments []string `gcfg:"arg"`
 }
 
+type DataCacheConfig struct {
+	CacheSize string `gcfg:"cache-size"`
+}
+
 type PersistenceConfig struct {
 	Optional
 	DataSource string `gcfg:"data-source"`
-	CacheSize  string `gcfg:"cache-size"`
 }
 
 type MoselNodedServerConfig struct {

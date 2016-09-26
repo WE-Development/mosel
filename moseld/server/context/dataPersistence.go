@@ -231,7 +231,6 @@ func (pers *sqlDataPersistence) GetAllSince(since time.Duration) (DataCacheStora
 	defer pers.dbLock.RUnlock()
 
 	t := time.Now().Add(-since)
-	log.Println(t)
 	rows, err := pers.query("allSince", t)
 
 	if err != nil {

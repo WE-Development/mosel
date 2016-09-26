@@ -29,6 +29,7 @@ type DataCacheStorage map[string]map[time.Time]DataPoint
 type dataCache struct {
 	points    DataCacheStorage
 	cacheLock sync.RWMutex
+	CacheSize time.Duration
 }
 
 type DataPoint struct {
@@ -43,6 +44,9 @@ func NewDataCache() (*dataCache, error) {
 }
 
 func (cache *dataCache) SetStorage(storage DataCacheStorage) {
+	cache.cacheLock.Lock()
+	defer cache.cacheLock.Unlock()
+
 	cache.points = storage
 }
 
@@ -76,6 +80,20 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 		points[t] = DataPoint{
 			Time: t,
 			Info: info,
+		}
+	}
+}
+
+func (cache *dataCache) Clean() {
+	cache.cacheLock.Lock()
+	defer cache.cacheLock.Unlock()
+
+	maxAge := time.Now().Add(-cache.CacheSize)
+	for _, points := range cache.points {
+		for stamp := range points {
+			if stamp.Unix() < maxAge.Unix() {
+				delete(points, stamp)
+			}
 		}
 	}
 }
