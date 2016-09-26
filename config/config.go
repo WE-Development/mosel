@@ -95,6 +95,7 @@ type ScriptConfig struct {
 type PersistenceConfig struct {
 	Optional
 	DataSource string `gcfg:"data-source"`
+	CacheSize  string `gcfg:"cache-size"`
 }
 
 type MoselNodedServerConfig struct {

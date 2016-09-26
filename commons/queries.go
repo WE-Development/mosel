@@ -48,6 +48,29 @@ func getMysqlQueries() SqlQueries {
 			RIGHT JOIN Nodes n
 				ON d.Node=n.ID`
 
+	q["allSince"] =
+		`SELECT
+			IFNULL(p.Value,     "") "value",
+			UNIX_TIMESTAMP(
+				IFNULL(	p.Timestamp,
+					NOW()
+				)) "timestamp",
+			IFNULL(g.ID,        -1) "graphId",
+			IFNULL(g.Name,      "") "graph",
+			IFNULL(d.ID,        -1) "diagramId",
+			IFNULL(d.Name,      "") "diagram",
+			IFNULL(n.ID,        -1) "nodeId",
+			IFNULL(n.Name,      "") "node",
+			IFNULL(n.Url,       "") "url"
+		FROM DataPoints p
+			RIGHT JOIN Graphs g
+				ON p.Graph=g.ID
+			RIGHT JOIN Diagrams d
+				ON g.Diagram=d.ID
+			RIGHT JOIN Nodes n
+				ON d.Node=n.ID
+		WHERE p.Timestamp >= ?`
+
 	q["createNodes"] =
 		`CREATE TABLE Nodes (
   			ID   INT          NOT NULL AUTO_INCREMENT,

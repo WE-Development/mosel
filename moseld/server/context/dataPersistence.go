@@ -221,6 +221,29 @@ func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
 	}
 
 	defer rows.Close()
+	return pers.get(rows)
+}
+
+func (pers *sqlDataPersistence) GetAllSince(since time.Duration) (DataCacheStorage, error) {
+	res := make(DataCacheStorage)
+
+	pers.dbLock.RLock()
+	defer pers.dbLock.RUnlock()
+
+	t := time.Now().Add(-since)
+	log.Println(t)
+	rows, err := pers.query("allSince", t)
+
+	if err != nil {
+		return res, err
+	}
+
+	defer rows.Close()
+	return pers.get(rows)
+}
+
+func (pers *sqlDataPersistence) get(rows *sql.Rows) (DataCacheStorage, error) {
+	res := make(DataCacheStorage)
 
 	// dirty force reset
 	pers.dbState = &dbState{

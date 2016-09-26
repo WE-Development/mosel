@@ -25,6 +25,7 @@ import (
 	"log"
 	"github.com/WE-Development/mosel/commons"
 	"fmt"
+	"time"
 )
 
 // The server started by moseld.
@@ -208,9 +209,34 @@ func (server *moseldServer) initDataPersistence() error {
 
 // Initialize the data persistence
 func (server *moseldServer) initDataCache() error {
+	var storage context.DataCacheStorage
+	var err error
+
 	log.Println("Init data cache")
-	dataCacheStorage, err := server.context.DataPersistence.GetAll()
-	server.context.DataCache.SetStorage(dataCacheStorage)
-	log.Println("Finished initializing data cache")
-	return err
+
+	if server.config.PersistenceConfig.CacheSize == "" {
+		storage, err = server.context.DataPersistence.GetAll()
+		if err != nil {
+			return err
+		}
+	} else {
+		dur, err := time.ParseDuration(server.config.PersistenceConfig.CacheSize)
+		if err != nil {
+			return err
+		}
+
+		storage, err = server.context.DataPersistence.GetAllSince(dur)
+		if err != nil {
+			return err
+		}
+	}
+
+	pointCount := 0
+	for _,points := range storage {
+		pointCount += len(points)
+	}
+
+	server.context.DataCache.SetStorage(storage)
+	log.Printf("Finished initializing data cache with %d data points", pointCount)
+	return nil
 }
