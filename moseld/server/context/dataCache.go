@@ -25,10 +25,10 @@ import (
 type DataCacheStorage map[string]map[time.Time]DataPoint
 
 // Collects and caches NodeInfo objects by node name and time (unix).
+// todo optimize locks
 type dataCache struct {
-	points DataCacheStorage
-
-	m      sync.Mutex
+	points    DataCacheStorage
+	cacheLock sync.RWMutex
 }
 
 type DataPoint struct {
@@ -51,8 +51,10 @@ func (cache *dataCache) SetStorage(storage DataCacheStorage) {
 func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 	var points map[time.Time]DataPoint
 
+	cache.cacheLock.Lock()
+	defer cache.cacheLock.Unlock()
+
 	t = t.Round(time.Second)
-	cache.m.Lock()
 
 	if _, ok := cache.points[node]; !ok {
 		points = make(map[time.Time]DataPoint)
@@ -76,12 +78,13 @@ func (cache *dataCache) Add(node string, t time.Time, info api.NodeInfo) {
 			Info: info,
 		}
 	}
-
-	cache.m.Unlock()
 }
 
 // Get node info at a given time (rounded to seconds)
 func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
+	cache.cacheLock.RLock()
+	defer cache.cacheLock.RUnlock()
+
 	points, err := cache.getAllByTime(node)
 
 	if err != nil {
@@ -98,6 +101,8 @@ func (cache *dataCache) Get(node string, t time.Time) (api.NodeInfo, error) {
 
 // Get all node infos for a node and not older than a given time (rounded to seconds)
 func (cache *dataCache) GetSince(node string, t time.Time) ([]DataPoint, error) {
+	cache.cacheLock.RLock()
+	defer cache.cacheLock.RUnlock()
 
 	points, err := cache.getAllByTime(node)
 
@@ -121,14 +126,12 @@ func (cache *dataCache) GetAll(node string) ([]DataPoint, error) {
 	var points map[time.Time]DataPoint
 	var err error
 
-	cache.m.Lock()
+	cache.cacheLock.RLock()
+	defer cache.cacheLock.RUnlock()
 
 	if points, err = cache.getAllByTime(node); err != nil {
-		cache.m.Unlock()
 		return nil, err
 	}
-
-	cache.m.Unlock()
 
 	res := make([]DataPoint, len(points))
 	for _, point := range points {
@@ -154,7 +157,6 @@ func (cache *dataCache) GetNodes() []string {
 func (cache *dataCache) getAllByTime(node string) (map[time.Time]DataPoint, error) {
 	points, ok := cache.points[node]
 	if !ok {
-		cache.m.Unlock()
 		return nil, errors.New("No node with name " + node)
 	}
 	return points, nil

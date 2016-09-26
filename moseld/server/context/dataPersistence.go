@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"sync"
 )
 
 type table struct {
@@ -52,6 +53,7 @@ type sqlDataPersistence struct {
 	q             commons.SqlQueries
 	serverContext *MoseldServerContext
 
+	dbLock        sync.RWMutex
 	dbState       *dbState
 }
 
@@ -149,6 +151,8 @@ func (pers *sqlDataPersistence) Init() error {
 }
 
 func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo) {
+	pers.dbLock.Lock()
+	defer pers.dbLock.Unlock()
 
 	if pers.dbState == nil {
 		log.Println("No database state initialized")
@@ -206,6 +210,10 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 
 func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
 	res := make(DataCacheStorage)
+
+	pers.dbLock.RLock()
+	defer pers.dbLock.RUnlock()
+
 	rows, err := pers.query("all")
 
 	if err != nil {
