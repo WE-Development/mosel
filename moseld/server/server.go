@@ -50,9 +50,10 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 
 	server.InitFuncs = append(server.InitFuncs,
 		server.initDebs,
-		server.initNodeCache,
 		server.initDataPersistence,
-		server.initDataCache)
+		server.initDataCache,
+		server.initNodeCache,
+	)
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewLoginHandler(server.context),
