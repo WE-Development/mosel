@@ -182,7 +182,7 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 			}
 
 			// update the state. dirty but what the heck
-			pers.GetAll()
+			pers.getAll()
 			diagramState = pers.dbState.nodes[node].diagrams[diagram]
 		}
 
@@ -196,7 +196,7 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 				}
 
 				// update the state. dirty but what the heck
-				pers.GetAll()
+				pers.getAll()
 				graphState = pers.dbState.nodes[node].diagrams[diagram].graphs[graph]
 			}
 
@@ -209,6 +209,12 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 }
 
 func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
+	pers.dbLock.RLock()
+	defer pers.dbLock.RUnlock()
+	return pers.getAll()
+}
+
+func (pers *sqlDataPersistence) getAll() (DataCacheStorage, error) {
 	res := make(DataCacheStorage)
 
 	pers.dbLock.RLock()
