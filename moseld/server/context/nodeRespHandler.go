@@ -38,4 +38,5 @@ func (handler nodeRespHandler) handleNodeResp(node string, resp api.NodeResponse
 	if handler.dataPersistence != nil {
 		handler.dataPersistence.Add(node, resp.Time, resp.NodeInfo)
 	}
+	//log.Println(resp)
 }

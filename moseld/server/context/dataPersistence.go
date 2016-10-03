@@ -168,7 +168,7 @@ func (pers *sqlDataPersistence) Add(node string, t time.Time, info api.NodeInfo)
 		}
 
 		// update the state. dirty but what the heck
-		pers.GetAll()
+		pers.getAll()
 		nodeState = pers.dbState.nodes[node]
 	}
 
@@ -216,9 +216,6 @@ func (pers *sqlDataPersistence) GetAll() (DataCacheStorage, error) {
 
 func (pers *sqlDataPersistence) getAll() (DataCacheStorage, error) {
 	res := make(DataCacheStorage)
-
-	pers.dbLock.RLock()
-	defer pers.dbLock.RUnlock()
 
 	rows, err := pers.query("all")
 
