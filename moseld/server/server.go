@@ -16,14 +16,14 @@
 package moseldserver
 
 import (
-	"github.com/WE-Development/mosel/moselserver"
-	"github.com/WE-Development/mosel/moseld/server/handler"
-	"github.com/WE-Development/mosel/moseld/server/context"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moseld/server/handler"
+	"github.com/bluedevel/mosel/moseld/server/context"
+	"github.com/bluedevel/mosel/config"
 	"errors"
 	"net/url"
 	"log"
-	"github.com/WE-Development/mosel/commons"
+	"github.com/bluedevel/mosel/commons"
 	"fmt"
 	"time"
 )

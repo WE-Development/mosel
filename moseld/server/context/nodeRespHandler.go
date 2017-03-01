@@ -16,7 +16,7 @@
 package context
 
 import (
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 )
 
 type nodeRespHandler struct {

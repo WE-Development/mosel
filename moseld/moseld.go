@@ -16,11 +16,11 @@
 package main
 
 import (
-	"github.com/WE-Development/mosel/moseld/server"
+	"github.com/bluedevel/mosel/moseld/server"
 	"gopkg.in/gcfg.v1"
 	"log"
 	"os"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/config"
 )
 
 func main() {

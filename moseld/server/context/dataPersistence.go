@@ -1,9 +1,9 @@
 package context
 
 import (
-	"github.com/WE-Development/mosel/commons"
+	"github.com/bluedevel/mosel/commons"
 	"time"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 	"database/sql"
 	"fmt"
 	"log"

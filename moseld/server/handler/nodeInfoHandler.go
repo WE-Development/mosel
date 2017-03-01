@@ -16,14 +16,14 @@
 package handler
 
 import (
-	"github.com/WE-Development/mosel/moseld/server/context"
+	"github.com/bluedevel/mosel/moseld/server/context"
 	"net/http"
 	"github.com/gorilla/mux"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 	"encoding/json"
 	"strconv"
 	"time"
-	"github.com/WE-Development/mosel/commons"
+	"github.com/bluedevel/mosel/commons"
 )
 
 // Handler for providing time coded information on a node.

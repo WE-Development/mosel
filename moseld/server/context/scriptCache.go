@@ -17,7 +17,7 @@ package context
 
 import (
 	"io/ioutil"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/config"
 	"errors"
 )
 

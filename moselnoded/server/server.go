@@ -16,10 +16,10 @@
 package moselnodedserver
 
 import (
-	"github.com/WE-Development/mosel/moselserver"
-	"github.com/WE-Development/mosel/moselnoded/server/handler"
-	"github.com/WE-Development/mosel/moselnoded/server/context"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/moselserver"
+	"github.com/bluedevel/mosel/moselnoded/server/handler"
+	"github.com/bluedevel/mosel/moselnoded/server/context"
+	"github.com/bluedevel/mosel/config"
 )
 
 type moselnodedServer struct {

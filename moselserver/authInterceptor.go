@@ -17,9 +17,9 @@ package moselserver
 
 import (
 	"net/http"
-	"github.com/WE-Development/mosel/commons"
+	"github.com/bluedevel/mosel/commons"
 	"log"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/config"
 	"regexp"
 )
 

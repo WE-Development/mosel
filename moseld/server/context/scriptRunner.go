@@ -18,8 +18,8 @@ package context
 import (
 	"time"
 	"log"
-	"github.com/WE-Development/mosel/commons"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/commons"
+	"github.com/bluedevel/mosel/api"
 	"strings"
 )
 

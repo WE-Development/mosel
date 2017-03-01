@@ -16,11 +16,11 @@
 package context
 
 import (
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 	"os"
 	"log"
 	"io/ioutil"
-	"github.com/WE-Development/mosel/commons"
+	"github.com/bluedevel/mosel/commons"
 )
 
 type collector struct {

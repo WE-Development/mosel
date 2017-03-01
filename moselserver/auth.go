@@ -20,7 +20,7 @@ import (
 	"os/exec"
 	"bytes"
 	"time"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/config"
 )
 
 // Interface for validating a user-password combination

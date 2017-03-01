@@ -18,10 +18,10 @@ package handler
 import (
 	"net/http"
 	"time"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 	"encoding/json"
 	"log"
-	"github.com/WE-Development/mosel/moselnoded/server/context"
+	"github.com/bluedevel/mosel/moselnoded/server/context"
 )
 
 type streamHandler struct {

@@ -18,7 +18,7 @@ package handler
 import (
 	"net/http"
 	"encoding/json"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 )
 
 type pingHandler struct {

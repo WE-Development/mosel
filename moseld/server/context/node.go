@@ -23,7 +23,7 @@ import (
 	"log"
 	"time"
 	"bufio"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 )
 
 // Represents a node and handles all communication with it.

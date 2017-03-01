@@ -21,7 +21,7 @@ import (
 	"log"
 	"fmt"
 	"strconv"
-	"github.com/WE-Development/mosel/config"
+	"github.com/bluedevel/mosel/config"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 )

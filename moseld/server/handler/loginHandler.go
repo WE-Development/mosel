@@ -17,9 +17,9 @@ package handler
 
 import (
 	"net/http"
-	"github.com/WE-Development/mosel/api"
+	"github.com/bluedevel/mosel/api"
 	"encoding/json"
-	"github.com/WE-Development/mosel/moseld/server/context"
+	"github.com/bluedevel/mosel/moseld/server/context"
 )
 
 // Handler for providing a login and credential validation functionality.
