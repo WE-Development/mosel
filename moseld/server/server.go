@@ -138,36 +138,17 @@ func (server *moseldServer) initNodeCache() error {
 			scripts = server.context.Scripts.GetScripts()
 		}
 
-		//exclude certain scripts
 		scripts = commons.ExcludeStr(scripts, nodeConf.ScriptsExclude)
+		nodeScripts, localScripts, err := server.sortScriptsByScope(scripts)
 
-		nodeScripts := make([]string, 0)
-		localScripts := make([]string, 0)
-
-		//sort scripts by scope
-		for _, script := range scripts {
-			if scriptConf, err := server.context.Scripts.GetScriptConfig(script); err == nil {
-				switch scriptConf.Scope {
-				case "node":
-					nodeScripts = append(nodeScripts, script)
-					break
-				case "local":
-					localScripts = append(localScripts, script)
-					break
-				default:
-					return errors.New("Unknown script scope " + scriptConf.Scope + " for node " + nodeName)
-				}
-
-			} else {
-				return err
-			}
+		if err != nil {
+			return err
 		}
 
 		log.Printf("Scripts configured for node %s: node=%s local=%s", nodeName, nodeScripts, localScripts)
 
 		//get base url
 		var baseUrl *url.URL
-		var err error
 		if baseUrl, err = baseUrl.Parse(nodeConf.URL); err != nil {
 			return err
 		}
@@ -191,6 +172,32 @@ func (server *moseldServer) initNodeCache() error {
 	}
 
 	return nil
+}
+
+func (server *moseldServer) sortScriptsByScope(scripts []string) ([]string, []string, error) {
+	nodeScripts := make([]string, 0)
+	localScripts := make([]string, 0)
+
+	//sort scripts by scope
+	for _, script := range scripts {
+		if scriptConf, err := server.context.Scripts.GetScriptConfig(script); err == nil {
+			switch scriptConf.Scope {
+			case "node":
+				nodeScripts = append(nodeScripts, script)
+				break
+			case "local":
+				localScripts = append(localScripts, script)
+				break
+			default:
+				return nil, nil, errors.New("Unknown script scope " + scriptConf.Scope)
+			}
+
+		} else {
+			return nil, nil, err
+		}
+	}
+
+	return nodeScripts, localScripts, nil
 }
 
 // Initialize the data persistence
