@@ -25,7 +25,7 @@ import (
 type moselnodedServer struct {
 	moselserver.MoselServer
 
-	config moselconfig.MoselNodedServerConfig
+	config  moselconfig.MoselNodedServerConfig
 	context *context.MoselnodedServerContext
 }
 
@@ -40,7 +40,7 @@ func NewMoselNodedServer(config moselconfig.MoselNodedServerConfig) *moselnodedS
 	}
 
 	server.InitFuncs = append(server.InitFuncs,
-		server.initCollector,)
+		server.initCollector, )
 
 	server.Handlers = []moselserver.MoselHandler{
 		handler.NewPingHandler(),

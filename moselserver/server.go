@@ -16,14 +16,17 @@
 package moselserver
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"log"
 	"fmt"
 	"strconv"
-	"github.com/bluedevel/mosel/config"
 	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
+
+	"github.com/gorilla/mux"
+
+	"github.com/bluedevel/mosel/config"
 )
 
 // The abstract http-server type underlying the mosel servers.

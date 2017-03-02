@@ -17,9 +17,10 @@ package context
 
 import (
 	"time"
-	"github.com/bluedevel/mosel/api"
 	"sync"
 	"errors"
+
+	"github.com/bluedevel/mosel/api"
 )
 
 type DataCacheStorage map[string]map[time.Time]DataPoint

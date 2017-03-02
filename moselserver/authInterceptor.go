@@ -17,10 +17,11 @@ package moselserver
 
 import (
 	"net/http"
-	"github.com/bluedevel/mosel/commons"
 	"log"
-	"github.com/bluedevel/mosel/config"
 	"regexp"
+
+	"github.com/bluedevel/mosel/commons"
+	"github.com/bluedevel/mosel/config"
 )
 
 // Wrap a http.HandleFunc such that it's authenticated before execution.

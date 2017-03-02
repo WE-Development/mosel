@@ -17,8 +17,9 @@ package context
 
 import (
 	"io/ioutil"
-	"github.com/bluedevel/mosel/config"
 	"errors"
+
+	"github.com/bluedevel/mosel/config"
 )
 
 type scriptCache struct {

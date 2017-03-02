@@ -19,8 +19,9 @@ import (
 	"net/http"
 	"time"
 	"fmt"
-	"github.com/bluedevel/mosel/moseld/server/context"
 	"log"
+
+	"github.com/bluedevel/mosel/moseld/server/context"
 )
 
 // As the name suggests

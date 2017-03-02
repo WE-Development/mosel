@@ -16,10 +16,11 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/moseld/server/context"
 	"net/http"
-	"github.com/bluedevel/mosel/api"
 	"encoding/json"
+
+	"github.com/bluedevel/mosel/api"
+	"github.com/bluedevel/mosel/moseld/server/context"
 )
 
 // Handler for providing general information about the server instance. See api for details.

@@ -16,11 +16,13 @@
 package handler
 
 import (
-	"github.com/bluedevel/mosel/moselnoded/server/context"
 	"net/http"
 	"io/ioutil"
-	"github.com/gorilla/mux"
 	"log"
+
+	"github.com/gorilla/mux"
+
+	"github.com/bluedevel/mosel/moselnoded/server/context"
 )
 
 type scriptHandler struct {

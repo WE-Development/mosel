@@ -18,14 +18,15 @@ package handler
 import (
 	"net/http"
 	"time"
-	"github.com/bluedevel/mosel/api"
 	"encoding/json"
 	"log"
+
+	"github.com/bluedevel/mosel/api"
 	"github.com/bluedevel/mosel/moselnoded/server/context"
 )
 
 type streamHandler struct {
-	ctx *context.MoselnodedServerContext
+	ctx  *context.MoselnodedServerContext
 
 	test int
 }

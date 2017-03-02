@@ -16,10 +16,11 @@
 package context
 
 import (
-	"github.com/bluedevel/mosel/api"
 	"os"
 	"log"
 	"io/ioutil"
+
+	"github.com/bluedevel/mosel/api"
 	"github.com/bluedevel/mosel/commons"
 )
 

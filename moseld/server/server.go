@@ -16,16 +16,17 @@
 package moseldserver
 
 import (
+	"errors"
+	"net/url"
+	"log"
+	"fmt"
+	"time"
+
+	"github.com/bluedevel/mosel/commons"
 	"github.com/bluedevel/mosel/moselserver"
 	"github.com/bluedevel/mosel/moseld/server/handler"
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"github.com/bluedevel/mosel/config"
-	"errors"
-	"net/url"
-	"log"
-	"github.com/bluedevel/mosel/commons"
-	"fmt"
-	"time"
 )
 
 // The server started by moseld.

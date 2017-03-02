@@ -16,10 +16,12 @@
 package main
 
 import (
-	"github.com/bluedevel/mosel/moseld/server"
-	"gopkg.in/gcfg.v1"
 	"log"
 	"os"
+
+	"gopkg.in/gcfg.v1"
+
+	"github.com/bluedevel/mosel/moseld/server"
 	"github.com/bluedevel/mosel/config"
 )
 

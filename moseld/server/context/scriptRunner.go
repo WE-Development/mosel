@@ -18,9 +18,10 @@ package context
 import (
 	"time"
 	"log"
+	"strings"
+
 	"github.com/bluedevel/mosel/commons"
 	"github.com/bluedevel/mosel/api"
-	"strings"
 )
 
 type scriptsRunner struct {

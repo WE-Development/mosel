@@ -1,13 +1,14 @@
 package context
 
 import (
-	"github.com/bluedevel/mosel/commons"
 	"time"
-	"github.com/bluedevel/mosel/api"
 	"database/sql"
 	"fmt"
 	"log"
 	"sync"
+
+	"github.com/bluedevel/mosel/api"
+	"github.com/bluedevel/mosel/commons"
 )
 
 type table struct {
