@@ -64,6 +64,7 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 	// if auth true is enabled, it's possible that a positiv authentication occurs without a user configuration
 	if server.Config.AuthTrue.Enabled {
 		fn(w, r)
+		return
 	}
 
 	if ok, err := validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups); !ok {

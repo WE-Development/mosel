@@ -139,7 +139,7 @@ func (server *moseldServer) initNodeCache() error {
 		}
 
 		//exclude certain scripts
-		arrayExclude(&scripts, nodeConf.ScriptsExclude)
+		scripts = commons.ExcludeStr(scripts, nodeConf.ScriptsExclude)
 
 		nodeScripts := make([]string, 0)
 		localScripts := make([]string, 0)
@@ -191,16 +191,6 @@ func (server *moseldServer) initNodeCache() error {
 	}
 
 	return nil
-}
-
-func arrayExclude(arr *[]struct{}, exclude []struct{}) () {
-	for _, elem := range *arr {
-		for i, ex := range exclude {
-			if elem == ex {
-				*arr = append(arr[:i], arr[i + 1:]...)
-			}
-		}
-	}
 }
 
 // Initialize the data persistence
