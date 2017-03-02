@@ -165,16 +165,16 @@ func (server *moseldServer) initNodeCache() error {
 		log.Printf("Scripts configured for node %s: node=%s local=%s", nodeName, nodeScripts, localScripts)
 
 		//get base url
-		var url *url.URL
+		var baseUrl *url.URL
 		var err error
-		if url, err = url.Parse(nodeConf.URL); err != nil {
+		if baseUrl, err = baseUrl.Parse(nodeConf.URL); err != nil {
 			return err
 		}
 
 		//instantiate node
 		node, err := context.NewNode(
 			nodeName,
-			*url,
+			*baseUrl,
 			nodeConf.User,
 			nodeConf.Password,
 			nodeScripts,
