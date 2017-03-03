@@ -60,57 +60,66 @@ func NewNode(name string, url url.URL, user  string, passwd string, scripts []st
 // Connect and Listen to the node pushing infos.
 // If the connection is lost, a reconnect is tried.
 func (node *node) ListenStream() {
-	Run: for {
+	for {
 		//provision scripts before connecting to stream
 		if err := node.ProvisionScripts(); err != nil {
 			log.Printf("Error while provisioning scripts: %s", err.Error())
 		}
 
-		// TRY
-		resp, err := func() (*http.Response, error) {
-			url := node.URL.String() + "/stream"
-			log.Printf("Connect to %s via %s", node.Name, url)
-			req, err := http.NewRequest("GET", url, nil)
-
-			if err != nil {
-				return nil, err
-			}
-			return node.doRequest(req)
-		}()
-		// CATCH
+		resp, err := node.openStream()
 		if err != nil {
 			log.Println(err)
 
 			//todo make reconnection timeout configurable by moseld.conf
 			time.Sleep(10 * time.Second)
-			continue Run
+			continue
 		}
 
-		for {
-			select {
-			case <-node.close:
-				resp.Body.Close()
-				break Run
-			default:
-				reader := bufio.NewReader(resp.Body)
-				data, err := reader.ReadBytes('\n')
+		keepRunning := node.processStream(resp)
+		if keepRunning {
+			continue
+		} else {
+			break
+		}
+	}
+}
 
-				if err != nil {
-					//check weather we are dealing with a non-stream resource
-					if err.Error() != "EOF" {
-						log.Println(err)
-					}
+// opens a stream to the node
+func (node *node) openStream() (*http.Response, error) {
+	streamUrl := node.URL.String() + "/stream"
+	log.Printf("Connect to %s via %s", node.Name, streamUrl)
+	req, err := http.NewRequest("GET", streamUrl, nil)
 
-					resp.Body.Close()
-					continue Run
+	if err != nil {
+		return nil, err
+	}
+	return node.doRequest(req)
+}
+
+func (node *node) processStream(resp *http.Response) bool {
+	for {
+		select {
+		case <-node.close:
+			resp.Body.Close()
+			return false
+		default:
+			reader := bufio.NewReader(resp.Body)
+			data, err := reader.ReadBytes('\n')
+
+			if err != nil {
+				//check weather we are dealing with a non-stream resource
+				if err.Error() != "EOF" {
+					log.Println(err)
 				}
 
-				var resp api.NodeResponse
-				json.Unmarshal(data, &resp)
-				node.handler.handleNodeResp(node.Name, resp)
+				resp.Body.Close()
+				return true
 			}
-		}
 
+			var resp api.NodeResponse
+			json.Unmarshal(data, &resp)
+			node.handler.handleNodeResp(node.Name, resp)
+		}
 	}
 }
 
