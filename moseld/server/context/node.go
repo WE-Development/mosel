@@ -126,14 +126,14 @@ func (node *node) processStream(resp *http.Response) bool {
 // Provision scripts with node scope to the node
 func (node *node) ProvisionScripts() error {
 	for _, script := range node.scripts {
-		var bytes []byte
+		var b []byte
 		var err error
 
-		if bytes, err = node.scriptCache.getScriptBytes(script); err != nil {
+		if b, err = node.scriptCache.getScriptBytes(script); err != nil {
 			return err
 		}
 
-		err = node.ProvisionScript(script, bytes)
+		err = node.ProvisionScript(script, b)
 
 		if err != nil {
 			return err
@@ -146,8 +146,8 @@ func (node *node) ProvisionScripts() error {
 // Provision a singe script to the node
 func (node *node) ProvisionScript(name string, b []byte) error {
 	err := func() (error) {
-		url := node.URL.String() + "/script/" + name
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+		targetUrl := node.URL.String() + "/script/" + name
+		req, err := http.NewRequest("POST", targetUrl, bytes.NewBuffer(b))
 		req.Header.Add("media-type", "application/x-sh")
 
 		if err != nil {
