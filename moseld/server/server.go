@@ -215,9 +215,8 @@ func (server *moseldServer) initDataCache() error {
 	var storage context.DataCacheStorage
 	var err error
 
-	log.Println("Init data cache")
-
 	cacheSize := server.config.DataCache.CacheSize
+	log.Printf("Init data cache. cache size: %s", cacheSize)
 
 	if cacheSize == "" {
 		storage, err = server.context.DataPersistence.GetAll()
@@ -243,6 +242,7 @@ func (server *moseldServer) initDataCache() error {
 		pointCount += len(points)
 	}
 
+	log.Printf("Loaded %d data points. Putting them into cache", pointCount)
 	server.context.DataCache.SetStorage(storage)
 
 	// clean up the cache
