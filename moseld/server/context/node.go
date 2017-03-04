@@ -60,71 +60,80 @@ func NewNode(name string, url url.URL, user  string, passwd string, scripts []st
 // Connect and Listen to the node pushing infos.
 // If the connection is lost, a reconnect is tried.
 func (node *node) ListenStream() {
-	Run: for {
+	for {
 		//provision scripts before connecting to stream
 		if err := node.ProvisionScripts(); err != nil {
 			log.Printf("Error while provisioning scripts: %s", err.Error())
 		}
 
-		// TRY
-		resp, err := func() (*http.Response, error) {
-			url := node.URL.String() + "/stream"
-			log.Printf("Connect to %s via %s", node.Name, url)
-			req, err := http.NewRequest("GET", url, nil)
-
-			if err != nil {
-				return nil, err
-			}
-			return node.doRequest(req)
-		}()
-		// CATCH
+		resp, err := node.openStream()
 		if err != nil {
 			log.Println(err)
 
 			//todo make reconnection timeout configurable by moseld.conf
 			time.Sleep(10 * time.Second)
-			continue Run
+			continue
 		}
 
-		for {
-			select {
-			case <-node.close:
-				resp.Body.Close()
-				break Run
-			default:
-				reader := bufio.NewReader(resp.Body)
-				data, err := reader.ReadBytes('\n')
+		keepRunning := node.processStream(resp)
+		if keepRunning {
+			continue
+		} else {
+			break
+		}
+	}
+}
 
-				if err != nil {
-					//check weather we are dealing with a non-stream resource
-					if err.Error() != "EOF" {
-						log.Println(err)
-					}
+// opens a stream to the node
+func (node *node) openStream() (*http.Response, error) {
+	streamUrl := node.URL.String() + "/stream"
+	log.Printf("Connect to %s via %s", node.Name, streamUrl)
+	req, err := http.NewRequest("GET", streamUrl, nil)
 
-					resp.Body.Close()
-					continue Run
+	if err != nil {
+		return nil, err
+	}
+	return node.doRequest(req)
+}
+
+func (node *node) processStream(resp *http.Response) bool {
+	for {
+		select {
+		case <-node.close:
+			resp.Body.Close()
+			return false
+		default:
+			reader := bufio.NewReader(resp.Body)
+			data, err := reader.ReadBytes('\n')
+
+			if err != nil {
+				//check weather we are dealing with a non-stream resource
+				if err.Error() != "EOF" {
+					log.Println(err)
 				}
 
-				var resp api.NodeResponse
-				json.Unmarshal(data, &resp)
-				node.handler.handleNodeResp(node.Name, resp)
+				resp.Body.Close()
+				return true
 			}
-		}
 
+			var resp api.NodeResponse
+			json.Unmarshal(data, &resp)
+			node.handler.handleNodeResp(node.Name, resp)
+		}
 	}
 }
 
 // Provision scripts with node scope to the node
 func (node *node) ProvisionScripts() error {
 	for _, script := range node.scripts {
-		var bytes []byte
+		var b []byte
 		var err error
 
-		if bytes, err = node.scriptCache.getScriptBytes(script); err != nil {
+		if b, err = node.scriptCache.getScriptBytes(script); err != nil {
 			return err
 		}
 
-		err = node.ProvisionScript(script, bytes)
+		err = node.ProvisionScript(script, b)
 
 		if err != nil {
 			return err
@@ -137,8 +146,8 @@ func (node *node) ProvisionScripts() error {
 // Provision a singe script to the node
 func (node *node) ProvisionScript(name string, b []byte) error {
 	err := func() (error) {
-		url := node.URL.String() + "/script/" + name
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(b))
+		targetUrl := node.URL.String() + "/script/" + name
+		req, err := http.NewRequest("POST", targetUrl, bytes.NewBuffer(b))
 		req.Header.Add("media-type", "application/x-sh")
 
 		if err != nil {
