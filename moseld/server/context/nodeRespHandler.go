@@ -21,10 +21,10 @@ import (
 
 type nodeRespHandler struct {
 	cache           *dataCache
-	dataPersistence *sqlDataPersistence
+	dataPersistence DataPersistence
 }
 
-func NewNodeRespHandler(cache *dataCache, dataPersistence *sqlDataPersistence) (*nodeRespHandler, error) {
+func NewNodeRespHandler(cache *dataCache, dataPersistence DataPersistence) (*nodeRespHandler, error) {
 	return &nodeRespHandler{
 		cache: cache,
 		dataPersistence:dataPersistence,

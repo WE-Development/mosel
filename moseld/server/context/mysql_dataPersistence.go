@@ -26,6 +26,7 @@ import (
 	"github.com/bluedevel/mosel/commons"
 )
 
+// implements DataPersistence
 type sqlDataPersistence struct {
 	db            *sql.DB
 	q             commons.SqlQueries
