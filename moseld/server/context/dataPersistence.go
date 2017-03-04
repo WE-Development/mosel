@@ -112,22 +112,6 @@ func (pers *sqlDataPersistence) tableExists(name string) (bool, error) {
 	return rows.Next(), nil
 }
 
-func (pers *sqlDataPersistence) lastInsertedId() (int, error) {
-	rows, err := pers.query("lastInsertedId")
-	defer rows.Close()
-	if err != nil {
-		return -1, err
-	}
-
-	if !rows.Next() {
-		return -1, fmt.Errorf("Last instered id couldn't be found")
-	}
-
-	var id int
-	rows.Scan(&id)
-	return id, nil
-}
-
 func (pers *sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
 	tables[0] = table{name:"Nodes", createQuery:"createNodes", }
@@ -139,7 +123,7 @@ func (pers *sqlDataPersistence) Init() error {
 		if exists, err := pers.tableExists(table.name); err != nil {
 			return err
 		} else if !exists {
-			log.Printf("Create table %s ", table)
+			log.Printf("Create table %s ", table.name)
 			_, err := pers.query(table.createQuery)
 
 			if err != nil {
