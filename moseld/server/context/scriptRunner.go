@@ -45,12 +45,12 @@ func (runner *scriptsRunner) initialize() error {
 }
 
 func (runner *scriptsRunner) Run(scripts []string, node *node) {
-	close := make(chan struct{})
-	runner.closer[node.Name] = close
+	chClose := make(chan struct{})
+	runner.closer[node.Name] = chClose
 	go func() {
 		Run: for {
 			select {
-			case <-close:
+			case <-chClose:
 				break Run
 			default:
 				runner.runScripts(scripts, node)
