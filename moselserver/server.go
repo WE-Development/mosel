@@ -142,7 +142,7 @@ func (server *MoselServer) initAuth() error {
 
 // Initialize the configured data sources
 func (server *MoselServer) initDataSources() error {
-	server.Context.DataSources = make(map[string]*dataSource)
+	server.Context.DataSources = make(map[string]dataSource)
 
 	for name, config := range server.Config.DataSources {
 		var db *sql.DB
@@ -150,24 +150,20 @@ func (server *MoselServer) initDataSources() error {
 
 		if config.Type == "mysql" {
 			// driver is configured by import
+
+			if db, err = sql.Open(config.Type, config.Connection); err != nil {
+				return err
+			}
+
+			if err = db.Ping(); err != nil {
+				return err
+			}
+
+			log.Printf("Register data source %s of type %s", name, config.Type)
+			server.Context.DataSources[name] = NewSqlDataSource(config.Type, db)
 		} else {
 			return fmt.Errorf("Data source type '%s' not supported", config.Type)
 		}
-
-		if db, err = sql.Open(config.Type, config.Connection); err != nil {
-			return err
-		}
-
-		if err = db.Ping(); err != nil {
-			return err
-		}
-
-		log.Printf("Register data source %s", name)
-		server.Context.DataSources[name] =
-			&dataSource{
-				Type: config.Type,
-				Db: db,
-			}
 	}
 
 	return nil

@@ -22,5 +22,5 @@ type MoselServerContext struct {
 
 	Auth          authProvider
 	Sessions      sessionCache
-	DataSources   map[string]*dataSource
+	DataSources   map[string]dataSource
 }

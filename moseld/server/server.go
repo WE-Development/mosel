@@ -27,6 +27,7 @@ import (
 	"github.com/bluedevel/mosel/moseld/server/handler"
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"github.com/bluedevel/mosel/config"
+	"reflect"
 )
 
 // The server started by moseld.
@@ -91,13 +92,26 @@ func (server *moseldServer) initDebs() error {
 			return fmt.Errorf("Datasource %s not configured", persistenceConfig.DataSource)
 		}
 
-		var queries commons.SqlQueries
-		var err error
-		if queries, err = commons.GetQueries(dataSource.Type); err != nil {
-			return fmt.Errorf("No queries configured for sql dialect %s", dataSource.Type)
-		}
+		if dataSource.GetType() == "mysql" {
+			var sqlDs moselserver.SqlDataSource
+			var correctDsType bool
+			if sqlDs, correctDsType = dataSource.(moselserver.SqlDataSource); !correctDsType {
+				return fmt.Errorf("Expected datasource of type SqlDataSource but got %s",
+					reflect.TypeOf(dataSource).Name())
+			}
 
-		ctx.DataPersistence = context.NewSqlDataPersistence(dataSource.Db, queries)
+			var queries commons.SqlQueries
+			var err error
+			if queries, err = commons.GetQueries(sqlDs.GetType()); err != nil {
+				return fmt.Errorf("No queries configured for sql dialect %s", sqlDs.GetType())
+			}
+
+			ctx.DataPersistence = context.NewSqlDataPersistence(sqlDs.GetDb(), queries)
+		} else if dataSource.GetType() == "mongo" {
+
+		} else {
+			return fmt.Errorf("Unable to build persistence for datasource type %s", dataSource.GetType())
+		}
 	}
 
 	if ctx.NodeHandler, err =
