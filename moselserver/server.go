@@ -20,8 +20,6 @@ import (
 	"log"
 	"fmt"
 	"strconv"
-	"database/sql"
-
 	"github.com/gorilla/mux"
 
 	"github.com/bluedevel/mosel/config"
@@ -147,9 +145,7 @@ func (server *MoselServer) initDataSources() error {
 		var err error
 
 		if config.Type == "mysql" {
-			var db *sql.DB
-			db, err = server.initMySql(config.Type, config.Connection)
-			ds = NewSqlDataSource(config.Type, db)
+			ds, err = server.initMySql(config.Type, config.Connection)
 		} else if config.Type == "mongo" {
 
 		} else {

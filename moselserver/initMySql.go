@@ -20,7 +20,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func (server *MoselServer) initMySql(driverName string, dataSourceName string) (*sql.DB, error) {
+func (server *MoselServer) initMySql(driverName string, dataSourceName string) (SqlDataSource, error) {
 	var db *sql.DB
 	var err error
 
@@ -32,5 +32,5 @@ func (server *MoselServer) initMySql(driverName string, dataSourceName string) (
 		return nil, err
 	}
 
-	return db, nil
+	return NewSqlDataSource(driverName, db), nil
 }
