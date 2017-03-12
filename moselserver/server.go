@@ -22,8 +22,6 @@ import (
 	"strconv"
 	"database/sql"
 
-	_ "github.com/go-sql-driver/mysql"
-
 	"github.com/gorilla/mux"
 
 	"github.com/bluedevel/mosel/config"
@@ -149,21 +147,19 @@ func (server *MoselServer) initDataSources() error {
 		var err error
 
 		if config.Type == "mysql" {
-			// driver is configured by import
+			db, err = server.initMySql(config.Type, config.Connection)
+		} else if config.Type == "mongo" {
 
-			if db, err = sql.Open(config.Type, config.Connection); err != nil {
-				return err
-			}
-
-			if err = db.Ping(); err != nil {
-				return err
-			}
-
-			log.Printf("Register data source %s of type %s", name, config.Type)
-			server.Context.DataSources[name] = NewSqlDataSource(config.Type, db)
 		} else {
 			return fmt.Errorf("Data source type '%s' not supported", config.Type)
 		}
+
+		if err != nil {
+			return err
+		}
+
+		log.Printf("Register data source %s of type %s", name, config.Type)
+		server.Context.DataSources[name] = NewSqlDataSource(config.Type, db)
 	}
 
 	return nil
