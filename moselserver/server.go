@@ -143,11 +143,13 @@ func (server *MoselServer) initDataSources() error {
 	server.Context.DataSources = make(map[string]dataSource)
 
 	for name, config := range server.Config.DataSources {
-		var db *sql.DB
+		var ds dataSource
 		var err error
 
 		if config.Type == "mysql" {
+			var db *sql.DB
 			db, err = server.initMySql(config.Type, config.Connection)
+			ds = NewSqlDataSource(config.Type, db)
 		} else if config.Type == "mongo" {
 
 		} else {
@@ -158,8 +160,8 @@ func (server *MoselServer) initDataSources() error {
 			return err
 		}
 
-		log.Printf("Register data source %s of type %s", name, config.Type)
-		server.Context.DataSources[name] = NewSqlDataSource(config.Type, db)
+		log.Printf("Register data source %s of type %s", name, ds.GetType())
+		server.Context.DataSources[name] = ds
 	}
 
 	return nil
