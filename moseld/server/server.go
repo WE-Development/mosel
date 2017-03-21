@@ -96,8 +96,7 @@ func (server *moseldServer) initDebs() error {
 			var sqlDs moselserver.SqlDataSource
 			var correctDsType bool
 			if sqlDs, correctDsType = dataSource.(moselserver.SqlDataSource); !correctDsType {
-				return fmt.Errorf("Expected datasource of type SqlDataSource but got %s",
-					reflect.TypeOf(dataSource).Name())
+				return errorWrongDatasourceType("SqlDataSource", reflect.TypeOf(dataSource).Name())
 			}
 
 			var queries commons.SqlQueries
@@ -108,7 +107,13 @@ func (server *moseldServer) initDebs() error {
 
 			ctx.DataPersistence = context.NewSqlDataPersistence(sqlDs.GetDb(), queries)
 		} else if dataSource.GetType() == "mongo" {
+			var mongoDs moselserver.MongoDataSource
+			var correctDsType bool
+			if mongoDs, correctDsType = dataSource.(moselserver.MongoDataSource); !correctDsType {
+				return errorWrongDatasourceType("SqlDataSource", reflect.TypeOf(dataSource).Name())
+			}
 
+			ctx.DataPersistence = context.NewMongoDataPersistence(mongoDs.GetSession())
 		} else {
 			return fmt.Errorf("Unable to build persistence for datasource type %s", dataSource.GetType())
 		}
@@ -135,6 +140,10 @@ func (server *moseldServer) initDebs() error {
 	}
 
 	return nil
+}
+
+func errorWrongDatasourceType(expected string, actual string) error {
+	return fmt.Errorf("Expected datasource of type %s but got %s", expected, actual)
 }
 
 // Initialize the node cache withe the configured nodes

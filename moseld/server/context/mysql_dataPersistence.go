@@ -30,7 +30,6 @@ import (
 type sqlDataPersistence struct {
 	db            *sql.DB
 	q             commons.SqlQueries
-	serverContext *MoseldServerContext
 
 	dbLock        sync.RWMutex
 	dbState       *dbState

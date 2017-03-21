@@ -147,7 +147,7 @@ func (server *MoselServer) initDataSources() error {
 		if config.Type == "mysql" {
 			ds, err = server.initMySql(config.Type, config.Connection)
 		} else if config.Type == "mongo" {
-
+			ds, err = server.initMongo(config.Type, config.Connection)
 		} else {
 			return fmt.Errorf("Data source type '%s' not supported", config.Type)
 		}
