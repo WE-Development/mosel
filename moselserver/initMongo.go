@@ -14,3 +14,22 @@
  * limitations under the License.
  */
 package moselserver
+
+import (
+	"gopkg.in/mgo.v2"
+)
+
+func (server *MoselServer) initMongo(driverName string, dataSourceName string) (MongoDataSource, error) {
+	var session *mgo.Session
+	var err error
+
+	if session, err = mgo.Dial(dataSourceName); err != nil {
+		return nil, err
+	}
+
+	if err = session.Ping(); err != nil {
+		return nil, err
+	}
+
+	return NewMongoDataSource(driverName, session), nil
+}
