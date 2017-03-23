@@ -265,8 +265,12 @@ func (server *moseldServer) initDataCache() error {
 		pointCount += len(points)
 	}
 
-	log.Printf("Loaded %d data points. Putting them into cache", pointCount)
-	server.context.DataCache.SetStorage(storage)
+	if storage != nil {
+		log.Printf("Loaded %d data points. Putting them into cache", pointCount)
+		server.context.DataCache.SetStorage(storage)
+	} else {
+		log.Println("Didn't find any data points")
+	}
 
 	// clean up the cache
 	go func() {
