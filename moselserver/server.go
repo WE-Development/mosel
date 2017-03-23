@@ -144,16 +144,22 @@ func (server *MoselServer) initDataSources() error {
 		var ds dataSource
 		var err error
 
+		log.Printf("Initializing data source %s of type %s", name, config.Type)
+
 		if config.Type == "mysql" {
 			ds, err = server.initMySql(config.Type, config.Connection)
 		} else if config.Type == "mongo" {
 			ds, err = server.initMongo(config.Type, config.Connection)
 		} else {
-			return fmt.Errorf("Data source type '%s' not supported", config.Type)
+			log.Printf("Data source type '%s' not supported; %s",
+				config.Type, err)
+			continue
 		}
 
 		if err != nil {
-			return err
+			log.Printf("Failed to register data source %s of type %s; %s",
+				name, config.Type, err)
+			continue
 		}
 
 		log.Printf("Register data source %s of type %s", name, ds.GetType())
