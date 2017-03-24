@@ -82,7 +82,15 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 
 		for graphName, value := range graphs {
 			var graph graphDoc
-			initGraphIfNil(graphName, &diagram, &graph)
+
+			if g, ok := diagram.Graphs[graphName]; ok {
+				graph = g
+			} else {
+				graph = graphDoc{
+					Name:graphName,
+					DataPoints:make([]dataPointDoc, 0),
+				}
+			}
 
 			point := dataPointDoc{
 				Time:t,
@@ -90,6 +98,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			}
 
 			graph.DataPoints = append(graph.DataPoints, point)
+			diagram.Graphs[graphName] = graph
 		}
 	}
 
@@ -124,15 +133,5 @@ func initDiagramIfNil(name string, node *nodeDoc, dia *diagramDoc) {
 		node.Diagrams[name] = *dia
 	} else {
 		(*dia) = node.Diagrams[name]
-	}
-}
-
-func initGraphIfNil(name string, dia *diagramDoc, gr *graphDoc) {
-	if _, ok := dia.Graphs[name]; !ok {
-		gr.Name = name
-		gr.DataPoints = make([]dataPointDoc, 0)
-		dia.Graphs[name] = *gr
-	} else {
-		(*gr) = dia.Graphs[name]
 	}
 }
