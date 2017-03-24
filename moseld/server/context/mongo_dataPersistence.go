@@ -109,6 +109,9 @@ func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheSto
 }
 
 func initNodeIfNil(name string, node *nodeDoc) {
+	if node.Name == "" {
+		node.Name = name
+	}
 	if node.Diagrams == nil {
 		node.Diagrams = make(map[string]diagramDoc)
 	}
