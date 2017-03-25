@@ -25,12 +25,12 @@ import (
 
 type nodeDoc struct {
 	Name     string `bson:"name"`
-	Diagrams map[string]diagramDoc `bson:"diagrams"`
+	Diagrams []diagramDoc `bson:"diagrams"`
 }
 
 type diagramDoc struct {
 	Name   string `bson:"name"`
-	Graphs map[string]graphDoc `bson:"graphs"`
+	Graphs []graphDoc `bson:"graphs"`
 }
 
 type graphDoc struct {
@@ -74,22 +74,38 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 		return
 	}
 
-	initNodeIfNil(nodeName, &node)
+	if node.Name == "" {
+		node.Name = nodeName
+	}
+
+	if node.Diagrams == nil {
+		node.Diagrams = make([]diagramDoc, len(info))
+	}
 
 	for diagramName, graphs := range info {
-		var diagram diagramDoc
-		initDiagramIfNil(diagramName, &node, &diagram)
+		diaIndex := findDiagramByName(diagramName, node.Diagrams)
+
+		var dia diagramDoc
+		if diaIndex == -1 {
+			dia = diagramDoc{
+				Name:diagramName,
+				Graphs: make([]graphDoc, 0),
+			}
+		} else {
+			dia = node.Diagrams[diaIndex]
+		}
 
 		for graphName, value := range graphs {
-			var graph graphDoc
+			graphIndex := findGraphByName(graphName, dia.Graphs)
 
-			if g, ok := diagram.Graphs[graphName]; ok {
-				graph = g
-			} else {
+			var graph graphDoc
+			if graphIndex == -1 {
 				graph = graphDoc{
 					Name:graphName,
-					DataPoints:make([]dataPointDoc, 0),
+					DataPoints: make([]dataPointDoc, 0),
 				}
+			} else {
+				graph = dia.Graphs[graphIndex]
 			}
 
 			point := dataPointDoc{
@@ -98,7 +114,18 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			}
 
 			graph.DataPoints = append(graph.DataPoints, point)
-			diagram.Graphs[graphName] = graph
+
+			if graphIndex == -1 {
+				dia.Graphs = append(dia.Graphs, graph)
+			} else {
+				dia.Graphs[graphIndex] = graph
+			}
+		}
+
+		if diaIndex == -1 {
+			node.Diagrams = append(node.Diagrams, dia)
+		} else {
+			node.Diagrams[diaIndex] = dia
 		}
 	}
 
@@ -117,21 +144,20 @@ func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheSto
 	return nil, nil
 }
 
-func initNodeIfNil(name string, node *nodeDoc) {
-	if node.Name == "" {
-		node.Name = name
+func findDiagramByName(name string, diagrams []diagramDoc) int {
+	for i, dia := range diagrams {
+		if dia.Name == name {
+			return i
+		}
 	}
-	if node.Diagrams == nil {
-		node.Diagrams = make(map[string]diagramDoc)
-	}
+	return -1
 }
 
-func initDiagramIfNil(name string, node *nodeDoc, dia *diagramDoc) {
-	if _, ok := node.Diagrams[name]; !ok {
-		dia.Name = name
-		dia.Graphs = make(map[string]graphDoc)
-		node.Diagrams[name] = *dia
-	} else {
-		(*dia) = node.Diagrams[name]
+func findGraphByName(name string, graphs []graphDoc) int {
+	for i, gr := range graphs {
+		if gr.Name == name {
+			return i
+		}
 	}
+	return -1
 }
