@@ -34,13 +34,15 @@ type diagramDoc struct {
 }
 
 type graphDoc struct {
-	Name       string `bson:"name"`
-	DataPoints []dataPointDoc `bson:"dataPoints"`
+	Id   bson.ObjectId `bson:"_id"`
+	Name string `bson:"name"`
+	//DataPoints []dataPointDoc `bson:"dataPoints"`
 }
 
 type dataPointDoc struct {
 	Time  time.Time `bson:"time"`
 	Value string `bson:"value"`
+	Graph bson.ObjectId `bson:"graph"`
 }
 
 type mongoDataPersistence struct {
@@ -60,14 +62,15 @@ func (pers *mongoDataPersistence) Init() error {
 }
 
 func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.NodeInfo) {
-	coll := pers.database.C("nodes")
+	collNodes := pers.database.C("nodes")
+	collData := pers.database.C("datapoints")
 
 	selector := bson.M{"name": nodeName}
 
 	var node nodeDoc
-	itr := coll.Find(selector).Iter()
+	itr := collNodes.Find(selector).Iter()
 
-	doUpdate := itr.Next(&node)
+	doUpdateNodes := itr.Next(&node)
 
 	if err := itr.Err(); err != nil {
 		log.Fatal(err)
@@ -81,6 +84,8 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 	if node.Diagrams == nil {
 		node.Diagrams = make([]diagramDoc, len(info))
 	}
+
+	points := make([]dataPointDoc, 0)
 
 	for diagramName, graphs := range info {
 		diaIndex := findDiagramByName(diagramName, node.Diagrams)
@@ -101,8 +106,8 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			var graph graphDoc
 			if graphIndex == -1 {
 				graph = graphDoc{
-					Name:       graphName,
-					DataPoints: make([]dataPointDoc, 0),
+					Id:   bson.NewObjectId(),
+					Name: graphName,
 				}
 			} else {
 				graph = dia.Graphs[graphIndex]
@@ -111,9 +116,9 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			point := dataPointDoc{
 				Time:  t,
 				Value: value,
+				Graph: graph.Id,
 			}
-
-			graph.DataPoints = append(graph.DataPoints, point)
+			points = append(points, point)
 
 			if graphIndex == -1 {
 				dia.Graphs = append(dia.Graphs, graph)
@@ -129,11 +134,15 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 		}
 	}
 
-	if doUpdate {
-		coll.Update(selector, node)
+	// persist meta data
+	if doUpdateNodes {
+		collNodes.Update(selector, node)
 	} else {
-		coll.Insert(node)
+		collNodes.Insert(node)
 	}
+
+	// persist points
+	collData.Insert(points)
 }
 
 func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
