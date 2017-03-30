@@ -82,7 +82,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 	}
 
 	if node.Diagrams == nil {
-		node.Diagrams = make([]diagramDoc, len(info))
+		node.Diagrams = make([]diagramDoc, 0)
 	}
 
 	points := make([]dataPointDoc, 0)
@@ -104,7 +104,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			graphIndex := findGraphByName(graphName, dia.Graphs)
 
 			var graph graphDoc
-			if graphIndex == -1 {
+			if graphIndex == -1 && graphName != "" {
 				graph = graphDoc{
 					Id:   bson.NewObjectId(),
 					Name: graphName,
