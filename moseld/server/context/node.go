@@ -29,20 +29,20 @@ import (
 
 // Represents a node and handles all communication with it.
 type node struct {
-	Name        string
-	URL         url.URL
-	scripts     []string
+	Name    string
+	URL     url.URL
+	scripts []string
 
-	user        string
-	passwd      string
+	user   string
+	passwd string
 
 	handler     *nodeRespHandler
 	scriptCache *scriptCache
 
-	close       chan struct{}
+	close chan struct{}
 }
 
-func NewNode(name string, url url.URL, user  string, passwd string, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
+func NewNode(name string, url url.URL, user string, passwd string, scripts []string, handler *nodeRespHandler, scriptCache *scriptCache) (*node, error) {
 
 	node := &node{}
 	node.Name = name
@@ -172,4 +172,3 @@ func (node *node) doRequest(req *http.Request) (*http.Response, error) {
 		return resp, err
 	}()
 }
-

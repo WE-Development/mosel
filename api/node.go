@@ -26,6 +26,6 @@ type NodeResponse struct {
 func NewNodeResponse() NodeResponse {
 	return NodeResponse{
 		moselResponse: newMoselResponse(),
-		NodeInfo: make(NodeInfo),
+		NodeInfo:      make(NodeInfo),
 	}
 }

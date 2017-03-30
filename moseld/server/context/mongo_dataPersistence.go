@@ -50,7 +50,7 @@ type mongoDataPersistence struct {
 
 func NewMongoDataPersistence(session *mgo.Session) *mongoDataPersistence {
 	return &mongoDataPersistence{
-		session:session,
+		session: session,
 	}
 }
 
@@ -88,7 +88,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 		var dia diagramDoc
 		if diaIndex == -1 {
 			dia = diagramDoc{
-				Name:diagramName,
+				Name:   diagramName,
 				Graphs: make([]graphDoc, 0),
 			}
 		} else {
@@ -101,7 +101,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			var graph graphDoc
 			if graphIndex == -1 {
 				graph = graphDoc{
-					Name:graphName,
+					Name:       graphName,
 					DataPoints: make([]dataPointDoc, 0),
 				}
 			} else {
@@ -109,8 +109,8 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			}
 
 			point := dataPointDoc{
-				Time:t,
-				Value:value,
+				Time:  t,
+				Value: value,
 			}
 
 			graph.DataPoints = append(graph.DataPoints, point)

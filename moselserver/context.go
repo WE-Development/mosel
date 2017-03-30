@@ -20,7 +20,7 @@ type MoselServerContext struct {
 	// Get's set to true after the server booted successfully
 	IsInitialized bool
 
-	Auth          authProvider
-	Sessions      sessionCache
-	DataSources   map[string]dataSource
+	Auth        authProvider
+	Sessions    sessionCache
+	DataSources map[string]dataSource
 }

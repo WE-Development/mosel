@@ -23,7 +23,7 @@ type nodeCache struct {
 	handler *nodeRespHandler
 	scripts *scriptCache
 
-	nodes   map[string]*node
+	nodes map[string]*node
 }
 
 func NewNodeCache(handler *nodeRespHandler, scripts *scriptCache) (*nodeCache, error) {

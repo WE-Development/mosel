@@ -40,7 +40,7 @@ type infoResponse struct {
 func NewInfoResponse() infoResponse {
 	return infoResponse{
 		moselResponse: newMoselResponse(),
-		Nodes: make([]string, 0),
+		Nodes:         make([]string, 0),
 	}
 }
 
@@ -53,6 +53,6 @@ type nodeInfoRepsonse struct {
 func NewNodeInfoResponse() nodeInfoRepsonse {
 	return nodeInfoRepsonse{
 		moselResponse: newMoselResponse(),
-		Data: make(map[string]NodeInfo),
+		Data:          make(map[string]NodeInfo),
 	}
 }

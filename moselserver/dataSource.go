@@ -30,7 +30,7 @@ type sqlDataSourceImpl struct {
 }
 
 func NewSqlDataSource(t string, db *sql.DB) SqlDataSource {
-	ds := sqlDataSourceImpl{db:db}
+	ds := sqlDataSourceImpl{db: db}
 	ds.typev = t
 	return &ds
 }
@@ -52,7 +52,7 @@ type mongoDataSourceImpl struct {
 }
 
 func NewMongoDataSource(t string, session *mgo.Session) MongoDataSource {
-	ds := mongoDataSourceImpl{session:session}
+	ds := mongoDataSourceImpl{session: session}
 	ds.typev = t
 	return &ds
 }

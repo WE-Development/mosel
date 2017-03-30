@@ -27,8 +27,8 @@ import (
 
 // The abstract http-server type underlying the mosel servers.
 type MoselServer struct {
-	Config    moselconfig.MoselServerConfig
-	Context   *MoselServerContext
+	Config  moselconfig.MoselServerConfig
+	Context *MoselServerContext
 
 	Handlers  []MoselHandler
 	InitFuncs []func() error
@@ -177,7 +177,6 @@ func (server *MoselServer) initSessionCache() error {
 	server.Context.Sessions = *c
 	return nil
 }
-
 
 /*
  * Initialize Handler

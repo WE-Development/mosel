@@ -48,13 +48,14 @@ func (runner *scriptsRunner) Run(scripts []string, node *node) {
 	chClose := make(chan struct{})
 	runner.closer[node.Name] = chClose
 	go func() {
-		Run: for {
+	Run:
+		for {
 			select {
 			case <-chClose:
 				break Run
 			default:
 				runner.runScripts(scripts, node)
-			//todo make reconnection timeout configurable by moseld.conf
+				//todo make reconnection timeout configurable by moseld.conf
 				time.Sleep(1 * time.Second)
 			}
 		}
@@ -70,7 +71,7 @@ func (runner *scriptsRunner) runScripts(scripts []string, node *node) {
 			continue
 		}
 
-		args := make([]string, len(conf.Arguments) + 1)
+		args := make([]string, len(conf.Arguments)+1)
 		args[0] = conf.Path
 
 		//interpret arguments
@@ -101,7 +102,7 @@ func (runner *scriptsRunner) runScripts(scripts []string, node *node) {
 				arg = "nil"
 				break
 			}
-			args[i + 1] = arg
+			args[i+1] = arg
 		}
 
 		res, err := commons.ExecuteScript(args...)

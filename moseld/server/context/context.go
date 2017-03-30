@@ -28,5 +28,5 @@ type MoseldServerContext struct {
 	Scripts         *scriptCache
 	ScriptsRunner   *scriptsRunner
 
-	Debug           int
+	Debug int
 }

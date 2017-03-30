@@ -31,7 +31,7 @@ type moselnodedServer struct {
 
 func NewMoselNodedServer(config moselconfig.MoselNodedServerConfig) *moselnodedServer {
 	server := moselnodedServer{
-		config: config,
+		config:  config,
 		context: new(context.MoselnodedServerContext),
 	}
 

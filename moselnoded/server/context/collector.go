@@ -32,7 +32,7 @@ type collector struct {
 func NewCollector() *collector {
 	return &collector{
 		scriptFolder: "/tmp/mosel",
-		scripts: make([]string, 0),
+		scripts:      make([]string, 0),
 	}
 }
 

@@ -26,8 +26,8 @@ type nodeRespHandler struct {
 
 func NewNodeRespHandler(cache *dataCache, dataPersistence DataPersistence) (*nodeRespHandler, error) {
 	return &nodeRespHandler{
-		cache: cache,
-		dataPersistence:dataPersistence,
+		cache:           cache,
+		dataPersistence: dataPersistence,
 	}, nil
 }
 

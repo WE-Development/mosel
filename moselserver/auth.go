@@ -31,7 +31,6 @@ type authProvider interface {
 
 // Will always authenticate successfully. (for testing purposes!)
 type AuthTrue struct {
-
 }
 
 // implement authProvider
@@ -62,7 +61,7 @@ type AuthSys struct {
 }
 
 //todo find a clever solution for this
-func (auth AuthSys)  Authenticate(userName string, passwd string) bool {
+func (auth AuthSys) Authenticate(userName string, passwd string) bool {
 	if (len(auth.AllowedUsers) == 0) {
 		log.Println("AuthSys is configured but no users are allowed")
 		return false

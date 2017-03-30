@@ -28,11 +28,11 @@ import (
 
 // implements DataPersistence
 type sqlDataPersistence struct {
-	db            *sql.DB
-	q             commons.SqlQueries
+	db *sql.DB
+	q  commons.SqlQueries
 
-	dbLock        sync.RWMutex
-	dbState       *dbState
+	dbLock  sync.RWMutex
+	dbState *dbState
 }
 
 type table struct {
@@ -75,8 +75,8 @@ type dbResult struct {
 
 func NewSqlDataPersistence(db *sql.DB, queries commons.SqlQueries) *sqlDataPersistence {
 	return &sqlDataPersistence{
-		db:db,
-		q:queries,
+		db: db,
+		q:  queries,
 	}
 }
 
@@ -129,10 +129,10 @@ func (pers *sqlDataPersistence) tableExists(name string) (bool, error) {
 
 func (pers *sqlDataPersistence) Init() error {
 	tables := make([]table, 4)
-	tables[0] = table{name:"Nodes", createQuery:"createNodes", }
-	tables[1] = table{name:"Diagrams", createQuery:"createDiagrams", }
-	tables[2] = table{name:"Graphs", createQuery:"createGraphs", }
-	tables[3] = table{name:"DataPoints", createQuery:"createDataPoints", }
+	tables[0] = table{name: "Nodes", createQuery: "createNodes", }
+	tables[1] = table{name: "Diagrams", createQuery: "createDiagrams", }
+	tables[2] = table{name: "Graphs", createQuery: "createGraphs", }
+	tables[3] = table{name: "DataPoints", createQuery: "createDataPoints", }
 
 	for _, table := range tables {
 		if exists, err := pers.tableExists(table.name); err != nil {
@@ -249,7 +249,7 @@ func (pers *sqlDataPersistence) get(rows *sql.Rows) (DataCacheStorage, error) {
 
 	// dirty force reset
 	pers.dbState = &dbState{
-		nodes:make(map[string]*dbNodeState),
+		nodes: make(map[string]*dbNodeState),
 	}
 
 	for rows.Next() {
@@ -281,8 +281,8 @@ func (pers *sqlDataPersistence) get(rows *sql.Rows) (DataCacheStorage, error) {
 		point, ok := node[t]
 		if !ok {
 			point = DataPoint{
-				Time:t,
-				Info:make(api.NodeInfo),
+				Time: t,
+				Info: make(api.NodeInfo),
 			}
 			node[t] = point
 		}
@@ -307,9 +307,9 @@ func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
 	node, ok := pers.dbState.nodes[dbRes.node]
 	if !ok {
 		node = &dbNodeState{
-			id:dbRes.nodeId,
-			name:dbRes.node,
-			diagrams:make(map[string]*dbDiagramState),
+			id:       dbRes.nodeId,
+			name:     dbRes.node,
+			diagrams: make(map[string]*dbDiagramState),
 		}
 		pers.dbState.nodes[dbRes.node] = node
 	}
@@ -321,9 +321,9 @@ func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
 	diagram, ok := node.diagrams[dbRes.diagram]
 	if !ok {
 		diagram = &dbDiagramState{
-			id:dbRes.diagramId,
-			name:dbRes.diagram,
-			graphs:make(map[string]*dbGraphState),
+			id:     dbRes.diagramId,
+			name:   dbRes.diagram,
+			graphs: make(map[string]*dbGraphState),
 		}
 		node.diagrams[dbRes.diagram] = diagram
 	}
@@ -335,8 +335,8 @@ func (pers *sqlDataPersistence) updateDbState(dbRes dbResult) {
 	graph, ok := diagram.graphs[dbRes.graph]
 	if !ok {
 		graph = &dbGraphState{
-			id:dbRes.graphId,
-			name:dbRes.graph,
+			id:   dbRes.graphId,
+			name: dbRes.graph,
 		}
 		diagram.graphs[dbRes.graph] = graph
 	}

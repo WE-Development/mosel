@@ -12,7 +12,8 @@ func ContainsStr(arr []string, val string) bool {
 func ExcludeStr(arr []string, ex []string) []string {
 	res := make([]string, 0)
 
-	elems: for _, elem := range arr {
+elems:
+	for _, elem := range arr {
 		for _, ex := range ex {
 			if elem == ex {
 				continue elems

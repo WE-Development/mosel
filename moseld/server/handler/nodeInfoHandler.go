@@ -36,7 +36,7 @@ type nodeInfoHandler struct {
 
 func NewNodeInfoHandler(ctxd *context.MoseldServerContext) *nodeInfoHandler {
 	return &nodeInfoHandler{
-		ctxd:ctxd,
+		ctxd: ctxd,
 	}
 }
 

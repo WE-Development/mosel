@@ -26,7 +26,7 @@ import (
 )
 
 type streamHandler struct {
-	ctx  *context.MoselnodedServerContext
+	ctx *context.MoselnodedServerContext
 
 	test int
 }

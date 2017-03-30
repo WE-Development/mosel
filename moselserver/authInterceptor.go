@@ -81,7 +81,6 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 
 func validateAccessRights(path string, userConfig *moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) (bool, error) {
 	allow := false;
-
 	rights := make([]moselconfig.AccessRights, 0)
 
 	for groupName, groupConf := range groupConfigs {

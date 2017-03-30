@@ -42,7 +42,7 @@ type moseldServer struct {
 // Construct a new Instance of a MoselServer for a given configuration.
 func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	server := moseldServer{
-		config: config,
+		config:  config,
 		context: new(context.MoseldServerContext),
 	}
 
