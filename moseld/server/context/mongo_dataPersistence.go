@@ -104,7 +104,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 			graphIndex := findGraphByName(graphName, dia.Graphs)
 
 			var graph graphDoc
-			if graphIndex == -1 && graphName != "" {
+			if graphIndex == -1 {
 				graph = graphDoc{
 					Id:   bson.NewObjectId(),
 					Name: graphName,
