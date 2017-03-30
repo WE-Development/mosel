@@ -85,7 +85,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 		node.Diagrams = make([]diagramDoc, 0)
 	}
 
-	points := make([]dataPointDoc, 0)
+	points := make([]interface{}, 0)
 
 	for diagramName, graphs := range info {
 		diaIndex := findDiagramByName(diagramName, node.Diagrams)
@@ -142,7 +142,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 	}
 
 	// persist points
-	collData.Insert(points)
+	collData.Insert(points...)
 }
 
 func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
