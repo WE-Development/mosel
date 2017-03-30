@@ -20,7 +20,7 @@ import (
 	"time"
 	"github.com/bluedevel/mosel/api"
 	"gopkg.in/mgo.v2/bson"
-	"log"
+	"github.com/bluedevel/mosel/commons"
 )
 
 type nodeDoc struct {
@@ -71,11 +71,7 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 	itr := collNodes.Find(selector).Iter()
 
 	doUpdateNodes := itr.Next(&node)
-
-	if err := itr.Err(); err != nil {
-		log.Fatal(err)
-		return
-	}
+	commons.LogFatal(itr.Err())
 
 	if node.Name == "" {
 		node.Name = nodeName
@@ -134,23 +130,18 @@ func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.Nod
 		}
 	}
 
+	var err error
 	// persist meta data
 	if doUpdateNodes {
-		collNodes.Update(selector, node)
+		err = collNodes.Update(selector, node)
 	} else {
-		collNodes.Insert(node)
+		err = collNodes.Insert(node)
 	}
+	commons.LogFatal(err)
 
 	// persist points
-	collData.Insert(points...)
-}
-
-func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
-	return nil, nil
-}
-
-func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheStorage, error) {
-	return nil, nil
+	err = collData.Insert(points...)
+	commons.LogFatal(err)
 }
 
 func findDiagramByName(name string, diagrams []diagramDoc) int {
@@ -169,4 +160,12 @@ func findGraphByName(name string, graphs []graphDoc) int {
 		}
 	}
 	return -1
+}
+
+func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
+	return nil, nil
+}
+
+func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheStorage, error) {
+	return nil, nil
 }
