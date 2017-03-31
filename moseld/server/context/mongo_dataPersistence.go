@@ -61,9 +61,13 @@ func (pers *mongoDataPersistence) Init() error {
 	return nil
 }
 
+func (pers *mongoDataPersistence) getCollections() (*mgo.Collection, *mgo.Collection) {
+	return pers.database.C("nodes"),
+		pers.database.C("datapoints")
+}
+
 func (pers *mongoDataPersistence) Add(nodeName string, t time.Time, info api.NodeInfo) {
-	collNodes := pers.database.C("nodes")
-	collData := pers.database.C("datapoints")
+	collNodes, collData := pers.getCollections()
 
 	selector := bson.M{"name": nodeName}
 
@@ -163,9 +167,99 @@ func findGraphByName(name string, graphs []graphDoc) int {
 }
 
 func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
-	return nil, nil
+	return pers.get(bson.M{}), nil
 }
 
 func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheStorage, error) {
-	return nil, nil
+	return pers.get(bson.M{}), nil
+}
+
+func (pers *mongoDataPersistence) get(query interface{}) DataCacheStorage {
+	res := make(DataCacheStorage)
+
+	graphs := pers.getGraphCache()
+
+	_, collData := pers.getCollections()
+	points := collData.Find(bson.M{}).Iter()
+
+	var point dataPointDoc
+	for points.Next(&point) {
+		info := graphs[point.Graph]
+
+		node, ok := res[info.Node.Name]
+		if !ok {
+			node = make(map[time.Time]DataPoint)
+			res[info.Node.Name] = node
+		}
+
+		t := point.Time
+		p, ok := node[t]
+		if !ok {
+			p = DataPoint{
+				Time: t,
+				Info: make(api.NodeInfo),
+			}
+			node[t] = p
+		}
+
+		diagram, ok := p.Info[info.Diagram.Name]
+		if !ok {
+			diagram = make(map[string]string)
+			p.Info[info.Diagram.Name] = diagram
+		}
+
+		diagram[info.Graph.Name] = point.Value
+	}
+
+	return res
+}
+
+type graphInfo struct {
+	Node    nodeDoc
+	Diagram diagramDoc
+	Graph   graphDoc
+}
+
+func (pers *mongoDataPersistence) getGraphCache() map[bson.ObjectId]graphInfo {
+	collNodes, _ := pers.getCollections()
+
+	graphs := make(map[bson.ObjectId]graphInfo)
+
+	nodeItr := collNodes.Find(bson.M{}).Iter()
+	var node nodeDoc
+	for nodeItr.Next(&node) {
+		for _, dia := range node.Diagrams {
+			for _, gr := range dia.Graphs {
+				graphs[gr.Id] = graphInfo{
+					Node:    node,
+					Diagram: dia,
+					Graph:   gr,
+				}
+			}
+		}
+	}
+
+	return graphs
+}
+
+func (pers *mongoDataPersistence) getNodeDataCaches() (map[string]nodeDoc, map[bson.ObjectId]graphDoc) {
+	collNodes, _ := pers.getCollections()
+
+	// build metadata cashes
+	nodes := make(map[string]nodeDoc)
+	graphs := make(map[bson.ObjectId]graphDoc)
+
+	nodeItr := collNodes.Find(bson.M{}).Iter()
+	var node nodeDoc
+	for nodeItr.Next(&node) {
+		nodes[node.Name] = node
+
+		for _, dia := range node.Diagrams {
+			for _, gr := range dia.Graphs {
+				graphs[gr.Id] = gr
+			}
+		}
+	}
+
+	return nodes, graphs
 }

@@ -15,6 +15,10 @@
  */
 package api
 
+/*
+Represents the state of a node at a certain time.
+Diagram -> Graph -> Value
+*/
 type NodeInfo map[string]map[string]string
 
 //A wrapper for sending data over the stream from the nodes to server
