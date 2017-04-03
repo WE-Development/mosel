@@ -171,7 +171,8 @@ func (pers *mongoDataPersistence) GetAll() (DataCacheStorage, error) {
 }
 
 func (pers *mongoDataPersistence) GetAllSince(since time.Duration) (DataCacheStorage, error) {
-	return pers.get(bson.M{}), nil
+	t := time.Now().Add(-since)
+	return pers.get(bson.M{"time": bson.M{"$gte": t}}), nil
 }
 
 func (pers *mongoDataPersistence) get(query interface{}) DataCacheStorage {
@@ -180,7 +181,7 @@ func (pers *mongoDataPersistence) get(query interface{}) DataCacheStorage {
 	graphs := pers.getGraphCache()
 
 	_, collData := pers.getCollections()
-	points := collData.Find(bson.M{}).Iter()
+	points := collData.Find(query).Iter()
 
 	var point dataPointDoc
 	for points.Next(&point) {
