@@ -58,6 +58,13 @@ func NewMongoDataPersistence(session *mgo.Session) *mongoDataPersistence {
 
 func (pers *mongoDataPersistence) Init() error {
 	pers.database = pers.session.DB("")
+	_, collData := pers.getCollections()
+
+	index := mgo.Index{
+		Key: []string{"time"},
+	}
+	collData.EnsureIndex(index)
+
 	return nil
 }
 
