@@ -57,7 +57,3 @@ func (handler debugHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (handler debugHandler) GetPath() string {
 	return "/debug"
 }
-
-func (handler debugHandler) Secure() bool {
-	return false
-}

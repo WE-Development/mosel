@@ -21,10 +21,13 @@ import (
 
 	"github.com/bluedevel/mosel/api"
 	"github.com/bluedevel/mosel/moseld/server/context"
+	"github.com/bluedevel/mosel/moselserver"
 )
 
 // Handler for providing a login and credential validation functionality.
 type loginHandler struct {
+	moselserver.SecureHandler
+
 	ctx *context.MoseldServerContext
 }
 

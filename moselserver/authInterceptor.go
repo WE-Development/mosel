@@ -24,30 +24,38 @@ import (
 	"github.com/bluedevel/mosel/config"
 )
 
-// Wrap a http.HandleFunc such that it's authenticated before execution.
-// It's build on basic auth or use with sessions as provided by moselserver.sessionCache.
-func (server *MoselServer) secure(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if server.Config.Sessions.Enabled {
-			authSession(server, fn, w, r)
-		} else {
-			authDirect(server, fn, w, r)
-		}
+type authFilter struct {
+	server *MoselServer
+}
+
+func (filter authFilter) Apply(w http.ResponseWriter, r *http.Request, next ApplyNext) {
+	if filter.server.Config.Sessions.Enabled {
+		filter.authSession(w, r, next)
+	} else {
+		filter.authDirect(w, r, next)
+	}
+}
+
+func newAuthFilter(server *MoselServer) *authFilter {
+	return &authFilter{
+		server: server,
 	}
 }
 
 // Authenticate via sessions
-func authSession(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
+func (filter *authFilter) authSession(w http.ResponseWriter, r *http.Request, next ApplyNext) {
 	key := r.FormValue("key")
-	if key == "" || !server.Context.Sessions.ValidateSession(key) {
+	if key == "" || !filter.server.Context.Sessions.ValidateSession(key) {
 		commons.HttpUnauthorized(w)
 		return
 	}
-	fn(w, r)
+
+	next()
 }
 
 // Authenticate directly via basic auth
-func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
+func (filter *authFilter) authDirect(w http.ResponseWriter, r *http.Request, next ApplyNext) {
+	server := filter.server;
 	user, passwd, _ := r.BasicAuth()
 
 	if server.Context.Auth == nil {
@@ -63,11 +71,11 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 
 	// if auth true is enabled, it's possible that a positiv authentication occurs without a user configuration
 	if server.Config.AuthTrue.Enabled {
-		fn(w, r)
+		next()
 		return
 	}
 
-	if ok, err := validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups); !ok {
+	if ok, err := filter.validateAccessRights(r.URL.Path, server.Config.Users[user], server.Config.Groups); !ok {
 		if err != nil {
 			log.Println(err)
 		}
@@ -76,10 +84,10 @@ func authDirect(server *MoselServer, fn http.HandlerFunc, w http.ResponseWriter,
 		return
 	}
 
-	fn(w, r)
+	next()
 }
 
-func validateAccessRights(path string, userConfig *moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) (bool, error) {
+func (filter *authFilter) validateAccessRights(path string, userConfig *moselconfig.UserConfig, groupConfigs map[string]*moselconfig.GroupConfig) (bool, error) {
 	allow := false;
 	rights := make([]moselconfig.AccessRights, 0)
 

@@ -19,10 +19,10 @@ import (
 	"net/http"
 	"log"
 	"fmt"
-	"strconv"
 	"github.com/gorilla/mux"
 
 	"github.com/bluedevel/mosel/config"
+	"strconv"
 )
 
 // The abstract http-server type underlying the mosel servers.
@@ -30,7 +30,8 @@ type MoselServer struct {
 	Config  moselconfig.MoselServerConfig
 	Context *MoselServerContext
 
-	Handlers  []MoselHandler
+	Filters   []Filter
+	Handlers  []Handler
 	InitFuncs []func() error
 }
 
@@ -184,23 +185,36 @@ func (server *MoselServer) initSessionCache() error {
 
 // Initialize the configured http handlers and wrap them into a gorilla/mux router
 func (server *MoselServer) initHandler(r *mux.Router) {
+	authFilter := newAuthFilter(server)
 
-	for n, _ := range server.Handlers {
+	for handlerIndex, _ := range server.Handlers {
 
-		h := server.Handlers[n]
+		h := server.Handlers[handlerIndex]
 
 		f := func(w http.ResponseWriter, r *http.Request) {
 			//h.ServeHTTPContext(server.Context, w, r)
 			h.ServeHTTP(w, r)
 		}
 
-		secure := h.Secure()
+		secure := false
+		if sh, ok := h.(SecureHandler); ok {
+			f = chainFilter(f, authFilter)
+			secure = sh.Secure()
+		}
 
-		if secure {
-			f = server.secure(f)
+		for filterIndex, _ := range server.Filters {
+			f = chainFilter(f, server.Filters[filterIndex])
 		}
 
 		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))
 		r.HandleFunc(h.GetPath(), f)
+	}
+}
+
+func chainFilter(f http.HandlerFunc, filter Filter) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		filter.Apply(w, r, func() {
+			f(w, r)
+		})
 	}
 }

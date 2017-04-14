@@ -21,9 +21,12 @@ import (
 
 // This handler extends the default http.Handler by providing information about the handled resource path
 // and the security level of the provided resource
-type MoselHandler interface {
+type Handler interface {
 	http.Handler
 	//ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
 	GetPath() string
+}
+
+type SecureHandler interface {
 	Secure() bool
 }
