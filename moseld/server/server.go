@@ -28,7 +28,6 @@ import (
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"github.com/bluedevel/mosel/config"
 	"reflect"
-	"net/http"
 )
 
 // The server started by moseld.
@@ -67,41 +66,11 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 	}
 
 	server.Filters = []moselserver.Filter{
-		FilterA{},
-		FilterB{},
-		FilterC{},
+		moselserver.DefaultOptionsFilter{},
 	}
 
 	return &server
 }
-
-// DEBUG
-
-type FilterA struct {
-}
-
-func (filter FilterA) Apply(w http.ResponseWriter, r *http.Request, next moselserver.ApplyNext) {
-	log.Println("A")
-	next()
-}
-
-type FilterB struct {
-}
-
-func (filter FilterB) Apply(w http.ResponseWriter, r *http.Request, next moselserver.ApplyNext) {
-	log.Println("B")
-	next()
-}
-
-type FilterC struct {
-}
-
-func (filter FilterC) Apply(w http.ResponseWriter, r *http.Request, next moselserver.ApplyNext) {
-	log.Println("C")
-	next()
-}
-
-//DEBUG END
 
 /*
  * Initialize Context

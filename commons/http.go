@@ -17,12 +17,16 @@ package commons
 
 import "net/http"
 
+func HttpNoContent(w http.ResponseWriter) {
+	HttpError(w, http.StatusNoContent)
+}
+
 func HttpUnauthorized(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+	HttpError(w, http.StatusUnauthorized)
 }
 
 func HttpBadRequest(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	HttpError(w, http.StatusBadRequest)
 }
 
 func HttpError(w http.ResponseWriter, code int) {
