@@ -20,7 +20,7 @@ import (
 )
 
 type moselInfo struct {
-	Time time.Time
+	Time time.Time `json:"time"`
 }
 
 func newMoselInfo() moselInfo {

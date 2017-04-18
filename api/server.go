@@ -20,9 +20,9 @@ import "time"
 type loginResponse struct {
 	moselResponse
 
-	Successful bool
-	Key        string
-	ValidTo    time.Time
+	Successful bool `json:"successful"`
+	Key        string `json:"key"`
+	ValidTo    time.Time `json:"validTo"`
 }
 
 func NewLoginResponse() loginResponse {
@@ -34,7 +34,7 @@ func NewLoginResponse() loginResponse {
 type infoResponse struct {
 	moselResponse
 
-	Nodes []string
+	Nodes []string `json:"nodes"`
 }
 
 func NewInfoResponse() infoResponse {
@@ -47,7 +47,7 @@ func NewInfoResponse() infoResponse {
 type nodeInfoRepsonse struct {
 	moselResponse
 
-	Data map[string]NodeInfo
+	Data map[string]NodeInfo `json:"data"`
 }
 
 func NewNodeInfoResponse() nodeInfoRepsonse {

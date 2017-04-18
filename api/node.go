@@ -24,7 +24,7 @@ type NodeInfo map[string]map[string]string
 //A wrapper for sending data over the stream from the nodes to server
 type NodeResponse struct {
 	moselResponse
-	NodeInfo NodeInfo
+	NodeInfo NodeInfo `json:"nodeÌnfo"`
 }
 
 func NewNodeResponse() NodeResponse {
