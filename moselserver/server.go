@@ -129,7 +129,7 @@ func (server *MoselServer) initAuth() error {
 	}
 
 	if enabledCount > 1 {
-		return fmt.Errorf("More then one auth services enabled")
+		return fmt.Errorf("More than one auth service enabled")
 	} else if enabledCount == 0 {
 		return fmt.Errorf("No auth service configured")
 	}
