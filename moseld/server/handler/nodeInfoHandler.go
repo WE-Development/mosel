@@ -25,6 +25,7 @@ import (
 	"github.com/bluedevel/mosel/api"
 	"github.com/bluedevel/mosel/commons"
 	"github.com/bluedevel/mosel/moseld/server/context"
+	"log"
 )
 
 // Handler for providing time coded information on a node.
@@ -55,6 +56,7 @@ func (handler nodeInfoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		var i int64
 		i, err = strconv.ParseInt(since, 10, 64)
 		if err != nil {
+			log.Println(err)
 			commons.HttpBadRequest(w)
 			return
 		}
