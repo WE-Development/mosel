@@ -1,1 +1,1 @@
-Use go-bindata-assetfs to compile
+Use elazarl/go-bindata-assetfs to compile
