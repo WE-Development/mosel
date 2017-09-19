@@ -1,0 +1,13 @@
+{
+  "name": "moselui",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/bluedevel/mosel/tree/master/ui",
+  "author": "Robin Engel",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@polymer/polymer": "^2.0.2",
+    "@webcomponents/webcomponentsjs": "^1.0.11",
+    "materialize-css": "^0.100.2"
+  }
+}
