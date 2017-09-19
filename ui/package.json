@@ -2,7 +2,10 @@
   "name": "moselui",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/bluedevel/mosel/tree/master/ui",
+  "repository": {
+    "url": "https://github.com/bluedevel/mosel/tree/master/ui",
+    "type": "git"
+  },
   "author": "Robin Engel",
   "license": "Apache-2.0",
   "dependencies": {
