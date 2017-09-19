@@ -1,0 +1,1 @@
+Use go-bindata-assetfs to compile
