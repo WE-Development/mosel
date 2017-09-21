@@ -183,6 +183,14 @@ func (server *MoselServer) initSessionCache() error {
  * Initialize Handler
  */
 
+type WrapHandler struct {
+	f func(http.ResponseWriter, *http.Request)
+}
+
+func (h WrapHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.f(w, r)
+}
+
 // Initialize the configured http handlers and wrap them into a gorilla/mux router
 func (server *MoselServer) initHandler(r *mux.Router) {
 	authFilter := newAuthFilter(server)
@@ -206,8 +214,15 @@ func (server *MoselServer) initHandler(r *mux.Router) {
 			f = chainFilter(f, server.Filters[filterIndex])
 		}
 
-		log.Printf("Handling %s - secure=%s", h.GetPath(), strconv.FormatBool(secure))
-		r.HandleFunc(h.GetPath(), f)
+		custom := false
+		if crh, ok := h.(CustomRouteHandler); ok {
+			crh.ConfigureRoute(r, WrapHandler{f: f})
+			custom = true
+		} else {
+			r.HandleFunc(h.GetPath(), f)
+		}
+
+		log.Printf("Handling %s - secure=%s;custom=%s", h.GetPath(), strconv.FormatBool(secure), strconv.FormatBool(custom))
 	}
 }
 

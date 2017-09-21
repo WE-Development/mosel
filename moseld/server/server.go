@@ -63,6 +63,7 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 		handler.NewDebugHandler(server.context),
 		handler.NewNodeInfoHandler(server.context),
 		handler.NewInfoHandler(server.context),
+		handler.NewUiHandler(),
 	}
 
 	server.Filters = []moselserver.Filter{
@@ -245,21 +246,23 @@ func (server *moseldServer) initDataCache() error {
 	cacheSize := server.config.DataCache.CacheSize
 	log.Printf("Init data cache. cache size: %s", cacheSize)
 
-	if cacheSize == "" {
-		storage, err = server.context.DataPersistence.GetAll()
-		if err != nil {
-			return err
-		}
-	} else {
-		dur, err := time.ParseDuration(cacheSize)
-		if err != nil {
-			return err
-		}
+	if server.context.DataPersistence != nil {
+		if cacheSize == "" {
+			storage, err = server.context.DataPersistence.GetAll()
+			if err != nil {
+				return err
+			}
+		} else {
+			dur, err := time.ParseDuration(cacheSize)
+			if err != nil {
+				return err
+			}
 
-		server.context.DataCache.CacheSize = dur
-		storage, err = server.context.DataPersistence.GetAllSince(dur)
-		if err != nil {
-			return err
+			server.context.DataCache.CacheSize = dur
+			storage, err = server.context.DataPersistence.GetAllSince(dur)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

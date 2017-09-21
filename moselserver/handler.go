@@ -17,6 +17,7 @@ package moselserver
 
 import (
 	"net/http"
+	"github.com/gorilla/mux"
 )
 
 // This handler extends the default http.Handler by providing information about the handled resource path
@@ -29,4 +30,8 @@ type Handler interface {
 
 type SecureHandler interface {
 	Secure() bool
+}
+
+type CustomRouteHandler interface {
+	ConfigureRoute(r *mux.Router, h http.Handler)
 }

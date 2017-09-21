@@ -1,6 +1,5 @@
 ### Mosel UI
-moselui/node_modules
-moselui/typings
+ui/src/node_modules
 
 # Created by .ignore support plugin (hsz.mobi)
 ### OSX template
