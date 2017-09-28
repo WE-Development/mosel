@@ -1,16 +1,15 @@
 {
-  "name": "moselui",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": {
-    "url": "https://github.com/bluedevel/mosel/tree/master/ui",
-    "type": "git"
+  "name": "polymer-starter-kit",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-google": "^0.7.0",
+    "eslint-plugin-html": "^2.0.0"
   },
-  "author": "Robin Engel",
-  "license": "Apache-2.0",
-  "dependencies": {
-    "@polymer/polymer": "^2.0.2",
-    "@webcomponents/webcomponentsjs": "^1.0.11",
-    "materialize-css": "^0.100.2"
+  "scripts": {
+    "lint": "npm run lint:javascript && polymer lint",
+    "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
+    "test": "polymer test",
+    "test:integration": "polymer build # test that psk builds without error with the CLI"
   }
 }
