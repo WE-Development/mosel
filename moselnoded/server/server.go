@@ -20,6 +20,7 @@ import (
 	"github.com/bluedevel/mosel/moselnoded/server/handler"
 	"github.com/bluedevel/mosel/moselnoded/server/context"
 	"github.com/bluedevel/mosel/config"
+	"net/http"
 )
 
 type moselnodedServer struct {
@@ -42,7 +43,7 @@ func NewMoselNodedServer(config moselconfig.MoselNodedServerConfig) *moselnodedS
 	server.InitFuncs = append(server.InitFuncs,
 		server.initCollector, )
 
-	server.Handlers = []moselserver.Handler{
+	server.Handlers = []http.Handler{
 		handler.NewPingHandler(),
 		handler.NewStreamHandler(server.context),
 		handler.NewScriptHandler(server.context),

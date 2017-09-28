@@ -28,6 +28,7 @@ import (
 	"github.com/bluedevel/mosel/moseld/server/context"
 	"github.com/bluedevel/mosel/config"
 	"reflect"
+	"net/http"
 )
 
 // The server started by moseld.
@@ -57,7 +58,7 @@ func NewMoseldServer(config moselconfig.MoseldServerConfig) *moseldServer {
 		server.initNodeCache,
 	)
 
-	server.Handlers = []moselserver.Handler{
+	server.Handlers = []http.Handler{
 		handler.NewLoginHandler(server.context),
 		handler.NewPingHandler(),
 		handler.NewDebugHandler(server.context),

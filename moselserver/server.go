@@ -23,6 +23,7 @@ import (
 
 	"github.com/bluedevel/mosel/config"
 	"strconv"
+	"reflect"
 )
 
 // The abstract http-server type underlying the mosel servers.
@@ -31,7 +32,7 @@ type MoselServer struct {
 	Context *MoselServerContext
 
 	Filters   []Filter
-	Handlers  []Handler
+	Handlers  []http.Handler
 	InitFuncs []func() error
 }
 
@@ -214,16 +215,26 @@ func (server *MoselServer) initHandler(r *mux.Router) {
 			f = chainFilter(f, server.Filters[filterIndex])
 		}
 
-		custom := false
+		var path string
 		if crh, ok := h.(CustomRouteHandler); ok {
 			crh.ConfigureRoute(r, WrapHandler{f: f})
-			custom = true
+			path = "<custom>"
 		} else {
-			r.HandleFunc(h.GetPath(), f)
+			path = getHandlerPath(h)
+			r.HandleFunc(path, f)
 		}
 
-		log.Printf("Handling %s - secure=%s;custom=%s", h.GetPath(), strconv.FormatBool(secure), strconv.FormatBool(custom))
+		log.Printf("Handling %s - secure=%s", path, strconv.FormatBool(secure))
 	}
+}
+
+func getHandlerPath(h http.Handler) string {
+	if pathInfo, ok := h.(PathInfo); ok {
+		return pathInfo.GetPath()
+	}
+
+	t := reflect.TypeOf(h)
+	return "/" + t.Name()
 }
 
 func chainFilter(f http.HandlerFunc, filter Filter) http.HandlerFunc {

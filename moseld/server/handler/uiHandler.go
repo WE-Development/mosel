@@ -21,9 +21,5 @@ func (uiHandler uiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (uiHandler uiHandler) ConfigureRoute(r *mux.Router, h http.Handler) {
-	r.PathPrefix(uiHandler.GetPath()).Handler(http.StripPrefix(uiHandler.GetPath(), h))
-}
-
-func (uiHandler uiHandler) GetPath() string {
-	return "/ui/"
+	r.PathPrefix("/ui/").Handler(http.StripPrefix("/ui/", h))
 }

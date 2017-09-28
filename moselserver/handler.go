@@ -20,11 +20,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// This handler extends the default http.Handler by providing information about the handled resource path
-// and the security level of the provided resource
-type Handler interface {
-	http.Handler
-	//ServeHTTPContext(MoselServerContext, http.ResponseWriter, *http.Request)
+type PathInfo interface {
 	GetPath() string
 }
 
